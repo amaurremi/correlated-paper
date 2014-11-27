@@ -1,0 +1,10 @@
+*.DS_STORE
+*.bak
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.pyg
+*.synctex.gz
+

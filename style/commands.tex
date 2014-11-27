@@ -1,0 +1,108 @@
+% inline todo
+\newcommand{\comment}[1]{\todo[size=\tiny,noline,backgroundcolor=-red!75!green!50!blue]{#1}}
+% side-note todo
+\newcommand{\TODO}[1]{\todo[inline,backgroundcolor=Peach]{#1}}
+
+% brackets for denotations
+\newcommand{\denote}[1]{\left\llbracket#1\right\rrbracket}
+
+%\renewcommand{\theFancyVerbLine}{\sffamily \textcolor[rgb]{0.5,0.5,0.5}{\scriptsize \oldstylenums{\arabic{FancyVerbLine}}}}
+\newcommand{\inputMinted}[2]{\par\inputminted[fontsize=\footnotesize,linenos=true,bgcolor=white,numberblanklines=false,mathescape,samepage=true]{#1}{code/#2}\\ \ \\}
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+%\usemintedstyle{manni}     % comci comca
+%\usemintedstyle{borland}   % pretty strict style
+%\usemintedstyle{vim}       % together with fruity and native only with dark bg!
+\usemintedstyle{bw}         % strict, too
+
+\counterwithout{footnote}{chapter}
+
+\newlength{\dist}
+\setlength{\dist}{1cm}
+
+\newlength{\edge}
+\setlength{\edge}{1.5cm}
+
+\newlength{\longedge}
+\setlength{\longedge}{1.7cm}
+
+\setlength{\parindent}{0cm}
+
+\newlength{\nd}
+\setlength{\nd}{.6cm}
+
+\newlength{\ndd}
+\setlength{\ndd}{.5cm}
+
+%\newtheorem{theorem}{Theorem}[section]
+\newtheorem{sublemma}[theorem]{Sub-Lemma}
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{proposition}[theorem]{Proposition}
+%\newtheorem{corollary}[theorem]{Corollary}
+%\newtheorem{definition}[theorem]{Definition}
+%\newtheorem{example}[theorem]{Example}
+\let\oldexample\example
+\renewcommand{\example}{\oldexample\normalfont}
+
+\tikzset{>=latex,on grid, auto}
+
+\tikzset{
+  ashadow/.style={
+    opacity=.25,
+    shadow xshift=0.07,
+    shadow yshift=-0.07
+  }
+}
+\tikzstyle{supergraph}=[
+  fill=greyblue,
+  rounded corners,
+  font=\small,
+  align=right,
+  text=charcoal,
+  drop shadow={ashadow, color=greyblue}
+]
+
+\newcommand{\backEq}{\mathcal U^\equiv}
+\newcommand{\backCC}{\mathcal U^\Subset}
+\newcommand{\transEq}{\mathcal T^\equiv}
+\newcommand{\transCC}{\mathcal T^\Subset}
+
+\newcommand{\rcc}{{R^\Subset}}
+\newcommand{\lcc}{L^\Subset}
+
+\newcommand{\result}{\mathcal R}
+
+\newcommand{\resultCC}{\result_\Subset}
+\newcommand{\resultEq}{\result_\equiv}
+
+\newcommand{\updmap}[1]{\textsf{update}_{#1}}
+\newcommand{\updfun}[1]{\textsf{update}_{#1,\,r}}
+
+\newcommand{\setpair}[2]{\left\langle #1,\,#2\right\rangle}
+
+\newcommand{\highlight}[2]{\colorbox{#2}{$\displaystyle #1$}}
+
+\newcommand{\ione}{I_{f_1,\,r}}
+\newcommand{\itwo}{I_{f_2,\,r}}
+\newcommand{\uone}{U_{f_1,\,r}}
+\newcommand{\utwo}{U_{f_2,\,r}}
+
+\newcommand{\mvp}[1]{\textsf{MVP}_{#1}}
+\newcommand{\ivp}{\textsf{VP}}
+
+\newcommand{\startmain}{\textsf{start}_\texttt{main}}
+
+\newcommand{\edgefn}{\textsf{EdgeFn}}
+\newcommand{\ccedgefn}[1]{\edgefn^\Subset_{#1}}
+
+\newcommand{\menv}{M_\textsf{Env}}
+
+\newcommand{\topcc}{\top_\Subset}
+\newcommand{\botcc}{\bot_\Subset}
+
+\newcommand{\mpddef}[2]{\xi(#1,\,#2)}
+\newcommand{\mpd}{\mpddef p d}
+\newcommand{\mppd}{\mpddef{p'} d}
+\newcommand{\mpdkm}{\mpddef{p}{d_{k-1}}}
+\newcommand{\efek}{\ccedgefn R(e_k)(\mpdkm)(r)}
+
+\newcommand{\id}{\textsf{id}}

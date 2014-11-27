@@ -1,0 +1,17 @@
+\section{Conclusions}\label{chapter:concl}
+We presented a technique to improve the precision of solutions to IFDS problems in the presence of correlated calls. Correlated calls occur when there are multiple polymorphic method invocations on the same receiver. Such method calls cause a data-flow analysis to consider infeasible paths, which makes the data-flow analysis less precise.
+
+Our method of eliminating infeasible paths caused by correlated calls works by transforming an existing IFDS problem into a specialized IDE problem. In this way, we are able to track the classes to which method invocations get dispatched. After solving the specialized IDE problem, we convert its result into an IFDS result that is potentially more precise than the solution to the original IFDS problem. The increase in precision can occur for programs that contain correlated calls. Specifically, if, on a certain data-flow path, there are two polymorphic method invocations on the same receiver that dispatch to incompatible classes, the IDE analysis will consider the path infeasible.
+
+We proved that the correlated-calls analysis is sound and that it improves the precision of IFDS results.
+
+Our Scala implementation of the correlated-calls analysis includes
+\begin{itemize}
+  \item an implementation of the IDE analysis, which is based on the WALA static program analysis framework;
+  \item a taint-analysis implementation as an IFDS problem instance;
+  \item a transformer of IFDS problems to equivalent IDE problems, and a second transformer that accounts for correlated calls.
+\end{itemize}
+
+We tested the correlated-calls analysis on our taint analysis implementation by comparing the number of secret values that were leaked when using an IFDS taint analysis and a taint analysis that accounts for correlated calls. We used the Dacapo benchmarks as input programs. Although the benchmarks contained a number of correlated calls, we were not able to improve the precision of the taint analysis, because the correlated calls did not occur on paths of secret information leaks.
+
+We are hopeful that other analyses can benefit from the extra information provided by the correlated-calls analysis, and plan to test this hypothesis in the future.

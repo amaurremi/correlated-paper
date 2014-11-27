@@ -1,0 +1,56 @@
+\documentclass[runningheads,a4paper]{llncs}
+
+\usepackage{style/packages} 
+
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\keywordname\enspace\ignorespaces#1}
+
+\begin{document}
+
+\mainmatter  % start of an individual contribution
+
+\title{Data Flow Analysis\\in the Presence of Correlated Calls}
+
+\author{
+ Marianna Rapoport\inst{1} \and
+ Ond\v{r}ej Lhot\'ak\inst{1} \and
+ Frank Tip\inst{2}
+}
+\institute{
+ University of Waterloo\\
+ \email{ \{mrapoport, olhotak\}@uwaterloo.ca }
+  \and
+ Samsung Research America\\
+ \email{ ftip@samsung.com  }
+}
+
+\pagenumbering{gobble}
+
+\toctitle{Data Flow Analysis in the Presence of Correlated Calls}
+%\tocauthor{Authors' Instructions} % TODO
+\maketitle
+
+
+\begin{abstract}
+We present a technique to improve the precision of data-flow analyses on object-oriented programs in the presence of 	\textit{correlated calls}. Two method calls are correlated if they are polymorphic and are invoked on the same object. Correlated calls are problematic because they can make  existing data-flow analyses consider certain infeasible data-flow paths as valid. This leads to loss in precision of the analysis solution.
+
+We show how infeasible paths can be eliminated for \textit{Inter-procedural Finite Distributive Subset} (IFDS) problems, a large class of data-flow analysis problems. We show how the precision of IFDS problems can be improved in the presence of correlated calls, by using the \textit{Inter-procedural Distributive Environment} (IDE) algorithm to eliminate infeasible paths.  Using IDE, we eliminate the infeasible paths and obtain a more precise result for the original IFDS problem.
+
+Our analysis is implemented in Scala, using the WALA framework for static program analysis on Java bytecode.
+
+%\keywords{We would like to encourage you to list your keywords within
+%the abstract section}
+\end{abstract}
+
+\input{style/commands}
+
+\input{content/intro}
+\input{content/background}
+\input{content/impl}
+\input{content/datastr}
+\input{content/eval}
+\input{content/concl}
+
+\bibliographystyle{plain}
+\bibliography{bib/ref}
+\end{document}

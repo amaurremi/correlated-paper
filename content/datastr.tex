@@ -1,0 +1,407 @@
+\section{Correlated Calls Representations}\label{sec:ccdatastr}
+
+In order to define a correlated-calls transformation, we need to represent 
+ lattice elements $\lcc_\rcc:\ \rcc\to 2^T$ of the target IDE problem, which are functions from receivers to sets of types,
+and micro functions $\lcc_\rcc\to\lcc_\rcc$.
+
+As defined in~Sagiv et al.~\cite{sagiv1996precise}, a representation of micro functions is efficient if the following conditions hold:
+\begin{enumerate}
+	\item There is a representation for the identity and top functions.
+  \item The representation is closed under the meet and composition operations.
+  \item The micro functions form a finite-height lattice.
+  \item The apply, meet, composition, and equality-check operations can be computed in constant time.
+  \item There is a constant bound on the storage space for a micro function representation.
+\end{enumerate}
+
+We will distinguish the representation of a concept from its denotation. For a concept $c$, we will write $\denote c$ for its denotation and just $c$ for its representation. For example, if we want to represent a constant function $g$ with the constant value $v$ that it returns, we will write for $g$'s representation, $g=v$, and for $g$'s denotation, $\denote g=\lambda x\,.\,v$.
+
+\subsection{Lattice Elements}Elements of the $\lcc_\rcc$ lattice can be represented with a map from receivers to sets of types. The bottom element maps each receiver to the set~$T$ of all types:
+\begin{align}
+  \botcc&=\left\{(r,\,T)\ |\ r\in \rcc\right\}
+\intertext{and the top element maps each receiver to the empty set:}
+  \topcc&=\left\{(r,\,\varnothing)\ |\ r\in \rcc\right\}.
+\end{align}
+
+\subsection{Micro Functions}
+In the context of the correlated-calls transformation to an IDE problem, a lattice element is a map from receivers to sets of types. Thus, a micro function transforms, or updates, an existing receiver-to-types map with new information about the types of a receiver.
+
+We will represent micro functions with \textit{update maps} which we describe in the next section.
+
+\subsubsection{Update Maps}
+To represent micro functions that transform maps from receivers to sets of types, we use \textit{update maps}. To define update maps, we first introduce the notions of \textit{update functions} and \textit{normalization}.
+
+Let $f$ be a micro function, $r\in\rcc$ a correlated-call receiver, and $T$ the set of types in a program.
+
+\begin{definition}
+  A non-normalized update function $\updfun f^*$ is a pair of sets
+  \begin{equation}
+    \updfun f^*=\setpair{I_{f,\,r}}{U_{f,\,r}},
+  \end{equation}
+  where $I_{f,\,r}\subseteq T$ is called the intersection set and $U_{f,\,r}\subseteq T$ the union set of the update function.
+\end{definition}
+
+\begin{definition}
+  Let $\setpair IU$ be a pair of sets. The normalization function $\mathcal N$ is defined as
+    \begin{equation}
+        \mathcal N(\setpair I U)=\setpair{I\cup U} U.
+    \end{equation}
+\end{definition}
+
+\begin{definition}\label{def:updfun}
+  An update function $\updfun f$ is a normalized pair of sets
+  \begin{equation}
+    \updfun f=\mathcal N(\updfun f^*)=\mathcal N(\setpair{I_{f,\,r}}{U_{f,\,r}})\,.
+  \end{equation}
+\end{definition}
+
+\begin{definition}
+  The update map of $f$ is a map from receivers to update functions:
+  \begin{equation}
+    \updmap f=\{(r,\,\updfun f)\,|\,r\in\rcc\}\,.
+  \end{equation}
+\end{definition}
+Thus, each micro function $f$ is represented with an update map:
+\begin{equation}
+  f=\denote{\updmap f}.
+\end{equation}
+
+\subsubsection{Denotation of Update Maps}
+Intuitively, the meaning of a micro function is the update that it performs on a receiver-to-types map. To represent a micro function, it is enough to specify how the set of types for a given receiver has to be transformed. This is what the update map does.
+
+For a micro function $f$, an update map takes a receiver and returns an update function:
+\begin{equation}
+  \denote{\updmap f}=\lambda r\,.\,\denote{\updfun f}.
+\end{equation}
+
+Given a micro function $f:(\rcc\to 2^T)\to(\rcc\to2^T)$, an update map is defined so that
+\begin{equation}
+    f(m)=\left\{\left(r,\,\denote{\updmap f}(r)(m(r)\right)\ |\ r\in\rcc\right\},
+\end{equation}
+where the update map $\denote{\updmap f}$ has type $\rcc\to(2^T\to2^T)$, and the update function  $\denote{\updfun f}=\denote{\updmap f}(r)$ has type $2^T\to2^T$.
+
+For any receiver-to-types map $m$, an update function specifies two things:
+\begin{itemize}
+    \item which elements of $m(r)$ should be preserved, and 
+    \item which new elements should be added to $m(r)$.
+\end{itemize}
+This can be achieved by maintaining  the intersection $I_{f,\,r}$ and union set $U_{f,\,r}$, where
+\begin{equation}
+    \denote{\updfun f}(m(r))=(m(r)\cap I_{f,\,r})\cup U_{f,\,r}\,.
+\end{equation}
+
+However, as we will see in Section~\ref{sec:equality}, we need to be able to check update functions for equality, which is difficult to do with non-normalized update functions.
+
+\begin{example}
+ For a non-empty set of types $T$, consider two update functions
+ $$u_1=\setpair T T$$ 
+and 
+$$u_2=\setpair\varnothing T.$$
+The denotations of the functions look as follows:
+$$\denote{u_1}=\lambda t\,.\,(t\cap T)\cup T$$ and $$\denote{u_2}=\lambda t\,.\,(t\cap\varnothing)\cup T\,.$$
+We can see that both $\denote{u_1}$ and $\denote{u_2}$ are equal to the function $\lambda t\,.\,T$.
+
+Therefore, the same function can have more than one non-normalized representation. This means that to check two functions for equality, it is not enough to compare their non-normalized representations.
+\end{example}
+
+This is why Definition~\ref{def:updfun} requires update functions to be normalized. Normalization makes the union set of the update function a subset of the intersection set.
+As we show later, normalization guarantees that each update function has a unique representation.
+
+\subsubsection{Equality of Micro Functions}\label{sec:equality}
+We will now show that micro functions can be checked for equality if their representations use normalized update functions.
+
+First, let us show that normalization does not change the behaviour of an update function. This means that the normalized and non-normalized versions of an update function always denote the same function.
+
+\newpage    
+\begin{lemma}\label{lem:normeq}
+    $\denote{\mathcal N(\updfun f^*)}=\denote{\updfun f^*}.$
+\end{lemma}
+
+\begin{proof}
+    Let $\updfun f^*=\setpair I U$.
+    For any $\tau\in T,$
+    \[
+        \begin{aligned}
+            \denote{\mathcal N(\updfun f^*)}(\tau)
+            &=\denote{\mathcal N(\langle I,\ U\rangle)}(\tau)\\
+            &=\denote{\setpair{I\cup U}U}(\tau)\\
+            &=\tau\cap(I\cup U)\cup U\\
+            &=(\tau\cap I)\cup(\tau\cap U)\cup U\\
+            &=\tau\cap I\cup U\\
+            &=\denote{\setpair IU}(\tau)\\
+            &=\denote{\updfun f^*}(\tau)\,.
+        \end{aligned}
+    \]
+    Thus, $\denote{\mathcal N(\updfun f^*)}=\denote{\updfun f^*}$.
+\end{proof}
+
+Let us show that two update functions are equal if and only if their normalized representations are equal.
+
+It is obvious that two functions represented with the same pairs of sets are equal. Let us prove that two different pairs of sets represent different update functions.
+
+\begin{lemma}
+    Let $\setpair IU$ and $\setpair{I'}{U'}$ be two normalized update functions such that $\setpair IU\ne\setpair {I'}{U'}$. Then $\denote{\setpair IU}\ne\denote{\setpair {I'}{U'}}$.
+\end{lemma}
+
+\begin{proof}
+    Let us show that there always exists a set $\tau\subseteq T$ such that $\denote{\setpair IU}(\tau)\ne\denote{\setpair{I'}{U'}}(\tau)$. There are two cases:
+    \begin{enumerate}
+        \item $U\ne U'$. Then for the empty set $\tau=\varnothing$,
+            \[
+                \denote{\setpair IU}(\tau)=\denote{\setpair IU}(\varnothing)=(\varnothing\cap I)\cup U=U\,,
+            \]
+            whereas 
+            \[ 
+                \denote{\setpair {I'}{U'}}(\tau)=\denote{\setpair {I'}{U'}}(\varnothing)=(\varnothing\cap I')\cup U'=U'.
+            \]
+            Hence, $\denote{\setpair IU}\ne\denote{\setpair {I'}{U'}}$.
+        \item $I\ne I'$. Then for the set of all types $\tau=T$,
+            \[
+                \denote{\setpair IU}(\tau)=\denote{\setpair IU}(T)=(T\cap I)\cup U=I\cup U\,.
+            \]
+            Since $\setpair IU$ is normalized, $U\subseteq I$, and
+            \[
+                I\cup U= I\,.
+            \]
+            At the same time,
+            \[
+                \denote{\setpair {I'}{U'}}(\tau)=\denote{\setpair {I'}{U'}}(T)=(T\cap I')\cup U'=I'\cup U'=I'\,.
+            \]
+            Since $I\ne I'$, it follows that $\denote{\setpair IU}\ne \denote{\setpair {I'}{U'}}$. \qedhere
+    \end{enumerate}
+\end{proof}
+
+We have shown that transfer functions can be represented using update maps. 
+
+\subsubsection{Operations on Update Maps}\label{sec:opsTransRep}
+
+Let us now define the apply, compose, meet, and equals functions on micro function representations.
+
+For an update map $f$ and  a receiver $r\in \rcc$, let the update function $f(r)=\setpair{I_{f,\,r}}{U_{f,\,r}}$.
+
+Then the operations on the update maps $f_1$ and $f_2$ are defined as follows:
+        \begin{align}
+    %apply
+            \textsf{apply}_{f_1}=&\lambda m\,.\,
+              \left\{
+                \left(
+                  r,\,
+                  (m(r)\cap I_{f,\,r})\cup U_{f,\,r}
+                \right)\,|\,
+                r\in\rcc
+              \right\},\\\notag \\
+    %compose
+            f_1\circ f_2=&
+            \left\{
+              \left(
+                r,\,
+                  \mathcal N(\langle
+                    I_{f_1,\,r}\cap I_{f_2,\,r},\ 
+                    (I_{f_1,\,r}\cap U_{f_2,\,r})\cup U_{f_1,\,r}
+                  \rangle)
+              \right)\,|\,
+              r\in\rcc
+            \right\},\\\notag \\
+    %meet
+            f_1\sqcap f_2=&
+            \left\{
+              \left(
+                r,\,
+                  \langle
+                    I_{f_1,\,r}\cup I_{f_2,\,r},\ 
+                    U_{f_1,\,r}\cup U_{f_2,\,r}
+                  \rangle
+              \right)\,|\,
+              r\in\rcc
+            \right\},\\\notag \\
+    %equals
+            \textsf{equals}(f_1,\,f_2)=&
+              \begin{cases}
+                 \mathsf{true}&\text{ if }f_1\text{ and }f_2\text{ are structurally equal,}\\
+                 \mathsf{false}&\text{otherwise.}
+              \end{cases}
+        \end{align}
+
+
+The denotation of the operations on update maps can be explained in the following way.
+
+The apply function of a micro function $f$ maps over all receivers. For each receiver $r\in \rcc$, \textsf{update}$_f(r)$ transforms the argument 
+receiver-to-types map $m$. It returns a new map in which $r$ is mapped to a new set of types, $\updfun f(m(r))$:
+\begin{align*}
+    \denote{\textsf{apply}_f}
+    &=\denote{\lambda m\,.\,\left\{
+                \left(
+                  r,\,
+                  (m(r)\cap I_{f,\,r})\cup U_{f,\,r}
+                \right)\,|\,
+                r\in\rcc
+              \right\}}\\
+    &=\lambda m\,.\,\left\{\left(r,\,\denote{\updfun f}(m(r))\right)\,|\,r\in \rcc\right\}.
+\end{align*}
+Note that in the beginning of the algorithm, $m$ maps each receiver to $\bot_T$ (all types).
+
+Composing two micro functions means to compose their update-map denotations:
+\begin{align}
+    \denote{f_1\circ f_2}
+    &=\denote{\left\{
+              \left(
+                r,\,
+                  \mathcal N(\langle
+                    \ione\cap\itwo,\ 
+                    (\ione\cap\utwo)\cup\uone
+                  \rangle)
+              \right)\,|\,
+              r\in\rcc
+            \right\}}\notag\\
+    &=\footnotemark\lambda m\,.\,\left\{
+              \left(
+                r,\,
+                  \denote{\langle
+                    \ione\cap\itwo,\ 
+                    (\ione\cap\utwo)\cup\uone
+                  \rangle}(m(r))
+              \right)\,|\,
+              r\in\rcc
+            \right\}\notag\\
+    &=\lambda m\,.\,\left\{\left(r,\,(\ione\cap m(r)\cap\itwo)\cup(\ione\cap\utwo)\cup\uone\right)\,|\,r\in\rcc\right\}\notag\\
+    &=\lambda m\,.\,\left\{\left(r,\,(((m(r)\cap\itwo)\cup\utwo)\cap\ione)\cup\uone\right)\,|\,r\in\rcc\right\}\notag\\
+    &=\left(\lambda m\,.\,\{(r,\,(m(r)\cap\ione)\cup\uone)\,|\,r\in\rcc\}\right)\notag\\
+      &\quad\circ\left((\lambda m\,.\,\{(r,\,(m(r)\cap\itwo)\cup\utwo)\,|\,r\in\rcc\}\right)\notag\\
+    &=\denote{\{(r,\,\setpair{\ione}{\itwo})\}}\circ\denote{\{(r,\,\setpair\itwo\utwo)\}}\notag\\
+    &=\denote{f_1}\circ\denote{f_2}.\label{eq:compclosed}
+\end{align}
+\footnotetext{See Lemma~\ref{lem:normeq}.}
+\indent Finally, the meet operation on two micro functions is the union of their update maps:
+\begin{align}
+    \denote{f_1\sqcap f_2}
+    &=\denote{\left\{
+              \left(
+                r,\,
+                  \langle
+                    \ione\cup\itwo,\ 
+                    \uone\cup\utwo
+                  \rangle
+              \right)\,|\,
+              r\in\rcc
+            \right\}}\notag\\
+    &=\lambda m\,.\,\left\{\left(r,\,m(r)\cap(\ione\cup\itwo)\cup\uone\cup\utwo\right)\,|\,r\in\rcc\right\}\notag\\
+    &=\lambda m\,.\,\left\{\left(r,\,((m(r)\cap\ione)\cup\uone)\cup((m(r)\cap\itwo)\cup\utwo)\right)\,|\,r\in\rcc\right\}\notag\\
+    &=\lambda m\,.\,\left\{\left(r,\,(m(r)\cap\ione)\cup\uone\right)\,|\,r\in\rcc\right\}\notag\\
+      &\quad\sqcap\lambda m\,.\,\left\{\left(r,\,(m(r)\cap\itwo)\cup\utwo\right)\,|\,r\in\rcc\right\}\notag\\
+    &=\denote{f_1}\sqcap\denote{f_2}.\label{eq:meetclosed}
+\end{align}
+
+We can now show how the correlated-calls definitions of the meet and composition operations on micro functions allow us to detect infeasible paths in a program.
+\begin{example}\label{ex:cc}
+  The edges of the exploded supergraph in Figure~\ref{fig:cc_edgefn_example} correspond to the edges of an IFDS taint analysis. We can see that there is a path from the node $(\highlight{\startmain}{greyblue},\,\Lambda)$ to $(\highlight{\texttt{print(s)}}{lightsalmonpink},\,\texttt s)$. This means that the IFDS taint analysis considers \texttt s to be a secret value that is leaked at the print statement.
+  
+  The correlated-calls analysis, on the other hand, detects that the path to $(\highlight{\texttt{print(s)}}{lightsalmonpink},\,\texttt s)$ is infeasible: at the print node, the lattice element corresponding to the fact \verb's' contains a mapping $\texttt a\to\top_T$.
+  
+  The lattice element for the print statement is evaluated as follows:
+  \begin{align*}
+    &((\lambda m\,.\,m[\texttt a\to m(\texttt a)\cap\{\texttt B\}])\circ
+    \id\circ
+    (\lambda m\,.\,m[\texttt a\to m(\texttt a)\cap\{\texttt A\}])\\
+    &\circ
+    (\lambda m\,.\,\botcc)\circ
+    \id\circ\ldots\circ\id)(\topcc)
+    \\
+    =&(\botcc[\texttt a\to m(\texttt a)\cap(\{\texttt A\}\cap\{\texttt B\})])
+    \\
+    =&(\botcc[\texttt a\to\top_T])\,.
+  \end{align*}
+  
+  Therefore, the path to the print statement will be considered infeasible, and the analysis does not claim that the program leaks a secret value.
+\end{example}
+
+\subsubsection{Efficiency}\label{sec:efficiency}
+In this section, we will show that our representation of micro functions is efficient according to the definition  of efficiency discussed in Section~\ref{sec:ccdatastr}.
+\begin{lemma}\label{lem:efficient}
+  The correlated-call representation of a micro function is efficient.
+\end{lemma}
+\begin{proof}
+\leavevmode
+  \begin{enumerate}
+    \item The identity function is represented as
+      \[
+        \denote{\id}=\{(r,\,\langle \bot_T,\,\top_T\rangle)\,|\,r\in \rcc\}\,;
+      \]
+      the top function is represented as
+      \[
+        \denote{\lambda m\,.\,\topcc}=\{(r,\,\langle \top_T,\,\top_T\rangle)\,|\,r\in \rcc\}\,.
+      \]
+    \item Equations~\eqref{eq:compclosed} and~\eqref{eq:meetclosed} show that the representation of micro functions is closed under composition and meet.
+    \item To show that our representation for micro functions forms a lattice with finite height, let us first show that $\lcc_\rcc:\,\rcc\to2^T$ forms a lattice. Since $T$ is a finite set, $(2^T,\,\subseteq)$ is a finite-height lattice. $\rcc$ is a finite set. Hence, the mapping
+    \[
+      \rcc\mapsto2^T=\{(r,\,t)\,|\,r\in \rcc,\,t\in 2^T\}=\lcc_\rcc
+    \]        
+    also forms a finite-height lattice \cite{nielson1999principles}. 
+    
+    Furthermore, $\lcc_\rcc$ is a finite set. 
+    Every element of $\lcc_\rcc$ can be applied to $|\rcc|$ receivers, where each receiver is mapped to a set of types. There are $|\rcc|\cdot2^{|T|}$ different possibilities to form those mappings, so
+    \[
+      |\lcc_\rcc|=|\rcc|\cdot2^{|T|}.
+    \]
+    Therefore, $\lcc_\rcc\mapsto \lcc_\rcc$ also forms a finite-height lattice.
+    \item All operations can be computed in $O(\rcc\times T)$ time. Note that the $\rcc$ and $T$ sets are an input to the correlated-calls analysis, and the time it takes to compute the meet or composition of micro functions is independent of the representation of the specific operand micro functions.
+    \item The space bound is $O(\rcc\times T)$.
+  \end{enumerate}
+\end{proof}
+
+\paragraph{Final Remarks}
+
+A straightforward solution to representing micro functions would be to use the function constructs that are provided by many programming languages. The efficiency requirement prohibits us from doing so.
+For most programming languages, equality for functions is either defined as reference equality (as in Scala), or is not defined at all (as in Haskell). Even if we were to define our own definition of equality for functions, we would have to iterate over the whole domain of the functions and compare the results of the function applications, which would be inefficient. Additionally, the equality check would be non-terminating if the domain of the functions were infinite, and undecidable if the language for defining the functions were Turing-complete.
+
+Second, a composition $f$ of two functions $f_1$ and $f_2$ would have to store both $f_1$ and $f_2$. For instance, if $f_1=\lambda x\,.\,x+1$ and $f_2=\lambda x\,.\,x+2$, then $f=f_2\circ f_1$ would be represented as 
+\[
+  f=\lambda x\,.\,(\lambda y\,.\,y+2)((\lambda z\,.\,z+1)\,x)
+\]
+instead of
+\[
+  f=\lambda x\,.\,x+3.
+\]
+Having a compact representation for function composition is especially important for the first phase of the IDE algorithm, in the computation of jump functions~\cite{sagiv1996precise}. The same argument applies to computing function meets.
+
+\subsubsection{Edge Function Representation}  \label{sec:edgefnrep}
+We will now show the representations for the correlated-call micro functions $\ccedgefn{\rcc}(e)$, described in Definition~\ref{def:edgefn}. Let $\textsf{identity}=\setpair{\bot_T}{\top_T}$ represent the identity function $\id$ and $\textsf{bottom}=\setpair{\bot_T}{\bot_T}$ represent the function $\lambda t\,.\,\bot_T$.
+
+On the call-start edge,
+\begin{align}
+  &m\left[r\to (m(r)\cap\tau(s_\mathcal F,\,f))\right]\notag\\
+  =&\denote{\{(r,\,\langle\tau(s_\mathcal F,\,f),\,\top_T\rangle)\}
+    \cup
+    \{(r',\,\textsf{identity})\,|\,r'\in \rcc,\,r'\ne r\}}.
+\end{align}
+
+On the end-return edge,
+\begin{align}
+  \lambda m\,.\,m&\left[v_1\to\bot_T\right]\dots[v_k\to\bot_T][r\to (m(r)\cap\tau(s_\mathcal F,\,f))]\notag
+  \\=&\denote{
+    \{(r,\,\langle\tau(s_\mathcal F,\,f),\,\top_T\rangle)\}
+    \cup
+    \left\{(r',\,w(r'))\,|\,r\in\rcc,\,r'\ne r
+  \right\}},
+\end{align}
+where
+\[
+w(r)=\begin{cases}
+      \textsf{bottom}&\text{if $r$ is a local variable in the exiting method,}\\
+      \textsf{identity}&\text{otherwise}.
+    \end{cases}
+\]
+
+For assignments in the source node of $e$,
+\begin{align}
+  \lambda m.m\left[r\to \bot_T\right]
+  =\denote{\left\{(r,\,\textsf{bottom})\}
+    \cup
+    \{(r',\,\textsf{identity})\,|\,r'\in \rcc,\,r'\ne r\right\}}.
+\end{align}%
+
+In the default case,
+\[
+  \id
+  =\denote{\{(r,\,\textsf{identity}),\,r\in \rcc\}}.
+\]
+
+We have shown how IDE problems that account for correlated calls can be represented in an efficient way. In the next section, we address the implementation and present an evaluation of the correlated-calls analysis.

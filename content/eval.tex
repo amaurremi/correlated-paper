@@ -1,0 +1,295 @@
+\section{Evaluation}\label{chapter:eval}
+
+This section discusses implementation aspects of the correlated-calls analysis and presents experimental results.
+
+\subsection{Implementation of the Analysis}
+The correlated-calls analysis was implemented in the Scala programming language~\cite{odersky2004overview}. 
+We chose Java as the target language for client programs of the analysis.
+To retrieve information about an input program, such as its control-flow supergraph or the set of receivers and their types, we used the WALA framework for static analysis on Java bytecode~\cite{fink2012wala}.
+
+Since WALA currently only contains an implementation of IFDS, we implemented IDE from scratch. Instead of using WALA's IFDS implementation, to run an IFDS problem, we converted it to an IDE problem and used our own IDE solver.
+
+\subsubsection{IFDS}
+As described in Section~\ref{sec:ifdsdef}, an IFDS problem is defined in terms of an exploded supergraph. The control-flow supergraph of an input program can be retrieved using WALA. Hence, our implementation of an IFDS problem should be able to convert a control-flow supergraph into an exploded supergraph.
+
+We represent an IFDS problem with a trait, or protocol, that contains declarations of four \textit{flow functions}. Each function has type 
+\[
+  F:\,(N\times D\times N)\to2^D
+\]
+and defines a set of edges on the exploded graph. 
+Given an edge $(n_1,\,n_2)$ of the control-flow supergraph and the fact $d_1$ that 
+corresponds to the source node $n_1$, $F(n_1,\,d_1,\,n_2)$ returns the set of all facts $d_2\in D_2$ such that $((n_1,\,d_1),\,(n_2,\,d_2))\in E^\#$\footnote{In each invocation of a flow function, the fact $d_1$ is provided by the IDE algorithm.}.
+The four functions are:
+\begin{itemize}
+  \item \textsf{call-start}, for inter-procedural edges from a call node to the start node of the target method;
+  \item \textsf{call-return}, for intra-procedural edges from a call node to its return node;
+  \item \textsf{end-return}, for inter-procedural edges from the end node of a method to the return node of the callee;
+  \item \textsf{default}, for all other intra-procedural edges.
+\end{itemize}
+
+\paragraph{Taint Analysis}
+Using this representation of an IFDS problem, we implemented an IFDS problem instance for taint analysis. We used it as a sample IFDS problem on which to evaluate the correlated-calls-IDE construction.
+
+Let $N^*$ be the control-flow supergraph of a program and $D$ the set of the program variables.
+Let \textsf{encl}$(n)$ be a function that returns the enclosing method of a node $n\in N^*$. Finally, let the function $r_m:\,D\to 2^D$ be defined as follows:
+\begin{equation}
+  r_m(d)=\begin{cases}
+                \varnothing&\text{if }d\text{ is a local variable in method }m,\\
+                \{d\}&\text{otherwise.}
+              \end{cases}
+\end{equation}
+When defining the flow functions for a taint analysis, we will use $r_m$ to avoid the propagation of local variables, as shown below.
+
+For a fact $d_1\in D\cup\{\mathbf0\}$ and two nodes $n_1,\,n_2\in N^*$, the simplified\footnote{For simplicity, the shown flow functions do not account for different Java-specific features such as arrays, fields, operations on strings, etc.} version of flow functions for a taint-analysis looks as follows.
+
+If $n_1$ is a call node that calls method $m$, and $n_2$ is $m$'s start node,
+\begin{align*}
+  \textsf{call-start}(n_1,\,d_1,\,n_2)&=
+    \begin{cases}
+      r_{\textsf{encl}(n_1)}(d_1)\cup\{v\}
+        &\text{if $a$ is the $i$th argument of the call,}\\
+        &\text{$d_1=a$, and $v$ is the $i$th parameter}\\
+        &\text{of $m$;}\\
+      r_{\textsf{encl}(n_1)}(d_1)&\text{otherwise.}
+    \end{cases}
+\intertext{If $n_1$ is a call node with corresponding return node $n_2$,}
+  \textsf{call-return}(n_1,\,d_1,\,n_2)&=
+    \begin{cases}
+      \{d_1\}&\text{if $d_1$ is a local variable in \textsf{encl}$(n_1)$,}\\
+      \varnothing&\text{otherwise.}
+    \end{cases}
+\intertext{If $c$ is a call node calling method $m$, $n_1$ is $m$'s end node, and $n_2$ is $c$'s return node,}
+  \textsf{end-return}(n_1,\,d_1,\,n_2)&=
+    \begin{cases}
+        r_{\textsf{encl}(n_1)}(d_1)\cup\{x\}
+          &\text{if $n_1$ is a return statement}\\
+          &\text{returning $v$, $n_2$ is an assignment}\\
+          &\text{with left-hand side $x$, and $d_1=v$;}
+        \\
+        r_{\textsf{encl}(n_1)}(d_1)&\text{otherwise.}
+    \end{cases}
+\intertext{Otherwise,}
+  \textsf{default}(n_1,\,d_1,\,n_2)&=\{d_1\}.
+\end{align*}
+
+\begin{example}
+  Consider the supergraph in Figure~\ref{fig:exampleexploded}. The call-to-start flow function from method \verb'main' to \verb'f' looks as follows:
+  \begin{align*}
+    \textsf{call-start}(\highlight{\textsf{call}_{\texttt{A.f}}}{greyblue},\,\texttt a,\,\highlight{\textsf{start}_\texttt{f}}{lightsalmonpink})
+    &=r_\texttt{main}(\texttt a)\cup\{\texttt s\}\\
+    &=\{\texttt s\}.
+  \end{align*}
+  We can see that correspondingly, the exploded supergraph contains an edge from $(\highlight{\textsf{call}_{\texttt{A.f}}}{greyblue},\,\texttt a)$ to $(\highlight{\textsf{start}_\texttt{f}}{lightsalmonpink},\,\texttt s)$.
+\end{example}
+
+\subsubsection{IDE}
+The correlated-calls analysis was implemented as an IDE problem instance.
+
+We defined an IDE problem in the same way as an IFDS problem, except that the IDE flow functions are of type
+\[
+  (N\times D\times N)\to2^{D\times (L\to L)}.
+\]
+With the new flow functions, we can implement a labeled exploded supergraph, since the new flow functions return a set of facts that are paired with micro functions.
+
+For example, if $Q$ is an IDE problem, then the call-to-start flow function for $Q$ is defined as follows:
+\begin{align*}
+  &\textsf{call-start}^Q(n_1,\,d_1,\,n_2)\\
+  =&\left\{(d_2,\,f)\,|\,d_2\in D,\,f\in L^Q\to L^Q:\,\edgefn^Q((n_1,\,d_1),\,(n_2,\,d_2))=f\right\}.
+\end{align*}
+The other flow functions are defined analogously.
+
+\subsection{Testing}
+In this section we assess the correctness and effectiveness of the correlated-calls analysis.
+
+\subsubsection{Conversion from IFDS to IDE}
+We implemented the equivalence transformation $\transEq$ and the correlated-calls transformation $\transCC_\rcc$ from IFDS to IDE described in Section~\ref{sec:equivtrans}. To run an IFDS problem, we converted it to an IDE problem using $\transEq$ and $\transCC_\rcc$ and used our IDE analysis algorithm to run the latter.
+
+Given an IFDS problem described with IFDS flow functions, an equivalence transformation creates an IDE problem described with the following IDE flow functions:
+\begin{align*}
+  \textsf{call-start}^\equiv(n_1,\,d_1,\,n_2)=&\{(d_2,\,\epsilon(d_1,\,d_2))\,|\,d_2\in\textsf{call-start}(n_1,\,d_1,\,n_2)\}\\
+  \textsf{call-return}^\equiv(n_1,\,d_1,\,n_2)=&\{(d_2,\,\epsilon(d_1,\,d_2))\,|\,d_2\in\textsf{call-return}(n_1,\,d_1,\,n_2)\}\\
+  \textsf{end-return}^\equiv(n_1,\,d_1,\,n_2)=&\{(d_2,\,\epsilon(d_1,\,d_2))\,|\,d_2\in\textsf{end-return}(n_1,\,d_1,\,n_2)\}\\
+  \textsf{default}^\equiv(n_1,\,d_1,\,n_2)=&\{(d_2,\,\epsilon(d_1,\,d_2))\,|\,d_2\in\textsf{default}(n_1,\,d_1,\,n_2)\}\,,
+\end{align*}
+where $\epsilon$ is the bottom function on an edge from a $\Lambda$-fact to a non-$\Lambda$-fact, and the identity function otherwise:
+\[
+  \epsilon(d_1,\,d_2)=\begin{cases}
+    \lambda l\,.\,\bot&\text{if $d_1=\Lambda$ and $d_2\ne\Lambda$;}\\
+    \id&\text{otherwise.}
+  \end{cases}
+\]
+
+We also implemented a correlated-call transformation from IFDS into IDE problems that consider correlated calls. This transformation is described in Section~\ref{sec:cctrans}. The flow functions can be easily inferred from Section~\ref{sec:edgefnrep}.
+
+\subsubsection{Regression Testing}
+We used regression tests to assess the correctness of the implemented analyses. Each test involves running a certain analysis on one input Java program.
+
+\paragraph{IDE-Implementation Correctness}
+To test the correctness of the IDE algorithm implementation, we implemented a copy-constant-propagation IDE problem~\cite{sagiv1996precise}. 
+In a copy-constant propagation analysis, a variable is considered constant if it is assigned a constant literal or another variable that is also a constant. For example, in a program
+\inputMinted{java}{correct.java}
+\verb'a' and \verb'b' are considered constant, but \verb'c' and \verb'd' are not (although \verb'd' would be considered constant in linear-constant propagation).
+
+We tested the propagation of constants on different intra- and inter-procedural data-flow paths, in parameter passing,
+and in conditional branches. Each regression test contained assertions of the form ``at the end of method $m$, variable with name $x$ should be (not) constant''.
+
+We also tested the implementation of the IDE algorithm on an IDE problem generated by conversion from an IFDS problem.
+
+To do that, we implemented an IFDS instance for taint analysis.
+
+Recall from Section~\ref{sec:bgifds} that taint analysis aims to discover variables that are secret at a given program point called a sink.
+
+We used assertions of the form ``at program statement $n$, variable $x$ should be (not) secret'' by defining the sink of a secret value through special \verb'isSecret' and \verb'notSecret' methods.
+Those methods asserted that the parameter passed to them is secret and not secret, respectively.
+To define a source secret value we created a static \verb'secret()' method that returned a string. 
+
+\begin{example}
+  Listing~\ref{list:assertions} illustrates the use of the \verb'isSecret' and \verb'notSecret' assertions.
+  \begin{listing}[H]
+  \inputMinted{java}{assertions.java}
+  \caption{Example usage of \texttt{isSecret} and \texttt{notSecret} assertions in regression tests}
+  \label{list:assertions}
+\end{listing}
+\end{example}
+
+We tested data flow through
+\begin{itemize}
+  \item method calls and returns;
+  \item conditional branches and loops, including nested constructions, the ternary operator, and \verb'switch' statements;
+  \item arrays and fields\footnote{%
+    In Java, arrays are allocated on the heap, and array elements can be aliases of each other. 
+    Hence, if any array element gets assigned a secret value, we considered all elements of any \texttt{String} or \texttt{Object} array in the program secret. 
+    For the same reason, if a field \texttt{f} of an object of class \texttt{A} is assigned a secret value, then we considered the field \texttt{f} of any object of class \texttt{A} secret.%  
+  };
+  \item static and instance class members;
+  \item classes and interfaces that involve inheritance, overriding, and overloading;
+  \item recursion;
+  \item library calls\footnote{%
+    We created a specification for library functions that allowed us to indicate under which conditions a library function returned a secret value. This let us avoid the expensive analysis of library functions.%
+  };
+  \item string concatenation and usage of the \texttt{StringBuffer} and \texttt{StringBuilder} classes\footnote{%
+    Using mutation, objects of these classes can be converted into wrappers around secret strings. This is why we added a special handling for \texttt{StringBuffer} and \texttt{StringBuilder} objects. For instance, if a field had the  \texttt{StringBuilder} type, it was considered secret.%
+  };
+  \item generics, type conversions through castings, and exception handling.
+\end{itemize}
+
+Our taint analysis implementation becomes unsound in the presence of static initializers. If a static field is initialized to a secret value, our analysis will not detect it as such.
+
+A static initializer is invoked only once, before the instance creation of a class or the access of a static member of that class.
+Static initializers are invoked lazily by the Java Virtual Machine~\cite{lindholmjava}. This makes finding out at which program point a static initializer is invoked undecidable~\cite{hubert2009soundly}. To account for static initializers in the analysis would require modifying WALA's control-flow supergraph (which does not have edges to static initializers) or using a data-flow analysis for static initialization. Since the primary purpose of the taint-analysis implementation was to test the correlated-call analysis, we did not include a static-initializer analysis in this work.
+
+\paragraph{Correlated-Calls-Analysis Correctness}
+We tested the implementation of the correlated-calls analysis by converting the taint analysis into an IDE problem with an implementation of $\transCC_\rcc$.
+
+Since none of the test cases in the previous section contained correlated calls, we used the same tests with the same assertions to ensure that the correlated-calls analysis produces the same results as an IFDS-equivalent analysis in the absence of correlated calls.
+
+We then added test cases that contained correlated calls. We added a new assertion method, \verb'notSecretCC'. For the IFDS-equivalent analysis, the method asserted that the argument passed to it was secret, and for the correlated-calls analysis, it asserted that the argument was not secret.
+
+Separately, we used unit tests to check the implementation correctness of micro functions. We wrote assertions for the results of the equality, meet, and composition operations on all possible combinations of the identity, top, bottom, and constant functions.
+
+\subsubsection{Benchmark Testing}
+To assess the benefit of the correlated-calls analysis, we counted the frequencies of correlated-call occurrences in the Dacapo benchmarks~\cite{blackburn2006dacapo}. We then ran the normal- and correlated-call-taint analysis on the Dacapo benchmarks to see what improvement we would get from the correlated-calls analysis.
+
+\paragraph{Occurrences of Correlated Calls}
+Our goal was to obtain an upper bound on the number of redundant IFDS-result nodes that could be potentially removed by our analysis.
+We counted the number of correlated calls that occurred in programs of the Dacapo benchmarks, as shown in Table~\ref{tab:dacapostat}.
+
+In the table, the number of all call sites in a program is denoted as $C$. 
+Polymorphic call sites are denoted as $C_P$, and correlated call sites as $C^\Subset$. 
+The first four columns indicate the overall number of various call sites and correlated-call receivers in a program. 
+The last three columns indicate the ratio of polymorphic to all call sites, the ratio of correlated to polymorphic call sites, and the ratio of correlated call sites to correlated-call receivers.
+
+\begin{table}
+\caption{Frequencies of correlated-call occurrences in the Dacapo benchmarks}\label{tab:dacapostat}
+\centering
+%\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lrrrr
+>{\columncolor[HTML]{FFFFFF}}r 
+>{\columncolor[HTML]{FFFFFF}}l r@{}}
+\toprule
+\textbf{Benchmark}  &
+  \multicolumn{1}{c}{\textbf{$|C|$}} & 
+  \multicolumn{1}{c}{\textbf{$|C_P|$}} & 
+  \multicolumn{1}{c}{\textbf{$|C^\Subset|$}} & 
+  \multicolumn{1}{c}{\textbf{$|\rcc|$}} & 
+  {\color[HTML]{000000} \textbf{\begin{tabular}[c]{@{}l@{}}$\cfrac{|C_P|}{|C|}$\end{tabular}}} & 
+  {\color[HTML]{000000} \textbf{\begin{tabular}[c]{@{}l@{}}$\cfrac{|C^\Subset|}{|C_P|}$\end{tabular}}} & 
+  \textbf{\begin{tabular}[c]{@{}l@{}}$\cfrac{|C^\Subset|}{|\rcc|}$\end{tabular}} \\ \midrule
+\textbf{antlr}      & 7,610                             & 428                                   & 299                              & 70                                   & {\color[HTML]{000000} \textbf{6\%}}                                                      & {\color[HTML]{000000} \textbf{70\%}}                                                     & 4                                                                \\
+\textbf{bloat}      & 18,157                            & 933                                   & 429                              & 119                                  & {\color[HTML]{000000} \textbf{5\%}}                                                      & {\color[HTML]{000000} \textbf{46\%}}                                                     & 4                                                                \\
+\textbf{chart}      & 18,101                            & 466                                   & 195                              & 61                                   & {\color[HTML]{000000} \textbf{3\%}}                                                      & {\color[HTML]{000000} \textbf{42\%}}                                                     & 3                                                                \\
+\textbf{eclipse}    & 3,222                             & 100                                   & 35                               & 10                                   & {\color[HTML]{000000} \textbf{3\%}}                                                      & {\color[HTML]{000000} \textbf{35\%}}                                                     & 4                                                                \\
+\textbf{fop}        & 4,831                             & 129                                   & 40                               & 12                                   & {\color[HTML]{000000} \textbf{3\%}}                                                      & {\color[HTML]{000000} \textbf{31\%}}                                                     & 3                                                                \\
+\textbf{hsqldb}     & 3,573                             & 81                                    & 35                               & 10                                   & {\color[HTML]{000000} \textbf{2\%}}                                                      & {\color[HTML]{000000} \textbf{43\%}}                                                     & 4                                                                \\
+\textbf{jython}     & 12,149                            & 487                                   & 129                              & 54                                   & {\color[HTML]{000000} \textbf{4\%}}                                                      & {\color[HTML]{000000} \textbf{26\%}}                                                     & 2                                                                \\
+\textbf{luindex}    & 7,190                             & 188                                   & 79                               & 29                                   & {\color[HTML]{000000} \textbf{3\%}}                                                      & {\color[HTML]{000000} \textbf{42\%}}                                                     & 3                                                                \\
+\textbf{lusearch}   & 9,043                             & 350                                   & 126                              & 47                                   & {\color[HTML]{000000} \textbf{4\%}}                                                      & {\color[HTML]{000000} \textbf{36\%}}                                                     & 3                                                                \\
+\textbf{pmd}        & 10,972                            & 219                                   & 68                               & 23                                   & {\color[HTML]{000000} \textbf{2\%}}                                                      & {\color[HTML]{000000} \textbf{31\%}}                                                     & 3                                                                \\
+\textbf{xalan}      & 3,889                             & 110                                   & 35                               & 10                                   & {\color[HTML]{000000} \textbf{3\%}}                                                      & {\color[HTML]{000000} \textbf{32\%}}                                                     & 4                                                                \\
+\textbf{Geom. mean} & \textbf{7,572}                    & \textbf{240}                          & \textbf{91}                      & \textbf{29}                          & {\color[HTML]{000000} \textbf{3\%}}                                                      & {\color[HTML]{000000} \textbf{38\%}}                                                     & \textbf{3}                                                       \\ \bottomrule
+\end{tabular}
+%}
+\end{table}
+
+We can see that on average, 3\% of all call sites $C$ are polymorphic call sites $C_P$. Out of those call sites, 38\% are correlated call sites $C^\Subset$. We also see that for one correlated-call receiver, there are on average three correlated calls. 
+
+\paragraph{Experiments}
+We ran the analysis on the Dacapo benchmarks to test if the taint analysis would benefit from the improved, correlated-calls based, analysis. 
+We defined any user input string to be considered a secret source and compared the overall number of results in the original and correlated-call taint analyses. If the number of secret values in the original result were larger than in the correlated-call result, we would see a practical benefit from our analysis.
+
+However, even when we considered each program point as a sink, the ``improved'' analysis revealed the same number of secret values as the original taint analysis.
+
+A correlated call that could affect a taint-analysis result could most likely occur in the following scenario:
+\begin{itemize}
+  \item there is a receiver with at least two polymorphic calls;
+  \item at least one of the calls $c_1$ returns a string~--- this would mean that the method potentially returns a secret value;
+  \item at least one of the calls $c_2$ takes a string parameter~--- this would mean that a secret value could potentially be propagated to the method as an argument.
+\end{itemize}
+Then, if the correlated call occurred on an invocation $c_2(c_1())$, there might be a possibility of benefiting from the correlated-calls analysis. 
+Given the relatively rare occurrence of correlated calls, this situation is not likely to appear often. 
+This is illustrated in Table~\ref{tab:stringstat} which shows how often correlated calls would invoke methods that either take a string as a parameter \textit{or} return a string.
+The set of receivers on which there are invocations of such methods is denoted as $\rcc_S$. 
+A situation where one correlated call returned a string, \textit{and} another correlated call on the same receiver took a string parameter, appeared in only one case in the \verb'antlr' benchmark. However, the strings invoked were not designated as secret.
+
+This explains why, specifically for a taint analysis as the client analysis, and specifically for the Dacapo benchmarks, the correlated call analysis did not make a difference.
+
+\begin{table}
+\caption{Frequency of correlated-call receivers for which at least one of the correlated calls takes a string as a parameter or returns a string}
+
+\centering
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{Benchmark}   & 
+  \textbf{$|\rcc_S|$} & 
+  \textbf{$|\rcc|$} & 
+  \textbf{$\cfrac{|\rcc_S|}{|\rcc|}$} \\ \midrule
+\textbf{antlr}       & 43                     & 70               & 62\%                            \\
+\textbf{bloat}       & 0                      & 119              & 0\%                             \\
+\textbf{chart}       & 1                      & 61               & 2\%                             \\
+\textbf{eclipse}     & 0                      & 10               & 0\%                             \\
+\textbf{fop}         & 0                      & 12               & 0\%                             \\
+\textbf{hsqldb}      & 0                      & 10               & 0\%                             \\
+\textbf{jython}      & 6                      & 54               & 23\%                            \\
+\textbf{luindex}     & 0                      & 29               & 0\%                             \\
+\textbf{lusearch}    & 2                      & 47               & 6\%                             \\
+\textbf{pmd}         & 1                      & 23               & 3\%                             \\
+\textbf{xalan}       & 0                      & 10               & 0\%                             \\
+\textbf{Geom. mean} & \textbf{3}             & \textbf{29}      & \textbf{9}                    \\ \bottomrule
+\end{tabular}
+\label{tab:stringstat}
+\end{table}
+
+\subsection{Future Work}
+In this section we point out the limitations of the correlated-calls analysis and suggest improvements to the analysis for future work. 
+
+One limitation of the analysis is that it only works for IFDS problems like taint analysis, reachable definitions, or available expressions. The correlated-call analysis is not applicable to IDE problems like copy- or linear-constant propagation. Therefore, a possible direction for future work is to create a correlated-calls analysis that transforms an original IDE problem into one that considers correlated calls (with a modified lattice and edge function definition), and then transforms the correlated-calls result into a more precise result of the original IDE problem.
+
+\begin{listing}
+  \inputMinted{java}{interprocRec.java}
+  \caption{Inter-procedurally-correlated calls}
+  \label{list:interProcRec}
+\end{listing}
+
+Another constraint of the algorithm is that it only accounts for intra-procedurally-correlated receivers, or receivers on which correlated calls occur within one method. For example, in Listing~\ref{list:interProcRec}, \verb'a' is a correlated-call receiver, since there are two polymorphic method invocations on \verb'a'. However, the first one, \verb'a.setString()', is inside method \verb'main', and the second one, \verb'a.printString()', is inside method \verb'propagate'. Therefore, we do not treat \verb'a' as a correlated-call receiver, and the analysis would not improve the original IFDS result for this program.
+
+Finally, correlated calls can occur on multiple receivers and other scenarios discussed in~\cite{frank2014correlated} that are not handled in this work.

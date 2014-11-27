@@ -1,0 +1,92 @@
+\section{Introduction}
+Static program analysis aims to discover properties of computer programs without running them.
+Static analysis has applications in compiler optimization, development of programming tools, and computer security, among others.
+As an example, we might want to analyze a program to know which variables are constants. 
+We could then write a compiler optimization that ensures that the values of those variables are computed only once.
+Alternatively, we could use the information about constant variables in an integrated development environment; for instance, to notify the user when an if-expression executes only one of its branches because its test condition has a constant value.
+
+There are demonstrable limits on what information we can obtain about a program without running it.
+Rice's theorem states that verifying any non-trivial property of a program is an undecidable problem~\cite{rice1953classes}. However, it is sometimes possible to design an algorithm that \textit{over}- or \textit{underapproximates} the solution that we are seeking.
+
+\textit{Data-flow analysis} is an area of program analysis whose goal is to compute approximations of certain information (for example, which variables must be constants) for each program point. 
+
+Other examples of data-flow analyses are \textit{reaching definitions} (finding out up to which instruction a given assignment of a variable must be valid) and \textit{available expressions} (retrieving the expressions in the program that do not need to be recomputed at a given program point).
+
+Another example of a data-flow analysis is \textit{taint analysis}~\cite{tripp2009taj}. Taint analysis discovers if ``secret'' values, like passwords or other confidential user information, can leak to an external observer. Methods that generate secret values, e.g. those that read user input, are called \textit{sources}. Methods that can leak information, e.g. those that write data to a file or send data through a network, are called \textit{sinks}. The goal of taint analysis is to find out whether data can propagate from sources to sinks.
+
+An important property of a data-flow analysis is \textit{precision}.
+Precision reflects how closely a data-flow-analysis result over- or underapproximates the information we are interested in. In the case of taint analysis, let $T$ be the number of sinks that the analysis considers to leak secret information, and $R$ the real number of potential information leaks. The smaller the difference between $T$ and $R$, the greater the precision of the taint analysis.
+
+Data-flow analyses operate on \textit{control-flow graphs} that model the order in which the instructions of a program are executed.
+A data-flow-analysis problem defines \textit{flow functions} that represent how data is propagated along the edges of the control-flow graph. The \textit{confluence operator} specifies how the data that has been computed along different paths should be merged when the paths join.
+
+Since a control-flow graph is an overapproximation of the possible flows of control in concrete executions of a program, the graph may contain \textit{infeasible} paths that cannot occur at runtime.
+
+One way to improve the precision of a data-flow analysis is to detect and eliminate infeasible paths.
+
+Our goal is to improve the precision of solutions to problems that can be solved by the \textit{Inter-procedural Finite Distributive Subset} (IFDS) algorithm~\cite{reps1995precise}.
+The IFDS algorithm is a general data-flow algorithm that can compute solutions to various data-flow problems, like reaching definitions, available expressions, and taint analysis.
+
+We improve the precision of IFDS problem solutions by eliminating infeasible paths that occur in object-oriented programs in the presence of \textit{correlated method calls}~--- polymorphic calls that are invoked on the same object~\cite{frank2014correlated}.
+
+\subsection{Correlated Calls}
+
+Consider a call site~$r.m()$ in an object-oriented programming language, where the variable~$r$ is the \textit{receiver} variable of the call site and $m$ is the name of the invoked method\footnote{We assume an internal representation of the program in which for each call site $e_r.m()$, the expression~$e_r$ has been evaluated to the variable~$r$.}. In the rest of the paper, we use the general term \textit{receiver} to mean a receiver variable.
+At runtime, the actual method that will be invoked by the call site depends on the runtime type of the object referenced by $r$. If the call site $r.m()$ can be associated with more than one method at compile time, we will say that the call site is \textit{polymorphic}.
+
+For example, in Listing~\ref{list:ccexample}, it is not possible to infer statically whether the runtime type of the variable \verb'a' in line~\ref{line:newa} is \verb'A' or \verb'B'.
+The call \verb'a.foo()' can be dispatched to either \verb'A.foo' or \verb'B.foo', and \verb'a.bar(v)' can be dispatched to either \verb'A.bar' or \verb'B.bar'.
+A concrete execution path for the main method might therefore go through \verb'A.foo' and \verb'A.bar', or through \verb'B.foo' and \verb'B.bar'.
+However, there cannot be an execution path through \verb'A.foo' and \verb'B.bar' or through \verb'B.foo' and \verb'A.bar'.
+
+  \begin{listing}[h]
+    \inputMinted{java}{ccexample.java}
+    \caption{Example program containing correlated calls}
+    \label{list:ccexample}
+  \end{listing}
+
+We call the invocations to methods \verb'foo' and \verb'bar' \textit{correlated}.
+More generally, correlated calls occur when more than one polymorphic call is invoked on the same receiver variable.
+
+Suppose we wanted to perform a taint analysis on the program in Listing~\ref{list:ccexample}.
+Most dataflow-analysis algorithms, including IFDS, would conservatively assume that the call \verb'a.bar' could be dispatched to both \verb'A.bar' and \verb'B.bar', independently of what \verb'a.foo' had been dispatched to in the previous line.
+
+As a result, 
+such an analysis would consider a path through \verb'A.foo' and \verb'B.bar' feasible. This means that the variable \verb'v' would be considered secret. We would conclude that a secret value is passed to \verb'B.bar' and printed to the user. In other words, we would consider the program to leak secret information, which it does not do in any concrete execution.
+
+Our technique for improving the precision of an IFDS result is based on transforming the original IFDS problem into a more expressive \textit{Inter-procedural Distributive Environment} (IDE) problem. IDE problems can be solved with the IDE algorithm which is a generalization of IFDS~\cite{sagiv1996precise}. The IDE algorithm can, for instance, solve certain versions of the constant propagation problem that IFDS cannot.
+
+To improve the precision of IFDS results, given an IFDS problem $P$, we convert it into an IDE problem $Q$ that accounts for correlated calls. We then use the IDE algorithm to obtain a solution to $Q$. Finally, we convert the IDE result into a IFDS result. In the presence of correlated calls, the obtained IFDS result can be more precise than the solution that the IFDS algorithm would compute for $P$.
+
+\subsection{IFDS and IDE}
+The IFDS framework is a precise and efficient algorithm for data-flow analysis. IFDS was developed in 1995 by T.\,Reps, S.\,Horwitz, and M.\,Sagiv at the University of Wisconsin and has been used to solve a variety of data-flow analysis problems~\cite{bodden2013spl,naeem2008typestate,DBLP:conf/birthday/KreikerRRSWY13,tripp2009taj}. The IFDS analysis is a version of the classic \textit{functional approach} to data-flow analysis proposed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}.
+
+Given a data-flow problem that satisfies the restrictions of IFDS, the algorithm provides a \textit{context-sensitive} solution in polynomial time. In other data-flow algorithms not based on the functional approach, the result of the analysis at the entry of a procedure ``merges'' the incoming data obtained from all callers of the procedure. As a consequence, there is one global data-flow result computed at the end of the procedure. Context-sensitivity, however, allows an analysis to compute the data-flow result for a given procedure as a \textit{function} of the data-flow value at the start of the procedure. 
+In other words, the analysis result for a procedure varies depending on where the procedure was called from. This significantly improves the precision of a data-flow analysis, which is why context-sensitivity is an important advantage of IFDS over classic data-flow algorithms.
+
+Compared to IFDS, most data-flow analyses are either general but do not run in polynomial time~\cite{knoop1992interprocedural,pnueli1981two} or handle a very specific set of problems~\cite{knoop1993efficient}.
+
+The IFDS algorithm is applicable to problems which can be expressed with data-flow functions that satisfy certain restrictions. \textit{Inter-procedural} flow functions specify how data flows from the invocation of a procedure to its start, and from the procedure's end back to its call site. \textit{Distributive} flow functions are those that distribute over the confluence operator. In the context of IFDS, the confluence operator is called meet, and it can be either union or intersection. The data-flow facts on which the analysis operates must be a \textit{finite} set $D$. Each flow function operates on a \textit{subset} of $D$ (for example, the set of variables in the program) which makes the domain of the flow functions the power set of $D$. We describe the IFDS restrictions in detail in Section~\ref{sec:suitableifds}.
+
+The IDE framework is an expressive extension to IFDS that was created by the same authors in 1996.
+The problems that IDE can solve include, but are not limited to, IFDS problems. Just as the IFDS algorithm, the IDE algorithm is suitable for data-flow analyses that can be encoded with inter-procedural, distributive flow functions. However, in IDE, the domain of the flow functions is not restricted to sets $D$ of data-flow facts. The IDE domain of a flow function consists of \textit{environments} that map data-flow facts from the set $D$ to lattice elements.
+
+As an example, in a constant propagation problem, an IDE environment would map each variable to the (possibly) constant value that it is bound to. To illustrate the distinction between IFDS and IDE we could say that IFDS can find out which variables in a program are constants, whereas IDE can additionally retrieve the values of the constant variables.
+
+\subsection{Paper Outline}
+
+The goal of the correlated-calls analysis presented in this work is to modify the output of an IFDS analysis to account for correlated calls. Specifically, the correlated-calls analysis improves the precision of IFDS problem results by eliminating infeasible execution paths caused by correlated calls. This is done by converting the input-IFDS problem to an IDE problem that detects infeasible paths, and converting the IDE result back to a more precise IFDS result.
+
+The contributions of this work are:
+\begin{itemize}
+  \item A transformation from IFDS to IDE problems that considers correlated calls.
+  \item An implementation in Scala of the correlated-calls transformation and the IDE algorithm which is based on the WALA framework for static analysis on Java bytecode~\cite{fink2012wala}.
+\end{itemize}
+
+  We prove that the solution to an IDE problem that considers correlated calls is more precise than the solution to the original IFDS problem.
+  We also show that the correlated-calls analysis is sound, i.e. that it never considers concrete execution paths as infeasible.
+ 
+ Finally, we evaluate the effectiveness of the correlated-calls analysis using an implementation of taint analysis as the source IFDS problem.
+
+The remainder of this paper is organized as follows. In the next section, we describe the IFDS and IDE analyses in detail. In Section~\ref{chapter:cca} we present the correlated-calls analysis as a transformation of IFDS problems into a special kind of IDE problem. Section~\ref{sec:ccdatastr} describes an efficient representation of the data structures that are required to define a correlated-calls IDE transformation.
+In Section~\ref{chapter:eval} we address some implementation aspects of the correlated-calls analysis and present an evaluation of its results. Section~\ref{chapter:concl} contains concluding remarks.

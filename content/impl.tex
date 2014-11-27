@@ -1,0 +1,1118 @@
+\section{Correlated Calls Analysis}\label{chapter:cca}
+The correlated-calls analysis is presented as a transformation from an arbitrary IFDS problem to a corresponding IDE problem.
+
+After solving the generated IDE problem, its result can be converted to an IFDS result. If the input program contains correlated calls, the converted IFDS result can be more precise than the original IFDS result.
+
+In this section, we first discuss what is necessary to define IFDS and IDE problems. Next we describe how to convert any IFDS problem into an equivalent IDE problem, and, given a solution to the generated IDE problem, how to obtain the result of the original IFDS problem. We then show how to transform an IFDS problem into an IDE problem using the correlated-calls transformation, and how to convert the solution to the latter IDE problem into a more precise IFDS result.
+
+\subsection{Defining IFDS and IDE Problems}
+In Section~\ref{sec:bg}, we defined what IFDS and IDE problems are, their applications, and their constraints. In this section, we describe how to create instances of IFDS and IDE problems.
+
+\subsubsection{Defining an IFDS Problem}\label{sec:ifdsdef}
+Recall that an IFDS problem instance is defined as a five-tuple
+\[
+    (G^*,\ D,\ F,\ M_F,\,\sqcap)\,,
+\]
+where $G^*=(N^*,\,E^*)$ is the control-flow supergraph of the program, $D$ is the set of dataflow facts, $F\subseteq2^D\to2^D$ is a set of distributive dataflow functions, and the function $$M_F:\,E^*\to(2^D\to2^D)$$ maps the supergraph edges to dataflow functions, and is extended to paths by composition.
+
+In practice, an IFDS problem can be defined by providing an exploded supergraph
+$G^\#=(N^\#,\,E^\#)$. Each node of $G^\#$ is a pair $(n,\ d)$, where $n\in N^*$ is a node in the control-flow supergraph and $d\in (D\cup\{\mathbf{0}\}),\ \mathbf0\notin D$, where $\mathbf0$ is an auxiliary fact that is necessary for the IFDS algorithm.
+
+The meaning of an edge in the exploded supergraph is the following.
+Let $(n_1,\,d_1)$ and $(n_2,\,d_2)$ be two nodes in the exploded supergraph $G^\#$. Furthermore, assume that if fact $d_1$ at node~$n_1$ holds, then the fact~$d_2$ at node~$n_2$ also holds. Then there is an edge $(n_1,\,d_1),\,(n_2,\,d_2)\in E^\#$.
+
+\subsubsection{Defining an IDE Problem}\label{sec:defide}
+An IDE problem instance is a four-tuple
+\[
+    (G^*,\ D,\ L,\ \menv),
+\]
+where $G^*$ and $D$ are defined in the same way as for IFDS. $L$ is a finite-height lattice that represents the values to which dataflow facts are mapped in an IDE problem. An environment $Env(D, L)$ maps dataflow facts to lattice elements. Finally, the map $$M_{\textsf{Env}}:\,E^*\to(\textsf{Env}(D, L)\to \textsf{Env}(D, L))$$ is a function from the control-flow-supergraph edges to environment transformers, extended to paths by composition.
+
+An IDE problem can be defined with a labeled exploded supergraph\footnote{
+    The exploded supergraph in an IDE problem is defined in the same way as in an IFDS problem. The only difference is that the $\mathbf0$ fact is denoted as $\Lambda$~\cite{reps1995precise,sagiv1996precise}.
+}, in which an edge function
+\begin{equation}
+  \edgefn:\ E^\#\to(L\to L)
+\end{equation}
+pairs edges with \textit{micro functions}, and is extended to paths by composition.
+
+The set of micro functions of an IDE problem is a subset of $L\to L$ that is closed under function meet and composition.
+
+The meaning of an edge in the labeled exploded supergraph is the following. Let $e=((n_1,\,d_1),\,(n_2,\,d_2))\in E^\#$ be an edge in the exploded supergraph with label $f=\mathsf{EdgeFn}(e)$. Then
+\begin{itemize}
+%	\item the fact that $d_1$ holds at node $n_1$ implies that $d_2$ holds at $n_2$;
+  \item if at node $n_1$ the fact $d_1$ was mapped to a lattice element $l_1$ by an environment $Env(D,\,L)$, then the fact $d_2$ at node $n_2$ should be mapped to $f(l_1)$.
+\end{itemize}
+
+As shown in~Sagiv et al.~\cite{sagiv1996precise}, the relationship between environment transformers and edge functions can be described with the following equations. For individual edges $(n_1,\,n_2)\in E^*$,
+\begin{align}\label{eq:envTransToEdgeFnEdge}
+  \menv&((n_1,\,n_2))(\textsf{env})(d)\notag\\
+  &=\edgefn((n_1,\,\Lambda),\,(n_2,\,d))(\top)\sqcap\bigsqcap_{d'\in D}\edgefn((n_1,\,d'),\,(n_2,\,d))(\textsf{env}(d'))\,,
+\end{align}
+where $\textsf{env}$ is an environment $\textsf{Env}(D,\,L)$. Informally, for a given control-flow-supergraph edge $e$ and data-flow fact $d$, the $M_\textsf{Env}$ function captures the meet of the edge function applied to all possible exploded-graph edges along $e$.
+
+For paths $p$ that start with the entry point~$\startmain$,
+\begin{equation}\label{eq:envTransToEdgefn}
+  \menv(p)(\Omega)(d)=\bigsqcap_{r\in\mathsf{RP}(p,\,d)}\edgefn(r)(\top)\,,
+\end{equation}
+where $n\in N^*$, $d\in D$, $p\in\ivp(n)$, and $\mathsf{RP}$ is the set of all inter-procedurally realizable paths.
+
+To summarize, an IDE problem can be defined by a labeled exploded supergraph 
+\begin{equation}(G^\#,\,L,\,\mathsf{EdgeFn})\,,\end{equation}
+where each edge of the exploded supergraph corresponds to a micro function.
+
+\subsection{Transformations Between IFDS and IDE}\label{seq:transIfdsIde}
+
+The correlated-call analysis transforms an existing IFDS problem into a special kind of IDE problem. We described what is necessary to define IFDS and IDE problems independently.
+
+Let $P=(G^\#)$ be an IFDS problem and $Q=(G^\#,\,\edgefn)$ an IDE problem obtained by a conversion from $P$.
+
+We will look at two kinds of transformations
+\begin{equation}
+  \mathcal T:\ (G^\#)\to (G^\#,\,\edgefn)
+\end{equation}
+from IFDS to IDE problems:
+\begin{itemize}
+	\item an equivalence transformation $\transEq$ (pronounced as ``t-equiv''), in which we show how to transform IFDS problems into equivalent IDE problems;
+  \item a correlated-call transformation $\transCC$ (pronounced as ``t-c-c''), where we show how to convert IFDS problems into a special form of IDE problems that help eliminate infeasible paths.
+\end{itemize}
+In each case we also show how to convert the result of the generated IDE problem to a result of the original IFDS problem.
+
+An overview of the transformations is shown in Figure~\ref{fig:transformations}.
+\begin{figure}
+  \centering
+    \tikzset{
+  ashadow/.style={opacity=.25, shadow xshift=0.07, shadow yshift=-0.07},
+}
+  \tikzstyle{problem}=[fill=greyblue,text width=2.3cm,rounded corners,font=\small,text=charcoal,drop shadow={ashadow, color=greyblue}]
+  \tikzstyle{result}=[fill=bisque,text width=1.8cm,rounded corners,font=\small,text=charcoal,drop shadow={ashadow, color=greyblue}]
+\begin{tikzpicture}
+    \node [problem] (ifds) {IFDS problem};
+    \node [problem] (equiv) [above right=0.9cm and .7\dist of ifds.east] {Equivalent IDE problem};
+    \node [problem] (ccide)[below=3cm of equiv.west, anchor=west] {Correlated-calls IDE problem};
+    \node [result] (equivres) [right=\dist of equiv.east] {Equivalence-IDE result};
+    \node [result] (ccres) [below=3cm of equivres.west,anchor=west] {Correlated-calls result};
+    \node [result] (ifdsres) [right=\dist of equivres.east] {IFDS result};
+    \node [result] (improved) [right=\dist of ccres.east] {Improved IFDS result};
+    \path[->] (equivres) edge node[above]{$\backEq$} (ifdsres);
+    \path[->] (ccres) edge node[above] {$\backCC$} (improved);
+    \path[->] (ccres) edge[out=30,in=240] node[above] {$\backEq$} (ifdsres);
+    \path[->] (ifds) edge[out=40,in=190] node[above] {$\transEq$} (equiv);
+    \path[->] (ifds) edge[out=-60,in=165] node[above] {$\transCC$} (ccide);
+    \path[->] (equiv) edge node[above]{$\result$} (equivres);
+    \path[->] (ccide) edge node[above]{$\result$} (ccres);
+\end{tikzpicture}
+  \caption{Transformations between IFDS and IDE problems and their results}%
+  \label{fig:transformations}%
+\end{figure}
+
+\subsubsection{Equivalence Transformation}\label{sec:equivtrans}
+We start with an equivalence transformation $\transEq$ to present a simple IFDS-to-IDE conversion that does not change the result of the original IFDS problem. We will compare the correlated-calls transformation with the equivalence transformation, and use the latter to show  that the correlated-calls analysis results in a
+precision improvement of the original IFDS problem result.
+
+\paragraph{Converting IFDS problems to IDE problems}
+Since IDE is a generalization of IFDS, any IFDS problem can be converted into an equivalent IDE problem~\cite{sagiv1996precise}.
+For an equivalence transformation $\transEq$, the generated lattice $L^\equiv$ consists of two elements, bottom and top:
+\[
+    L^\equiv=\{\bot,\ \top\}\,,
+\]
+where $\bot$ means ``reachable'', and $\top$ means ``not reachable''. 
+
+ All micro functions are identity functions.
+
+ 
+Given an exploded supergraph $G^\#$ provided by an IFDS problem, we want to create an edge function $\edgefn^\equiv$ that maps $G^\#$'s edges $E^\#$ to micro functions $L^\equiv\to L^\equiv$.
+
+The edge functions $\edgefn^\equiv$ are defined as
+\begin{equation}
+    \edgefn^\equiv=
+    \begin{cases}
+      \lambda e\,.\,\lambda m\,.\,\bot&\text{if $d_1(e)=\Lambda$ and $d_2(e)\ne\Lambda$;}\\
+      \lambda e\,.\,\id&\text{otherwise,}
+    \end{cases}
+\end{equation}
+where $d_1(e)$ is the source fact of an edge $e$ and $d_2(e)$ is its target fact. At a ``diagonal'' edge from a $\Lambda$-fact to a non-$\Lambda$-fact $d$, the micro function is a constant function that returns $\bot$, which makes it a bottom element in the $L\to L$ lattice. Since the initial lattice element passed to the micro function at the start node is the top element (see~\eqref{eq:envTransToEdgefn}), the bottom function at the diagonal edge swaps the top element to bottom to make the fact $d$ reachable.
+
+The resulting equivalence transformation looks as follows:
+\begin{equation}
+  \transEq((G^\#))=(G^\#,\,L^\equiv,\,\mathsf{EdgeFn}^\equiv).
+\end{equation}
+
+Thus, in $\transEq$, all non-diagonal edges in the original IFDS problem are mapped to identity functions.
+
+\paragraph{Converting IDE Results to IFDS Results}
+
+The output of an IFDS analysis states whether a node is reachable in the exploded supergraph. This means that for an IFDS problem $P$, the IFDS-analysis result $\result_{\text{IFDS}}(P):\ N^*\to 2^D$ is a map from nodes of the control-flow supergraph to sets of facts:
+\begin{equation}
+  \result_{\text{IFDS}}(P)=\{(n,\,\mvp F(n))\,|\,n\in N^*\}\,.
+\end{equation}
+
+\begin{example}\label{ex:ifdsresult}
+  The solution to the taint-analysis IFDS problem $\mathcal P$ in Listing~\ref{list:examplejava} whose exploded supergraph is presented in Figure~\ref{fig:exampleexploded} looks as follows:
+  \small\begin{align*}
+    \result_\text{IFDS}(\mathcal P)=\{&(\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\{\texttt a\}),
+      &(\highlight{\textsf{start}_\texttt f}{lightsalmonpink},\,\{\texttt s\}),
+      &\qquad\qquad(\highlight{\textsf{return}_\texttt f}{lightsalmonpink},\,\{\texttt r,\,\texttt s\}),\\
+%      
+      &(\highlight{\textsf{call}_\texttt{A.f}}{greyblue},\,\{\texttt a\}),
+      &(\highlight{\texttt{if(s==null)}}{lightsalmonpink},\,\{\texttt s\}),
+      &\qquad\qquad(\highlight{\texttt{return r}}{lightsalmonpink},\,\{\texttt r,\,\texttt s\}),\\
+%
+      &(\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\{\texttt a,\,\texttt b\}),
+      &(\highlight{\textsf{call}_\texttt f}{lightsalmonpink},\,\{\texttt s\}),
+      &\qquad\qquad(\highlight{\textsf{end}_\texttt f}{lightsalmonpink},\,\{\texttt r,\,\texttt s\})\}.\\
+%
+      &(\highlight{\textsf{end}_\texttt{main}}{greyblue},\,\{\texttt a,\,\texttt b\}),&(\highlight{\texttt{return s}}{lightsalmonpink},\,\{\texttt s\}),
+  \end{align*}\normalsize
+  All other nodes of the control-flow supergraph are mapped to the empty set.
+\end{example}
+
+ The IDE analysis associates a lattice element with each node in the exploded supergraph. For an IDE problem $Q$, the result $\result(Q):\ N^\#\to L$ maps nodes of the exploded supergraph to lattice elements (see~\eqref{eq:mvpdef}):
+\begin{equation}\label{eq:ideresult}
+  \result(Q)=\{((n,\,d),\,\mvp{\textsf{Env}}(n,\,d))\ |\ n\in N^*,\,d\in D\}\,.
+\end{equation}
+In other words, for each fact $d\in D$ at a given node $n\in N^*$, $\result(Q)(n,\,d)$ returns a lattice element. If a fact $d\in D$ is unreachable, $\result(Q)(n,\,d)=\top$.
+
+In the case of an equivalence transformation from IFDS to IDE, if a node in the IFDS result is reachable, it will be also reachable in the IDE result, and it will be mapped to the bottom lattice element. For an exploded node in the IDE result, being mapped to the top element means being not reachable.
+
+The~domain of an equivalence-IDE result 
+\begin{equation}
+  \resultEq=\result(\transEq(P))
+\end{equation}
+consists of pairs of control-flow-supergraph nodes and data-flow facts. The range of the result is the set of lattice elements. To transform an IDE result to an IFDS result, we need to map each control-flow-supergraph node to the set of facts with which it is paired, provided that the pair is mapped to the bottom lattice element.
+
+\begin{example}\label{ex:ideresult}
+  Converting the IFDS problem $\mathcal P$ from Example~\ref{ex:ifdsresult} into an equivalent IDE problem and solving it will yield the following result:
+    \small\begin{align*}
+    \result(\transEq(\mathcal P))=\{&((\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\texttt a),\,\bot),\\
+      &((\highlight{\textsf{call}_\texttt{A.f}}{greyblue},\,\texttt a),\,\bot),\\
+      &((\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\texttt a),\,\bot),\\
+      &((\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\texttt b),\,\bot),\\
+      &\dots\}.\\
+    \end{align*}\normalsize
+  Suppose that for a pair $(n,\,d)$, where $n\in N^*$ and $d\in D$, there is no corresponding result in ~$\result_\text{IFDS}(\mathcal P)$ (see Example~\ref{ex:ifdsresult}). Then $(n,\,d)$ appears in $\result(\transEq(\mathcal P))$ as $((n,\,d),\,\top)$.
+\end{example}
+
+Let $\rho$ be the result of an equivalence-IDE analysis for an IFDS problem $P$:
+\[
+  \rho=\result(\transEq(P)).
+\]
+For a node $n\in N^*$, let $D_n^\equiv(\rho)$ be a set of data-flow facts such that
+\begin{equation}
+  D_n^\equiv(\rho)=\{d\ |\ d\in D\,\wedge\,\rho(n,\,d)\ne\top\}\,.
+\end{equation}
+Then the transformation function
+$\backEq:\,(N^\#\to L)\to(N^*\to2^D)$
+from an IDE result to~an~IFDS result looks as follows:
+\begin{equation}
+  \backEq\left(\rho\right)=
+    \left\{(n,\,D_n^\equiv(\rho))\ |\ n\in N^*\right\}\,.
+\end{equation}
+
+Obviously, if applied to the result of an equivalence-IDE problem, $\backEq$ returns a result equivalent to the original IFDS problem result. In other words, for any IFDS problem $P$ with supergraph $N^*$, and any node $n\in N^*$,
+\begin{equation}
+  \backEq\left(\result(\transEq(P))\right)(n)=\result_{\text{IFDS}}(P)(n)\,.
+\end{equation}
+
+\begin{example}
+  Converting the result in Example~\ref{ex:ideresult} with the equivalence-transformation from an IDE result to an IFDS result $\backEq$ will yield the same result as in Example~\ref{ex:ifdsresult}.
+\end{example}
+\subsubsection{Correlated-Call Transformation}\label{sec:cctrans}
+
+To improve the precision of an IFDS problem, we can convert it to a special type of IDE problem, and use lattice elements to provide us with additional information about a node.
+When converting the IDE result to an IFDS result, lattice elements will tell us whether to make the corresponding exploded nodes reachable. This is the idea of the correlated-calls analysis.
+
+\paragraph{Lattice Elements}
+Just like in the equivalence transformation $\transEq$, the exploded supergraph for $\transCC$ is the same as in the original IFDS problem. The elements of the correlated-calls lattice $\lcc$ are functions that map receivers to sets of types:
+\[
+    \lcc=\left\{\,m:\ R\to2^T\right\},
+\]
+where $R$ is the set of receivers and $T$ is the set of all types in the program. 
+The type power set $2^T$ is also a lattice with a bottom element 
+\begin{align*}
+\bot_T&=T
+\intertext{and top element}
+\top_T&=\varnothing.
+\intertext{The top element of the function lattice}
+\topcc&=\lambda r.\top_T
+\intertext{is a function that maps any receiver to the empty set\footnote{%
+  We prove that $\lcc$ is a lattice in the Proof of Lemma~\ref{lem:efficient}%
+}. 
+The bottom element}
+\botcc&=\lambda r.\bot_T
+\end{align*}
+maps any receiver to all types in the program.
+
+To understand the meaning of lattice elements in a correlated-call analysis, suppose that an IFDS problem has been converted to an IDE problem using the correlated-calls transformation. 
+Assume also that $s$ is the entrypoint of the program, $n$ is a node in the exploded supergraph, and that in the IDE result, $n$ is mapped to a lattice element $l\in \lcc$. 
+Then the purpose of $l$ is to provide information about the set of types of the objects that may be referenced by each receiver at runtime at a path from $s$ to $n$. 
+If a receiver is mapped to the empty set $\top_T$, it means that for the given program point, the receiver cannot reference an object of any type.
+In other words, the corresponding data-flow fact is considered not reachable.
+
+\paragraph{Micro Functions}\label{sec:micro}
+Unlike in the equivalence transformation, the micro functions returned by the edge function $\edgefn^\Subset$ are not always identity functions.
+
+Let $e=(n_1,\,n_2)\in E^\#$ be an edge in the exploded supergraph.
+$\edgefn^\Subset(e)$ returns a micro function $f\subset\lcc\to \lcc$.
+Given a micro function (a map from receivers to sets of types) $m\in \lcc$, $f(m)$ returns a new map from receivers to sets of types.
+In other words, $f$ shows how to update the map from receivers to sets of types when we encounter program point $n_1$.
+
+Let $f_1$ and $f_2$ be two micro functions such that ${f_1=\lambda m\,.\,\lambda r\,.\,t_1(r)}$ and ${f_2={\lambda m\,.\,\lambda r\,.\,t_2(r)}}$. We define the meet operation on micro-functions as follows:
+\begin{equation}\label{eq:micromeet}
+  \lambda m\,.\,\lambda r\,.\,t_1(r)\sqcap\lambda m\,.\,\lambda r\,.\,t_2(r)
+  =\lambda m\,.\,\lambda r\,.\,t_1(r)\cup t_2(r)\,.
+\end{equation}
+
+The composition of micro functions is defined as ordinary function composition.
+
+\paragraph{Edge Functions}\label{sec:ef}
+
+Let $\mathcal F$ be the set of methods in a program with a signature $s_\mathcal F$.
+\begin{definition}
+  Let $r.c()$ be a call site on a receiver $r\in R$ with runtime type $t\in T$.
+  Let~$s_\mathcal F$ be the method signature corresponding to the call $c()$.
+  For $s_\mathcal F$ and $t$, a \textit{lookup function} returns the method implementation $f\in\mathcal F$ to which the call $r.c()$ is dispatched:
+  \begin{equation}
+    \textsf{lookup}(s_\mathcal F,\,t)=f.
+  \end{equation}
+\end{definition}
+
+\begin{definition}
+  For a method signature $s_\mathcal F$ and a method implementation $f\in\mathcal F$, the static-type function $\tau$ returns the set of types for which the lookup function yields $f$:
+  \begin{equation}
+    \tau(s_\mathcal F,\,f)=\{\,t\ |\ \textsf{lookup}(s_\mathcal F,\,t)=f\}\,.
+  \end{equation}
+\end{definition}
+In other words, $\tau$ computes the set of types for which calls to methods
+with signatures~$s_\mathcal F$ are dispatched to~$f$.
+
+If there is a supergraph path from a method call with signature $s_\mathcal F$ to the start of $f$, then the set $\tau(s_\mathcal F,\,f)$ is always non-empty.
+
+\begin{definition}\label{def:momopoly}
+  A call site is called monomorphic if it can be dispatched to only one method. If a call site can be dispatched to more than one method it is called polymorphic.
+\end{definition}
+
+  Let $r.c()$ be a call on a receiver $r\in R$ with a method signature $s_\mathcal F$ to a function $f\in\mathcal F$.
+  If the call site is monomorphic, then $\tau(s_\mathcal F,\,f)$ contains all types $T'\subseteq T$ that are compatible with the static type of $r$.
+  If the call site is polymorphic, then $\tau(s_\mathcal F,\,f)\subset T'$, since some types $t\in T'$ cause dispatch to a method other than $f$.
+
+\begin{definition}\label{def:edgefn}
+  For an edge $e$, let $n_1(e)$ and $n_2(e)$ be the source and target nodes of $e$, and $d_1(e)$ and $d_2(e)$ be its source and target facts. A correlated-call edge function for the set $S\subseteq R$ is defined as follows:
+  \begin{equation}\label{eq:edgefndef}
+    \ccedgefn S=\lambda e\,.\,
+        \begin{cases}
+          \id  &\text{if $d_1(e)=d_2(e)=\Lambda$},\\
+          \lambda m\,.\,\varepsilon_S(e)(\botcc) &\text{if $d_1(e)=\Lambda$ and $d_2(e)\ne\Lambda$},\\
+          \lambda m\,.\,\varepsilon_S(e)(m)  &\text{otherwise,}
+        \end{cases}
+  \end{equation}
+  where $\varepsilon_S:\,E\to(L\to L)$ is a function defined as
+  \begin{equation}\label{eq:varepsilon}
+    \varepsilon_S=\lambda e\,.\,
+        \begin{cases}
+            \lambda m\,.\,m[r\to m(r)\cap \tau(s_\mathcal F,\,f)],
+                &\text{if $e$ is a call-start edge. $r.c()$ is}\\
+                &\text{the call site at $n_1(e)$, $f$ is the called}\\
+                &\text{procedure with signature $s_\mathcal F$,}\\
+                &\text{and $r\in S$;}\\
+            \lambda m\,.\,m[r\to m(r)\cap \tau(s_\mathcal F,\,f)]
+                &\text{if $e$ is an end-return edge.}\\
+            \textcolor{white}{\lambda m\,.\,m}[v_1\to\bot_T]
+                &\text{$v_1,\,\dots,\,v_k\in S$ are the local variables}\\
+            \textcolor{white}{\lambda m\,.\,m}\dots
+                &\text{in the callee method, $r.c()$ is the call}\\
+            \textcolor{white}{\lambda m\,.\,m}[v_k\to\bot_T],
+                &\text{corresponding to the return node}\\
+                &\text{at $n_2(e)$, $f$ is the called method with}\\
+                &\text{signature $s_\mathcal F$, and $r\in S$;}\\
+            \lambda m\,.\,m\left[r\to \bot_T\right],
+                &\text{if $n_1(e)$ contains an assignment}\\
+                &\text{for $r\in S$;}\\
+            \id
+                &\text{otherwise.}
+        \end{cases}
+  \end{equation}
+  We define both $\ccedgefn S$ and $\varepsilon_S$ to be extended to paths by composition.
+\end{definition}
+In the above definition, the purpose of the set $S$ is to limit the set of considered receivers. We will use $S$ in Section~\ref{sec:ccreceivers}.
+
+The micro functions returned by a correlated-calls edge function can be described as follows. Along $\Lambda$-edges, the micro functions are identity functions. All other functions can be described with $\varepsilon_S$. On ``diagonal'' edges from $\Lambda$ facts to non-$\Lambda$ facts, $\varepsilon_S$ creates edge-specific mappings for a set of receivers, and maps all the other receivers to the set of all types $\bot_T$. On all other edges, $\varepsilon_S$ modifies the mappings for a set of receivers and leaves the mappings for the other receivers unchanged.
+
+\begin{example}
+  Consider the program Listing~\ref{list:ccexample}. The exploded supergraph for that program is shown in Figure~\ref{fig:cc_edgefn_example}.
+
+  Returning a secret value in method \verb'A.foo' creates a ``diagonal'' edge from the $\Lambda$-fact to the secret fact $\psi$. 
+  The diagonal edge is labeled with the micro function $\lambda m\,.\,\botcc$. Thus, at the end node of the method, every receiver is mapped to the set of all types~$\bot_T$.
+  
+On the end-return edge from \verb'A.foo' to \verb'main', we need to restrict the set of types for the receiver \verb'a' by labeling the end-return edge from the fact $\psi$ to the fact \verb'v' with the micro function $\lambda m\,.\,m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$.
+
+Similarly, on the call-start edge from method \verb'main' to method \verb'B.bar', from fact \verb'v' to \verb's', we restrict the type of the receiver \verb'a' to the set \{\texttt B\} with the micro function~$\lambda m\,.\,m[\texttt a\to m(\texttt a)\cap\{\texttt B\}]$.
+
+After we have shown the definitions for the meet and composition operations, we will show in Example~\ref{ex:cc} how the correlated-calls analysis uses the presented micro functions to detect infeasible paths.
+  
+\begin{figure}%
+  \centering
+    \tikzstyle{supergraph}=[
+      fill=greyblue,
+      rounded corners,
+      font=\footnotesize,
+      align=right,
+      text=charcoal,
+      drop shadow={ashadow, color=greyblue}
+    ]
+    \tikzstyle{supergraph_y}=[
+      fill=bisque,
+      rounded corners,
+      font=\footnotesize,
+      align=left,
+      text=charcoal,
+      drop shadow={ashadow, color=greyblue}
+    ]
+    \tikzstyle{supergraph_f}=[
+      fill=lightsalmonpink,
+      rounded corners,
+      font=\footnotesize,
+      align=left,
+      text=charcoal,
+      drop shadow={ashadow, color=greyblue}
+    ]
+    \tikzstyle{description}=[fill=white]
+    \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
+    \tikzstyle{arrowtext}=[font=\tiny,color=black,above]
+    
+\hspace*{-10pt}
+\begin{tikzpicture}
+\scalebox{.8}{
+% main method nodes
+    \node [supergraph] (st_main) {\textsf{start}$_{\texttt{main}}$};
+    \node [supergraph] (asgn_a) [below = \dist of st_main.south east, anchor=east] {\texttt{a = args==null\,?}\\\texttt{new\,A()\,:\,new\,B()}};
+    \node [supergraph] (call_foo) [below = \dist of asgn_a.south east, anchor=east] {\textsf{call}$_\texttt{foo}$};
+    \node [supergraph] (return_foo) [below = \dist of call_foo.south east,anchor=east] {\textsf{return}$_\texttt{foo}$\\\texttt{v = a.foo()}};
+    \node [supergraph] (call_bar) [below = \dist of return_foo.south east, anchor=east] {\textsf{call}$_\texttt{bar}$};
+    \node [supergraph] (return_bar) [below = \dist of call_bar.south east, anchor=east] {\textsf{return}$_\texttt{bar}$};
+    \node [supergraph] (end_main) [below = \dist of return_bar.south east, anchor=east] {\textsf{end}$_{\texttt{main}}$};
+    
+    \node [n,label=$\Lambda$] (st_main_z) [right=\nd of st_main.east] {};
+    \node [n,label=\texttt{v}] (st_main_v) [right=\nd of st_main_z] {};
+    \node [n] (asgn_a_z) [right=\nd of asgn_a.east] {};
+    \node [n] (call_foo_z) [right=\nd of call_foo.east] {};
+    \node [n] (return_foo_z) [right=\nd of return_foo.east] {};
+    \node [n] (call_bar_z) [right=\nd of call_bar.east] {};
+    \node [n] (return_bar_z) [right=\nd of return_bar.east] {};
+    \node [n] (end_main_z) [right=\nd of end_main.east] {};
+    \node [n] (asgn_a_v) [right=\nd of asgn_a_z] {};
+    \node [n] (call_foo_v) [right=\nd of call_foo_z] {};
+    \node [n] (return_foo_v) [right=\nd of return_foo_z] {};
+    \node [n] (call_bar_v) [right=\nd of call_bar_z] {};
+    \node [n] (return_bar_v) [right=\nd of return_bar_z] {};
+    \node [n] (end_main_v) [right=\nd of end_main_z] {};
+% main method edges
+    \path[->](st_main_z) edge (asgn_a_z);
+    \path[->](asgn_a_z) edge (call_foo_z);
+    \path[->](call_foo_z) edge (return_foo_z);
+    \path[->](return_foo_z) edge (call_bar_z);
+    \path[->](call_bar_z) edge (return_bar_z);
+    \path[->](return_bar_z) edge (end_main_z);  
+    \path[->](st_main_v) edge (asgn_a_v);
+    \path[->](asgn_a_v) edge (call_foo_v);
+    \path[->](call_foo_v) edge (return_foo_v);
+    \path[->](return_foo_v) edge (call_bar_v);
+    \path[->](call_bar_v) edge (return_bar_v);
+    \path[->](return_bar_v) edge (end_main_v);  
+    
+%A.foo method nodes
+    \node [supergraph_y] (st_a_foo) [right = 6*\dist of st_main] {\textsf{start}$_{\texttt{A.foo}}$};
+    \node [supergraph_y] (return_secret) [below = \dist of st_a_foo.south west, anchor=west] {\texttt{return secret()}};
+    \node [supergraph_y] (end_a_foo) [below = \dist of return_secret.south west,anchor = west] {\textsf{end}$_\texttt{A.foo}$};
+    
+    \node [n,label=$\psi$] (st_a_foo_p) [left=\nd of st_a_foo.west] {};
+    \node [n] (return_secret_p) [left=\nd of return_secret.west] {};
+    \node [n] (end_a_foo_p) [left=\nd of end_a_foo.west] {};
+    \node [n,label=$\Lambda$] (st_a_foo_z) [left=\nd of st_a_foo_p] {};
+    \node [n] (return_secret_z) [left=\nd of return_secret_p] {};
+    \node [n] (end_a_foo_z) [left=\nd of end_a_foo_p] {};
+%A.foo method edges
+    \path[->](st_a_foo_z) edge (return_secret_z); 
+    \path[->](return_secret_z) edge node[arrowtext,near start,above right=0.4cm and -.15cm,rotate=-60]{$\lambda m.\botcc$} (end_a_foo_z); 
+    \path[->,dashed](call_foo_z) edge [out=38,in=238]  (st_a_foo_z);
+    \path[->,dashed](end_a_foo_z) edge [out=200,in=43] (return_foo_z);
+    \path[->,dashed](end_a_foo_p) edge  [out=200,in=43] node[arrowtext,below,rotate=30]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$} (return_foo_v);
+    \path[->](st_a_foo_p) edge (return_secret_p); 
+    \path[->](return_secret_p) edge (end_a_foo_p);
+    \path[->](return_secret_z) edge (end_a_foo_p);
+    
+%A.bar method nodes
+    \node [supergraph_y] (st_a_bar) [right = 6*\dist of st_a_foo] {\textsf{start}$_{\texttt{A.bar}}$};
+    \node [supergraph_y] (end_a_bar) [below = \dist of st_a_bar.south west,anchor = west] {\textsf{end}$_\texttt{A.bar}$};
+    
+    \node [n,label=\texttt{s}] (st_a_bar_s) [left=\nd of st_a_bar.west] {};
+    \node [n,label=$\Lambda$] (st_a_bar_z) [left=\nd of st_a_bar_s] {};
+    \node [n] (end_a_bar_s) [left=\nd of end_a_bar.west] {};    
+    \node [n] (end_a_bar_z) [left=\nd of end_a_bar_s] {};
+%A.bar method edges
+    \path[->](st_a_bar_z) edge (end_a_bar_z);
+    \path[->,dashed](call_bar_z) edge [out=20,in=229] (st_a_bar_z);
+    \path[->,dashed](end_a_bar_z) edge [out=220,in=35] (return_bar_z);
+    \path[->](st_a_bar_s) edge (end_a_bar_s);
+    \path[->,dashed](call_bar_v) edge [out=20,in=230] node[arrowtext,near end,above left=-.1cm and -.15cm,rotate=36]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$} (st_a_bar_s);
+
+
+%B.foo method nodes
+    \node [supergraph_f] (st_b_foo) [right = 6*\dist of call_bar] {\textsf{start}$_{\texttt{B.foo}}$};
+    \node [supergraph_f] (return_not_secret) [below = \dist of st_b_foo.south west, anchor=west] {\texttt{return "not secret"}};
+    \node [supergraph_f] (end_b_foo) [below = \dist of return_not_secret.south west,anchor = west] {\textsf{end}$_\texttt{B.foo}$};
+    
+    \node [n,label=$\Lambda$] (st_b_foo_z) [left=\nd of st_b_foo.west] {};
+    \node [n] (return_not_secret_z) [left=\nd of return_not_secret.west] {};
+    \node [n] (end_b_foo_z) [left=\nd of end_b_foo.west] {};
+    
+%B.foo method edges
+    \path[->](st_b_foo_z) edge (return_not_secret_z); 
+    \path[->](return_not_secret_z) edge (end_b_foo_z); 
+    \path[->,dashed](call_foo_z) edge [out=-60,in=160,color=lightsalmonpink] (st_b_foo_z);
+    \path[->,dashed](end_b_foo_z) edge [out=145,in=-65,color=lightsalmonpink] (return_foo_z);
+    
+%B.bar method nodes
+    \node [supergraph_f] (st_b_bar) [right = 6*\dist of st_b_foo] {\textsf{start}$_{\texttt{B.bar}}$};
+    \node [supergraph_f] (print) [below = \dist of st_b_bar.south west,anchor = west] {\texttt{print(s)}};
+    \node [supergraph_f] (end_b_bar) [below = \dist of print.south west,anchor = west] {\textsf{end}$_\texttt{B.bar}$};
+    
+    \node [n,label=\texttt{s}] (st_b_bar_s) [left=\nd of st_b_bar.west] {};
+    \node [n] (print_s) [left=\nd of print.west] {};
+    \node [n] (end_b_bar_s) [left=\nd of end_b_bar.west] {};
+    \node [n,label=$\Lambda$] (st_b_bar_z) [left=\nd of st_b_bar_s] {};
+    \node [n] (print_z) [left=\nd of print_s] {};
+    \node [n] (end_b_bar_z) [left=\nd of end_b_bar_s] {};
+%B.bar method edges
+    \path[->](st_b_bar_z) edge (print_z);
+    \path[->](print_z) edge (end_b_bar_z);
+    \path[->](st_b_bar_s) edge (print_s);
+    \path[->](print_s) edge (end_b_bar_s);
+    \path[->,dashed](call_bar_z) edge [out=40,in=140,color=lightsalmonpink] (st_b_bar_z);
+    \path[->,dashed](call_bar_v) edge [out=20,in=160,color=lightsalmonpink] node[arrowtext,above right=-.4cm and .4cm,rotate=-10]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt B\}]$} (st_b_bar_s);
+    \path[->,dashed](end_b_bar_z) edge [out=210,in=-40,color=lightsalmonpink] (return_bar_z);    
+}
+\end{tikzpicture}
+  \caption[An example program demonstrating correlated-call edge functions on the $\Lambda$-node path for Listing~\ref{list:ccexample}]{An example program demonstrating correlated-call edge functions on the $\Lambda$-node path for Listing~\ref{list:ccexample}. All non-labeled edges are implicitly labeled with identity functions $\id$. The variable corresponding to an initial secret value is denoted as $\psi$.}%
+  \label{fig:cc_edgefn_example}%
+  \end{figure}
+\end{example}
+
+\begin{definition}
+  For an IFDS problem $P=(G^\#)$ and a set $S$, the correlated-calls transformation $\transCC_S$ is defined as
+  \begin{equation}
+    \transCC_S((G^\#))=\left(G^\#,\,\lcc_S,\,\ccedgefn S\right),
+  \end{equation}
+  where $\lcc_S:\,S\to2^T$.
+\end{definition}
+
+Then, for an edge $e$, the correlated-call micro functions can be defined as $\ccedgefn R$ and a correlated-calls transformation is defined as $\transCC_R$.
+
+\paragraph{Converting IDE Results to IFDS Results}
+
+Let $P$ be an IFDS problem. 
+Let $E:\,N\times D$ be the domain of the IDE result $\result(Q)$.
+To convert $\result(\transCC_R(P))$ to an IFDS result, we need to map the control-flow-supergraph nodes $n\in N^*$ to the corresponding facts $d\in D$. 
+Unlike in~$\backEq$, we will only map each~$n$ to the facts~$d$ for~which~$\result(\transCC_R(P))(n,\,d)$ does not contain an~empty mapping for~any~receiver. 
+
+For a node $n\in N^*$ and a correlated-calls IDE problem result $\rho=\result(\transCC_S(P))$, let $D_n^\Subset(\rho)$ be a set of data-flow facts defined as
+\begin{equation}\label{eq:dnq}
+  D_n^\Subset(\rho)=\left\{d\ |\ 
+    d\in\mvp F(n)\,\wedge\,\forall r\in R:\ \rho(n,\ d)(r)\ne\top_T\right\}.
+\end{equation}
+Then, for a set $S\subseteq R$, the~correlated-calls-conversion function from a~correlated-calls IDE~result $\rho$ to~an~IFDS~result looks as~follows:
+\begin{equation}\label{eq:ucc}
+  \backCC\left(\rho\right)=
+    \left\{(n,\,D_n^\Subset(\rho)\ | \ n\in N^*\right\}.
+\end{equation}
+
+In the following lemma we show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.
+
+\begin{lemma}[Precision]\label{lem:subsetifds}
+    For an IFDS problem $P$ and all ${n\in N^*}$,
+    \begin{equation}\label{eq:correct}
+      \backCC\left(\result(\transCC_R(P))\right)(n)
+      \subseteq
+      \result_{\text{IFDS}}(P)(n)\,.
+    \end{equation}
+\end{lemma}
+\begin{proof}
+  The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
+  \begin{align*}
+    \backCC\left(\result(\transCC_R(P))\right)(n)&=\{(n',\,D_n'^\Subset(\result(\transCC_R(P))))\ |\ n\in N^*\}(n)\\
+      &=D_n^\Subset(\result(\transCC_R(P)))\\
+      &\subseteq\mvp F(n)\\
+      &=\result_\text{IFDS}(P)(n)\,.\qedhere
+  \end{align*}
+\end{proof}
+
+We will next show, in Lemma~\ref{lem:sound}, that our analysis is sound, i.e. that the result of an IDE problem obtained through a correlated-calls transformation removes only facts that occur on infeasible paths. To prove the Soundness Lemma, we first introduce Lemmas~\ref{lem:sound1} and~\ref{lem:sound3}.
+
+We will denote the top element in the environment lattice as
+\begin{equation}
+  \Omega=\lambda d\,.\,\topcc\,.
+\end{equation}
+
+For the purpose of the proofs, we will rewrite Equation~\eqref{eq:edgefndef} that defines an edge function as follows:
+  \begin{equation}\label{eq:edgefnThroughDelta}
+    \ccedgefn S=\lambda e\,.\,
+    \begin{cases}
+      \id&\text{if $d_1=d_2=\Lambda$,}\\
+      \lambda m\,.\,\varepsilon(e)(\delta(m))&\text{otherwise},
+    \end{cases}
+  \end{equation}
+  where $S\subseteq R$, $d_1$ and $d_2$ are the source and target facts, and for a map $m\in\lcc_U$, $\delta(m)$ is either $m$ or $\botcc$:
+  \begin{equation}\label{eq:deltadef}
+    \delta(m)=\begin{cases}
+      \botcc&\text{if $d_1=\Lambda$}\\
+      m&\text{otherwise.}
+    \end{cases}
+  \end{equation}
+
+Additionally, for a path $p=[\startmain,\,\dots]$ and a fact $d\in D$, we will denote the lattice element that is mapped to $d$ according to the flow functions of path $p$ as follows:
+\begin{equation}
+  \mpd=\menv(p)(\Omega)(d)\,.
+\end{equation}
+
+The following Lemma shows that the lattice elements (receiver-to-types maps) of a correlated-calls IDE analysis correctly overapproximate the possible types of a receiver in a program execution.
+
+\begin{lemma}\label{lem:sound1}
+Let $p=[\startmain,\,\dots,\,n]$ be some concrete execution trace of the program, and let $r\in R$ be a receiver. If after the execution trace $p$, at node $n$, $r$ points to an object of runtime type~$t$, and $d\in D$ is a fact such that $d\in M_F(p)(\varnothing)$, then
+  \begin{equation}
+    t\in\mpd(r)\,.
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  By induction on the length of the trace.
+  
+  \textit{Basis:} $p=[\startmain]$. Then there is no instruction at which a receiver $r$ could be instantiated, and the Lemma is trivially true.    
+
+  \textit{Induction hypothesis:} Let $p=[\startmain,\,\dots,\,n_{k-1}]$, and let $\uptau$ be the set of types to which $\mpdkm$ maps $r$:
+  \begin{equation}
+    \uptau=\mpdkm(r)\,.
+  \end{equation}
+  Assume that for a concrete execution path $p=[\startmain,\,\dots,\,n_{k-1}]$, at node $(n_{k-1},\,d_{k-1})$, the Lemma holds, i.e. $t\in\uptau$.
+  
+  \textit{Induction step:} Let $p'=[\startmain,\,\dots,n_{k-1},\,n_k]$ and $t'\in T$ be the type to which $r$ is mapped at $n_k$.
+  
+  For each $i$, let $e_i$ be the edge $((n_{i-1},\,d_{i-1}),\,(n_i,\,d_i))$. Note that $$e_1=((\startmain,\,\Lambda),\,(n_1,\,d_1))\,.$$  
+
+  Observe that
+  \begin{align*}
+    \mppd
+    &=\menv(p')(\Omega)(d)\\
+    &=\left(\menv(e_k)\circ\menv(e_{k-1})\circ\ldots\circ\menv(e_1)\right)(\Omega)(d)\\
+    &=\menv(e_k)\left(\menv(p)(\Omega)\right)(d)\,.
+  \end{align*}
+  
+  According to~\eqref{eq:envTransToEdgeFnEdge},
+  \begin{align*}
+    &\menv(e_k)\left(\menv(p)(\Omega)\right)(d)(r)\\
+      =&\bigg(\ccedgefn R((n_{k-1},\,\Lambda),\,(n_k,\,d))(\topcc)\sqcap\\
+       &\bigsqcap_{d'\in D}\ccedgefn R((n_{k-1},\,d'),\,(n_k,\,d))(\menv(p)(\Omega)(d'))\bigg)(r)\\
+      \supseteq&
+        \bigsqcap_{d'\in D}\ccedgefn R((n_{k-1},\,d'),\,(n_k,\,d))(\menv(p)(\Omega)(d'))(r)\\
+      \supseteq&\,\ccedgefn R((n_{k-1},\,d_{k-1}),\,(n_k,\,d))(\mpdkm)(r)\,.
+  \end{align*}
+  Therefore, 
+  \begin{equation}\label{eq:musubset}
+    \efek\subseteq\mppd(r)\,.
+  \end{equation}
+  
+  We will now show that
+  \[
+    t'\in\efek\,,
+  \]
+  which, due to~\eqref{eq:musubset}, means that the Lemma holds.
+  
+  According to~\eqref{eq:edgefnThroughDelta}, there are two cases in which $\ccedgefn R(e_k)$ could fall.
+
+  If $d_{k-1}=d_k=\Lambda$, then $d_k\notin M_F(p)(\varnothing)$, since it does not belong to the set $D$, and the Lemma trivially holds.
+  
+  Otherwise, 
+  \[
+    \ccedgefn R(e_k)=\lambda m\,.\varepsilon(e_k)(\delta(m))\,.
+  \]
+  It follows that
+  \begin{align}\label{eq:efek}
+    \efek
+    &=(\lambda m\,.\varepsilon(e_k)(\delta(m)))(\mpdkm)(r)\notag\\
+    &=\varepsilon(e_k)(\delta(\mpdkm))(r).
+  \end{align}
+  Let us denote the lattice element $\delta(\mpdkm)$ with $\Delta$:
+  \[
+    \Delta=\delta(\mpdkm)\,.
+  \]
+  Note that since $\Delta$, according to~\eqref{eq:deltadef}, can be either $\botcc$ or $\mpdkm$, it always maps $r$ to a set containing~$t$:
+  \begin{equation}\label{eq:deltaContainsT}
+    t\in\Delta(r)\,.
+  \end{equation}
+  Note also that unless the instruction at $n_{k-1}$ contains an assignment for $r$, $r$ is mapped to the same object of type $t$ as at node $n_{k-1}$, and $t=t'$. Therefore, for the non-assignment instructions, it is sufficient to prove that $t\in\Delta(r)$.
+ 
+   Depending on the instructions at the nodes $n_{k-1}$ and $n_k$, there are four cases:
+  \begin{enumerate}
+    \item\label{item:asgn} The instruction at $n_{k-1}$ is an assignment for a receiver $r'\in R$.
+        Since $\varepsilon_R(e_k)=\lambda m\,.\,m[r'\to\bot_T]$,
+        \begin{align*}
+          \efek&=            
+            (\lambda m\,.\,m[r'\to\bot_T])(\Delta)(r)\\
+          &=\Delta[r'\to\bot_T](r)\,.
+        \end{align*}
+      In the resulting map, $r'$ is mapped to $\bot_T$. Then
+      
+      \begin{enumerate}
+        \item if $r=r'$, then $\efek=\bot_T$, which contains $t'$.
+        \item\label{item:defaultmap} If $r\ne r'$, then $r$ has not been reassigned a value, and still maps to the same object of type $t$. The receiver $r$ is mapped to $\Delta(r)$, which, according to~\eqref{eq:deltaContainsT}, contains $t$. Since $t=t'$, $\Delta(r)$ contains $t'$.
+      \end{enumerate}
+    \item\label{item:callstart} $e_k$ is a call-start edge with signature $s_\mathcal F$, and $f\in\mathcal F$ is the called procedure.
+      Then
+        \begin{align*}
+          \efek
+          &=(\lambda m\,.\,m[r'\to m(r')\cap\tau(s_\mathcal F,\,f)])(\Delta)(r)\\
+          &=\Delta[r'\to\Delta(r')\cap\tau(s_\mathcal F,\,f)]\,,
+        \end{align*}
+      where $r'$ is the receiver of the call.
+      \begin{itemize}
+        \item If $r'=r$, then $\Delta(r')=\Delta(r)$ which contains $t$. Since $t\in\tau(s_\mathcal F,\,f)$, it follows that $t\in\Delta(r)\cap\tau(s_\mathcal F,\,f)$, and $t\in\efek$.
+         \item If $r'\ne r$, see~(\ref{item:defaultmap}).
+       \end{itemize}
+    \item $e_k$ is an end-return edge, $r_1,\,\dots,\,r_k\in R$ are the local variables in the callee method, $r'$ is the receiver of the call site corresponding to the return node $n_k$, and $f\in\mathcal F$ is the called method with signature~$s_\mathcal F$.
+      Then 
+      \[
+        \varepsilon_R(e_k)=\lambda m\,.\,m[r'\to m(r')\cap\tau(s_\mathcal F,\,f)][r_1\to\bot_T]\dots[r_k\to\bot_T].
+      \]
+      If $r\in\{r_1,\,\dots,\,r_k\}$, see~Case~\ref{item:asgn}. Otherwise, the case is analogous to Case~\ref{item:callstart}.
+    \item\label{item:idcase} The node contains any other instruction.
+      Then 
+      \[
+        \ccedgefn R(e_k)(\mpdkm)(r)=\id(\Delta)(r)=\Delta(r),
+      \]
+      which contains $t$ according to~\eqref{eq:deltaContainsT}.\qedhere
+  \end{enumerate}
+\end{proof}
+
+We will now show that on a node of a concrete execution path, the correlated-calls analysis does not map receivers to $\top_T$. In other words, the analysis never considers nodes of a concrete execution path unreachable.
+
+\begin{lemma}\label{lem:sound3}
+  Let $p=[\startmain,\,\dots,\,n]$ be a concrete execution path, $r\in R$ a receiver, and $d\in D$ a data-flow fact. Then if $d\in M_F(p)(\varnothing)$,
+  \begin{equation}
+    \mpd(r)\ne\top_T\,.
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  By induction on the length of the execution trace.
+  
+  \textit{Basis:} 
+    Let $p=[\startmain]$. Since the only realizable path corresponding to $p$ is $[(\startmain,\,\Lambda)]$, there is no fact $d\in D$ such that $d\in M_F(p)(\varnothing)$, and the claim follows immediately.
+  
+  \textit{Induction hypothesis:} 
+  Let $p=[\startmain,\,\dots,\,n_{k-1}]$. Let $\uptau$ be the set of types to which $r$ is mapped by $\mpdkm$:
+  \begin{equation}
+    \uptau=\mpdkm(r)\,.
+  \end{equation}
+  Assume the Lemma holds for that for a concrete execution path $$p=[\startmain,\,n_1,\,\dots,\,n_{k-1}]\,,$$ i.e. $\uptau\ne\top_T$ for an arbitrary $r\in R$ and $d_{k-1}\in D$.
+  
+  \textit{Induction step:}
+    Let $p'=[\startmain,\,n_1,\,\dots,n_{k-1},\,n_k]$ be a concrete execution path.
+    
+    Let $e_k=((n_{k-1},\,d_{k-1}),\,(n_k,\,d))$. As shown in~\eqref{eq:musubset},
+    \begin{align*}
+      \mppd(r)
+        &\supseteq\ccedgefn R(e_k)(\mpdkm)(r)\,.
+    \end{align*}
+
+    From Definition~\ref{def:edgefn}, we can see that unless $e_k$ is a call-start edge or an end-return edge, the result follows from the induction hypothesis.
+    More formally, if $e_k$ is not a call-start or end-return edge, then for all $m\in\lcc_R$,
+    \[
+      \ccedgefn R(e_k)(m)\sqsubseteq m\,.
+    \]
+     The edge function corresponding to the call-start and end-return edges is the only place in which the set of types that a receiver maps to can be reduced.
+    
+    Assume that $e_k$ is a end-return edge with a call on the receiver $r'\in R$ with a signature $s_\mathcal F$ to a function $f\in\mathcal F$.
+    \begin{align*}
+      \ccedgefn R&(e_k)(\mpdkm)(r)\\
+      &=\left(\lambda m\,.\,m[r'\to m(r)\cap\tau(s_\mathcal F,\,f)][r_1\to\bot_T]\dots[r_l\to\bot_T]\right)(\mpdkm)(r)\\
+      &=\left(\mpdkm[r'\to \uptau\cap\tau(s_\mathcal F,\,f)][r_1\to\bot_T]\dots[r_l\to\bot_T]\right)(r)\,,
+    \end{align*}
+  where $r_1,\,\dots,r_l\in R$ are the local variables in the called method.
+    
+    If $r\in\{r_1,\,\dots,\,r_l\}$, then $\efek=\bot_T\ni t$\footnote{In the case of a recursive call, it is possible that both $r\in\{r_1,\,\dots,\,r_l\}$ and $r=r'$.
+    In that case, the set to which $r$ will be mapped would be still ``overwritten'' by $\bot_T$.}.
+    
+    Otherwise, if $r=r'$, then $\efek=\uptau\cap\tau(s_\mathcal F,\,f)$.
+
+    According to Lemma~\ref{lem:sound1} and by the induction hypothesis, the runtime type $t$ of $r$ must be contained in $\mpdkm(r)=\uptau$. At the same time, by definition, $t$ is part of $\tau(s_\mathcal F,\,f)$. Therefore, $t\in\uptau\cap\tau(s_\mathcal F,\,f)\subseteq\efek$, which means that $\efek\ne\top_T$.
+    
+    The same reasoning applies to the case where $e_k$ is a call-start edge.
+\end{proof}
+
+Finally, we will prove the soundness of the correlated-calls analysis: we will show that our analysis only considers a path infeasible if it cannot occur in a concrete execution of a program.
+
+\begin{lemma}[Soundness]\label{lem:sound}
+  Let $p=[\startmain,\,\dots,\,n]$ be a concrete execution path, and let $d\in D$.
+  If $d\in M_F(p)(\varnothing),$
+  then
+  \begin{equation}
+    d\in \backCC\left(\result(\transCC_R(P))\right)(n)\,.
+  \end{equation}
+\end{lemma}
+\begin{proof} Let $\rho=\result(\transCC_R(P))$. Then
+  \begin{align*}
+    \backCC(\rho)(n)
+    &=D_n^\Subset(\rho)\\
+    &=\left\{d'\ |\ 
+        d'\in\mvp F(n)\,\wedge\,\forall r\in R:\ \rho(n,\ d')(r)\ne\top_T\right\}.
+  \end{align*}
+  Since $\mvp F(n)=\bigsqcap_{q\in\ivp(n)}M_F(q)(\varnothing)$, and $p\in\ivp(n)$, it follows that
+    \begin{align*}
+      d&\in M_F(p)(\varnothing)\\&\subseteq\mvp F(n)\,.
+    \end{align*}
+  At the same time, for all receivers $r\in R$,
+  \begin{align*}
+    \rho(n,\,d)(r)
+    &=\left(\bigsqcap_{q\in\ivp(n)}\mpddef q d\right)(r)\\
+    &=\bigsqcap_{q\in\ivp(n)}\mpddef q d(r)\,.
+  \end{align*}
+  According to~Lemma~\ref{lem:sound3}, $\mpd(r)\ne\top_T$.
+  Since $p\in\ivp(n)$,
+  \begin{align*}
+    \mpd(r)\subseteq\bigsqcap_{q\in\ivp(n)}\mpddef qd(r)\,.
+  \end{align*}
+  From $\bigsqcap_{q\in\ivp(n)}\mpddef qd(r)=\rho(n,\,d)(r)$ it follows that
+  $\mpd(r)\subseteq\rho(n,\,d)(r)$.
+  Therefore, $\rho(n,\,d)(r)\ne\top_T$, and $d\in D_n^\Subset(\rho)=\backCC(\rho)(n)$.
+\end{proof}
+
+\paragraph{Correlated-Call Receivers}\label{sec:ccreceivers}
+We will now show that in a correlated-calls transformation, it is enough to consider only some of the receivers of set $R$.
+
+\begin{definition}
+Let $c_1$ and $c_2$ be two call sites on a receiver $r\in R$.
+  If both call sites are polymorphic, then we say that $r$ is a \textit{correlated-call receiver}.
+\end{definition}
+In other words, a correlated-call receiver is a receiver that has at least two polymorphic call invocations.
+We will denote the set of correlated-call receivers as $\rcc$.
+
+We will describe a ``reduced'' correlated-calls transformation in which we only consider receivers from $\rcc$ and ignore other receivers of $R$. We will show that IDE problems obtained through ordinary and reduced correlated-calls transformations yield the same results.
+  
+The following Lemma shows that the types to which a given receiver is mapped in the result of the algorithm is not affected by other receivers and the types to which they are mapped.
+
+\begin{lemma}\label{lem:recindepedgefn}
+  Let $P$ be an IFDS problem. Let $N^*$ be the supergraph for $P$, $D$ the set of data-flow facts, $n\in N^*$ a node, and $p=[\startmain,\,\dots,\,n]$ a path in the supergraph. Let $d\in D\cup\{\Lambda\}$.
+  Then for any realizable path $p'\in\textsf{RP}(p,\,d)$, set $S\subseteq R$, and receiver $r\in S$,
+  \begin{equation}
+    \ccedgefn S(p')(\topcc)(r)=
+    \ccedgefn{\{r\}}(p')(\topcc)(r)\,.
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  By induction on the length of $p$.
+  
+  \textit{Basis:} $p'=[(\startmain,\,\Lambda)]$. Then $\ccedgefn S(p')=\id=\ccedgefn{\{r\}}(p')$, and the Lemma follows directly.
+  
+  \textit{Induction hypothesis:} Suppose that for a path $q=[(\startmain,\,\Lambda),\,\dots,\,(n_{k-1},\,d_{k-1})]$, where $q\in\textsf{RP}(n,\,d)$, the Lemma holds, i.e. both edge functions map $r$ to the same set of types $\uptau$:
+  \begin{align*}
+    \uptau
+    &=\ccedgefn S(q)(\topcc)(r)\\
+    &=\ccedgefn{\{r\}}(q)(\topcc)(r)\,.
+  \end{align*}
+  
+  \textit{Induction step:} Let $q'=[(\startmain,\,\Lambda),\,\dots,\,(n_{k-1},\,d_{k-1}),\,(n_k,\,d_k)]$ and the edge $e_k=((n_{k-1},\,d_{k-1}),\,(n_k,\,d_k))$.
+  
+  Observe that for any set $U\subseteq R$ such that $r\in U$,
+  \begin{align}\label{eq:edgefnU}
+    \ccedgefn U(q')(\topcc)(r)
+    &=\ccedgefn U(e_k)(\ccedgefn U(q)(\topcc))(r)\,.
+  \end{align}
+  
+  We can see from~\eqref{eq:edgefnThroughDelta} that there are two cases.  
+  
+  If $d_{k-1}=d_k=\Lambda$, $\ccedgefn S(e_k)=\id=\ccedgefn{\{r\}}(e_k)$, and, due to~\eqref{eq:edgefnU},
+  \begin{align*}
+    \ccedgefn S(q')(\topcc)(r)&=\uptau\\
+    &=\ccedgefn{\{r\}}(q')(\topcc)(r)\,.
+  \end{align*}
+  
+  Otherwise, there are four sub-cases.
+  \begin{enumerate}
+    \item $e_k$ is a call-start edge, $r'.c()$ is the call site at $n_{k-1}$ with signature $s_\mathcal F$, $f\in\mathcal F$ is the called procedure, and $r'\in U$.
+    Then
+    \[
+      \ccedgefn U(e_k)=\lambda m\,.\,\delta(m)[r'\to\delta(m)(r)\cap\tau(s_\mathcal F,\,f)]\,.
+    \]
+    There are two sub-cases.
+    \begin{enumerate}
+      \item\label{item:callstartreceq} If $r=r'$, then, according to~\eqref{eq:edgefnU}, the resulting set of types 
+        \[
+          \ccedgefn U(q')(\topcc)(r)=\delta(\ccedgefn U(q)(\topcc))(r)\cap\tau(s_\mathcal F,\,f).
+        \]
+        If $d_{k-1}=\Lambda$, then $\delta(\ccedgefn U(q)(\topcc))(r)=\botcc(r)=\bot_T$. If $d_{k-1}\ne\Lambda$, then $\delta(\ccedgefn U(q)(\topcc))(r)=\ccedgefn U(q)(\topcc)(r)=\uptau$. The set $\tau(s_\mathcal F,\,f)$ is the same for either case.
+    
+        Therefore, the value of $\ccedgefn U(q')(\topcc)(r)$ has the same result regardless of $U$,
+        which means that $\ccedgefn S(q')(\topcc)(r)=\ccedgefn{\{r\}}(q')(\topcc)(r)$, and the Lemma holds.
+      \item\label{item:callstartrecneq} If $r\ne r'$, then
+        \begin{equation}
+          \ccedgefn U(q')(\topcc)(r)=\delta(\ccedgefn U(q)(\topcc))(r)\,,
+        \end{equation}
+        which, as we have seen in~Case~\eqref{item:callstartreceq}, does not depend on~$U$, and the Lemma holds.
+    \end{enumerate}
+    \item $e_k$ is an end-return edge, $r_1,\,\dots,\,r_l\in U$ are the local variables in the callee method, $r'.c()$ is the call corresponding to the return node at $n_k$, $f\in\mathcal F$ is the called method with signature $s_\mathcal F$, and $r'\in U$.
+    Then
+    \[
+      \ccedgefn U(e_k)=\lambda m\,.\,\delta(m)
+      [r'\to\delta(m)(r)\cap\tau(s_\mathcal F,\,f)]
+      [r_1\to\bot_T]\ldots[r_l\to\bot_T]\,.
+    \]
+    There are three sub-cases.
+    \begin{enumerate}
+      \item\label{item:localvarrec} If $r\in\{r_1,\,\dots,\,r_l\}$, then regardless of the value of $U$,
+      \[
+        \ccedgefn U(q')(\topcc)(r)=\bot_T\,,
+      \]
+      and the Lemma holds.
+      \item Otherwise, if $r=r'$, the case is analogous to Case~\eqref{item:callstartreceq}.
+      \item If $r\notin\{r',\,r_1,\,\dots,\,r_l\}$, then see Case~\eqref{item:callstartrecneq}.
+    \end{enumerate}
+    \item $n_{k-1}$ contains an assignment for $r'\in U$. Then
+    \[
+      \ccedgefn U(e_k)=\lambda m\,.\,\delta(m)[r'\to\bot_T]\,.
+    \]
+    If $r=r'$, see Case~\eqref{item:localvarrec}. If $r\ne r'$, see Case~\eqref{item:callstartrecneq}.
+    \item Otherwise,
+    \[
+      \ccedgefn U(e_k)=\lambda m\,.\,\delta(m)\,,
+    \]
+    and the case is analogous to Case~\eqref{item:callstartrecneq}.\qedhere
+  \end{enumerate}
+\end{proof}
+
+The following Lemma shows that the correlated-calls analysis computes the results for each receiver independently, or separately. To compute the set of types to which a receiver~$r$ is mapped at each exploded-graph node, we can exclude all other receivers in the program from the analysis (recall from~\eqref{eq:edgefndef} that the set of receivers that are considered in the analysis is specified by the set $S$ in a correlated-calls transformation $\transCC_S$). Therefore, for a given receiver $r$, the results of a $\transCC_S$- and a $\transCC_{\{r\}}$-analysis are the same.
+
+\begin{lemma}\label{lem:recindep} Let $P$ be an IFDS problem. Let $N^*$ be the supergraph for $P$, $D$ the set of data-flow facts, and $S\subseteq R$ a set of receivers.
+  Then for any $n\in N^*$, $d\in D$, and receiver $r\in S$,
+  \begin{equation}
+    \result\left(\transCC_S(P)\right)(n,\,d)(r)=
+    \result(\transCC_{\{r\}}(P))(n,\,d)(r)\,.
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  According to~\eqref{eq:ideresult}, \eqref{eq:mvpdef}, and~\eqref{eq:envTransToEdgefn},
+  \begin{align}
+    \result\left(\transCC_S(P)\right)(n,\,d)(r)
+    &=\mvp{\textsf{Env}}(n,\,d)(r)\notag\\
+    &=\left(\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\Omega)(d)\right)(r)\notag\\
+    &=\left(\bigsqcap_{q\in\ivp(n)}\bigsqcap_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn S(q')(\topcc)\right)(r)\notag\\
+    &=\bigcup_{q\in\ivp(n)}\bigcup_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn S(q')(\topcc)(r)\,.\label{eq:resultThroughEdgefn}
+  \end{align}
+  Then from Lemma~\ref{lem:recindepedgefn},
+  \begin{align*}
+    \result\left(\transCC_S(P)\right)(n,\,d)(r)
+    &=\bigcup_{q\in\ivp(n)}\bigcup_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn{\{r\}}(q')(\topcc)(r)\\
+    &=\result\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)\,.\qedhere
+  \end{align*}
+\end{proof}
+
+The next lemma shows that the set of types to which a receiver is mapped in a correlated-calls lattice element can be represented as an intersection of static-type function applications $\tau(s_{\mathcal F_i},\,f_i)$.
+\begin{lemma}\label{lem:edgefnThroughTaus}
+  For an IFDS problem $P$, a node $n\in N^*$, and fact $d\in D$, let $p\in\mathsf{RP}(n,\,d)$ be a realizable path and $r\in R$ a receiver. Then there exists a non-negative number $\gamma$ of calls on the receiver $r$ with signatures $s_{\mathcal F_\gamma}$ to the functions $f_\gamma\in\mathcal F_\gamma$, for which
+  \[
+    \ccedgefn{\{r\}}(p)(\topcc)(r)=
+      \bigcap_{\gamma\ge0}\tau(s_{\mathcal F_\gamma},\,f_\gamma)\,.
+  \]
+\end{lemma}
+\begin{proof}
+  Let $p$ have the following form\footnote{It can be shown from the definition of a pointwise representation in~Sagiv et al.~\cite{sagiv1996precise} that in a realizable path, there is never an edge from a fact of the set $D$ to a $\Lambda$ fact. Therefore, we can represent $p$ as a sequence of nodes that has a prefix of $\Lambda$-fact nodes, after which all nodes are non-$\Lambda$ facts.}:
+  \[
+    p=[(\startmain,\,\Lambda),\,(n_1,\,\Lambda),\,\dots,\,(n_k,\,\Lambda),
+       (n_{k+1},\,d_{k+1}),\,\dots,\,(n_{k+l},\,d_{k+l})]\,,
+  \]
+  where $l\ge1$ and the facts for all nodes up to $n_k$ are equal to $\Lambda$ and $d_{k+i}\in D$ for $0<i\le l$.
+  
+  As previously, for all $i$, we will denote the edge $(n_i,\,n_{i+1})$ by $e_i$.  
+  
+  From~\eqref{eq:edgefndef} we can infer that
+  \[
+    \ccedgefn{\{r\}}(p)=
+    \ccedgefn{\{r\}}(e_{k+l})
+    \circ\ldots
+    \circ\ccedgefn{\{r\}}(e_{k+2})
+    \circ(\lambda m\,.\,\beta)
+    \circ\id
+    \circ\ldots
+    \circ\id\,,
+  \]
+  where
+  \[
+    \beta=
+    \begin{cases}
+      \botcc[r\to\tau(s_\mathcal F,\,f)]&\text{if $(n_k,\,n_{k+1})$ is a call-start or end-return edge, and}\\&\text{the call site $r.c()$ with signature $s_\mathcal F$ to the function}\\
+      &\text{$f\in\mathcal F$ corresponds to the call-start or end-return edge,}\\
+      \botcc&\text{otherwise\footnotemark.}
+    \end{cases}
+  \]
+  \footnotetext{Since $d_k=\Lambda$ and $d_{k+1}\ne\Lambda$, the micro function for the edge $e_{k+1} $ is equal to $\lambda m\,.\,\varepsilon_{\{r\}}(e_{k+1})(\botcc)$. From the definition of $\varepsilon_S$~\eqref{eq:varepsilon} we can see that the only case where $\varepsilon_{\{r\}}(e_{k+1})(m)$ would not be equal to $\botcc$ is when $e_{k+1}$ is call-start or end-return edge.}
+  
+  Therefore,
+  \begin{align}\label{eq:edgefnbeta}
+    \ccedgefn{\{r\}}(p)(\topcc)
+      &=\left(\ccedgefn{\{r\}}(e_{k+l})\circ\ldots\circ
+        \ccedgefn{\{r\}}(e_{k+2})\right)((\lambda m\,.\,\beta)(\topcc))\notag\\
+      &=\left(\ccedgefn{\{r\}}(e_{k+l})\circ\ldots\circ
+        \ccedgefn{\{r\}}(e_{k+2})\circ\id\right)(\beta)\,.
+  \end{align}
+
+We can now prove the lemma by induction on $l$.
+
+\textit{Basis:}
+If $l=1$, then $\ccedgefn{\{r\}}(p)(\topcc)=\id(\beta)=\beta$.
+There are two cases.
+
+If $\beta=\botcc$, then 
+\begin{align*}
+  \ccedgefn{\{r\}}(p)(\topcc)(r)&=\beta(r)\\&=\bot_T\,,
+\end{align*} and $\gamma=0$.
+
+If $\beta=\botcc[r\to\tau(s_\mathcal F,\,f)]$, then 
+\[
+  \ccedgefn{\{r\}}(p)(\topcc)(r)=\tau(s_\mathcal F,\,f)\,,
+\]
+and $\gamma=1$.
+
+\textit{Induction hypothesis:}
+Assume that for a path $p=[(\startmain,\,\Lambda),\,\dots,\,(n_{k+l},\,d_{k+l})]$, the Lemma holds for $\gamma=N$, where $N\ge0$.
+
+\textit{Induction step:}
+Let $p'=[(\startmain,\,\Lambda),\,\dots,\,(n_{k+l},\,d_{k+l}),\,(n_{k+l+1},\,d_{k+l+1})]$.
+
+Recall that
+\begin{align*}
+  \ccedgefn{\{r\}}(p')(\topcc)(r)
+  &=\ccedgefn{\{r\}}(e_{k+l+1})\left(\ccedgefn{\{r\}}(p)(\topcc)\right)(r)\,.
+\end{align*}
+
+From~\eqref{eq:varepsilon} we can see that unless $e_{k+l+1}$ is a call-start or end-return edge corresponding to a call on the receiver $r$, then $\ccedgefn{\{r\}}(e_{k+l+1})(r)$ must be equal to either $\bot_T$ or $m(r)$, where $m=\ccedgefn{\{r\}}(p)(\topcc)$. 
+
+If $\ccedgefn{\{r\}}(e_{k+l+1})(r)=\bot_T$, then the Lemma holds for $\gamma=0$. 
+
+Otherwise,
+\begin{align*}
+  \ccedgefn{\{r\}}(e_{k+l+1})(\topcc)(r)&=\ccedgefn{\{r\}}(p)(\topcc)(r)\\
+  &=\bigcap_{N}\tau(s_{\mathcal F_N},\,f_N)\,,
+\end{align*}
+and therefore $\gamma=N$.
+
+Suppose that $e_{k+l+1}$ is a call-start edge with a call on the receiver $r$ with signature $s_\mathcal G$ to a function $g\in\mathcal G$. Then, according to~\eqref{eq:varepsilon}, 
+\[
+  \ccedgefn{\{r\}}(e_{k+l+1})=\lambda m\,.\,m[r\to m(r)\cap\tau(s_\mathcal G,\,g)]\,.
+\]
+Therefore,
+\begin{align*}
+  \ccedgefn{\{r\}}&(p')(\topcc)(r)\\
+  &=\lambda m\,.\,m[r\to m(r)\cap\tau(s_\mathcal G,\,g)]\left(\ccedgefn{\{r\}}(p)(\topcc)\right)(r)\\
+  &=\ccedgefn{\{r\}}(p)(\topcc)(r)\cap\tau(s_\mathcal G,\,g)\\
+  &=\left(\bigcap_{N}\tau(s_{\mathcal F_N},\,f_N)\right)\cap\tau(s_\mathcal G,\,g)\,,
+\end{align*}
+and the Lemma holds for $\gamma=N+1$.
+
+The case where $e_{k+l+1}$ is an end-return edge is analogous to the previous case.
+\end{proof}
+
+We now show that a receiver will be only mapped to $\topcc$ if it is the receiver of a correlated call.
+
+\begin{lemma}\label{lem:ccrectop}
+   For an IFDS problem $P$, let $n\in N^*$ be a node, and $d\in D$ a dataflow fact such that there exists a realizable path $p\in\textsf{RP}(n,\,d)$. Let $T$ be the set of all types in the program.
+   If there exists a receiver $r\in R$ such that
+  \[
+    \ccedgefn{\{r\}}(p)(\topcc)(r)=\top_T\,,                       
+  \]
+  then $r\in \rcc$.
+\end{lemma}
+\begin{proof}
+ According to Lemma~\ref{lem:edgefnThroughTaus},
+ \[
+   \ccedgefn{\{r\}}(p)(\topcc)(r)=
+      \bigcap_{\gamma\ge0}\tau(s_{\mathcal F_\gamma},\,f_\gamma).
+ \]
+ 
+ Let $\tau_i=\tau(s_{\mathcal F_i},\,f_i)$. 
+ For a given $k$, let $r.m_k()$ be the call site corresponding to $\tau_k$, and $T'$ the set of types compatible with the static type of $r$.
+ Recall from Section~\ref{sec:ef} that 
+ \begin{itemize}
+   \item $\tau_k\ne\top_T$;
+   \item if $\tau_k=T'$ then the corresponding call site is monomorphic;
+   \item if $\tau_k\subset T'$ then the call site is polymorphic.
+ \end{itemize}
+ 
+ From the conditions of the Lemma, 
+ \begin{equation}
+   \bigcap_{\gamma\ge 0}\tau_\gamma=\top_T\,.
+ \end{equation} 
+ 
+ If all $\tau_k=T'$, then $\bigcap_{\gamma\ge 0}\tau_\gamma$ is also equal to $T'$. Since $T'\ne\top_T$, this is a contradiction. 
+ 
+ If exactly one $\tau_k\subset T'$ and the rest are equal to $T'$, then $\bigcap_{\gamma\ge 0}\tau_\gamma$ is equal to $\tau_k$, which cannot be $\top_T$ either.
+ 
+ Therefore, there are at least two sets, $\tau_i$ and $\tau_j$, which are strict subsets of $T'$. Since both $\tau_i$ and $\tau_j$ are non-empty and their intersection equals $\top_T$, $\tau_i$ and $\tau_j$ must be disjoint. If $\tau_i$ and $\tau_j$ are disjoint, they must correspond to different call sites.
+ 
+ In other words, there are at least two calls on the same receiver for which the static-type function is a strict subset of the set of types compatible with a given receiver $r$. It follows that both calls have to be polymorphic. Therefore,~${r\in\rcc}$.
+\end{proof}
+
+We will now show that if a receiver ever gets mapped to top, then it is a correlated-calls receiver.
+
+\begin{lemma}\label{lem:ccrectop}
+   For an IFDS problem $P$, let $n\in N^*$ be a node, and $d\in D$ a dataflow fact such there exists a realizable path $p\in\textsf{RP}(n,\,d)$.
+   Then, if there exists a receiver $r\in R$, such that
+  \[
+    \result\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)=\top_T\,,
+  \]
+  then $r\in \rcc$.
+\end{lemma}
+\begin{proof}
+  As shown in~\eqref{eq:resultThroughEdgefn},
+  \[
+    \result\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)=\bigcup_{q\in\ivp(n)}\bigcup_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn{\{r\}}(q')(\topcc)(r)\,.
+  \]
+  Since the latter is equal to $\top_T$, it follows that for each realizable path $p'$ to node $n$, $\ccedgefn{\{r\}}(p')(\top)(r)=\top_T$. According to~Lemma~\ref{lem:ccrectop}, this is only possible if $r\in\rcc$.
+\end{proof}
+
+Finally, we show that if a correlated calls analysis considers only correlated-call receivers, no precision is lost. A correlated-calls analysis that considers all receivers computes the same result as an analysis that considers only correlated-call receivers.
+
+\begin{lemma}\label{lem:onlycorrrec}
+  Let $P$ be an IFDS problem. Then
+  \begin{equation}
+    \backCC\left(\result\left(\transCC_\rcc(P)\right)\right)=\backCC(\result\left(\transCC_R(P)\right))\,.
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  From~\eqref{eq:ucc} we know that
+  \begin{align*}
+    \backCC(\result\left(\transCC_R(P)\right))
+    &=\left\{(n,\,D_n^\Subset(\result(\transCC_R(P))))\ |\ n\in N^*\right\}.
+  \end{align*}
+  According to~\eqref{eq:dnq} and~Lemma~\ref{lem:recindep}, for a given $n\in N^*$,
+  \begin{align*}
+    D_n^\Subset&(\result(\transCC_R(P))))\\
+    &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall r\in R:\ \left\{(r,\,\result(\transCC_{\{r\}}(P))(n,\,d)(r))\ |\ r\in R\right\}(r)\ne\top_T\right\}\\
+    &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall\bm{r\in R}:\ \result(\transCC_{\{r\}}(P))(n,\,d)(r)\ne\top_T\right\}.
+  \end{align*}
+
+Since, according to Lemma~\ref{lem:ccrectop}, $\result(\transCC_{\{r\}}(P))(n,\,d)(r)$ can only be equal to $\top_T$ when $r\in\rcc$, we can conclude that
+  \begin{align*}
+    D_n^\Subset&(\result(\transCC_R(P))))\\
+    &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall\bm{r\in\rcc}:\ \result(\transCC_{\{r\}}(P))(n,\,d)(r)\ne\top_T\right\}\\
+    &=D_n^\Subset(\result(\transCC_\rcc(P)))).
+  \end{align*}
+  
+  Therefore,
+  \begin{align*}
+    \backCC(\result\left(\transCC_R(P)\right))
+    &=\left\{(n,\,D_n^\Subset(\result(\transCC_\rcc(P))))\ |\ n\in N^*\right\}\\
+    &=\backCC(\result\left(\transCC_\rcc(P)\right))\,.\qedhere
+  \end{align*}
+\end{proof}
+
+To summarize, Lemma~\ref{lem:sound} shows that the result $\resultCC$ of a correlated-calls analysis is sound since it overapproximates the data flow of all possible concrete execution paths.
+We have also shown in Lemma~\ref{lem:subsetifds} that the correlated-calls analysis improves the precision of the original IFDS result $\result_\text{IFDS}$, because the correlated-calls result $\resultCC$ underapproximates an equivalence-IDE result $\resultEq=\result_\text{IFDS}$.
+Finally, we showed that a correlated-call transformation to IDE that considers only correlated-call receivers $\rcc$ achieves the same result $\resultCC$ that is obtained when considering all receivers $R$.
+
+This is the general idea of the correlated-calls analysis. The analysis involves a transformation from IFDS to IDE problems. To implement an IDE problem, it is necessary to define a representation of lattice elements and micro functions. An efficient representation of those data structures for the correlated-calls analysis is presented in the next section.
