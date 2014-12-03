@@ -118,7 +118,7 @@ First, let us show that normalization does not change the behaviour of an update
 
 Let us show that two update functions are equal if and only if their normalized representations are equal.
 
-It is obvious that two functions represented with the same pairs of sets are equal. Let us prove that two different pairs of sets represent different update functions.
+It is obvious that two functions represented with the same pairs of sets are equal. The following lemma states that two different pairs of sets represent different update functions.
 
 \begin{lemma}\label{lem:normuneq}
     Let $\setpair IU$ and $\setpair{I'}{U'}$ be two normalized update functions such that $\setpair IU\ne\setpair {I'}{U'}$. Then $\denote{\setpair IU}\ne\denote{\setpair {I'}{U'}}$.
@@ -193,7 +193,7 @@ receiver-to-types map $m$. It returns a new map in which $r$ is mapped to a new 
 \end{align*}
 Note that in the beginning of the algorithm, $m$ maps each receiver to $\bot_T$ (all types).
 
-Composing two micro functions means to compose their update-map denotations:
+Composing two micro functions means to compose their update-map denotations:\mtodo{Should this be somehow moved to the appendix? Or should we just say ``It can be shown that ...'' and remove the whole computations at all?}
 \begin{align}
     \denote{f_1\circ f_2}
     &=\denote{\left\{
@@ -267,7 +267,9 @@ We can now show how the correlated-calls definitions of the meet and composition
   Therefore, the path to the print statement will be considered infeasible, and the analysis does not claim that the program leaks a secret value.
 \end{example}
 
+\begin{mdelete}
 The following Lemma states that the representation of micro functions is efficient according to the definition  of efficiency discussed in Section~\ref{sec:ccdatastr}.
+\end{mdelete}
 \begin{lemma}\label{lem:efficient}
   The correlated-call representation of a micro function is efficient.
 \end{lemma}

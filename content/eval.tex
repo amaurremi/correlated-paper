@@ -119,16 +119,17 @@ where $\epsilon$ is the bottom function on an edge from a $\Lambda$-fact to a no
   \end{cases}
 \]
 
-We also implemented a correlated-call transformation from IFDS into IDE problems that consider correlated calls. This transformation is described in Section~\ref{sec:cctrans}. The flow functions can be easily inferred from Section~\ref{sec:edgefnrep}.
+We also implemented a correlated-call transformation from IFDS into IDE problems that consider correlated calls. This transformation is described in Section~\ref{sec:cctrans}.
 
 \subsubsection{Regression Testing}
 We used regression tests to assess the correctness of the implemented analyses. Each test involves running a certain analysis on one input Java program.
 
+\begin{mdelete}
 \paragraph{IDE-Implementation Correctness}
-To test the correctness of the IDE algorithm implementation, we implemented a copy-constant-propagation IDE problem~\cite{sagiv1996precise}. 
+To test the correctness of the IDE algorithm implementation, we implemented a copy-constant-propagation IDE problem~\cite{sagiv1996precise}.
 In a copy-constant propagation analysis, a variable is considered constant if it is assigned a constant literal or another variable that is also a constant. For example, in a program
 \inputMinted{java}{correct.java}
-\verb'a' and \verb'b' are considered constant, but \verb'c' and \verb'd' are not (although \verb'd' would be considered constant in linear-constant propagation).
+\texttt a and \texttt b are considered constant, but \texttt c and \texttt d are not (although \texttt d would be considered constant in linear-constant propagation).
 
 We tested the propagation of constants on different intra- and inter-procedural data-flow paths, in parameter passing,
 and in conditional branches. Each regression test contained assertions of the form ``at the end of method $m$, variable with name $x$ should be (not) constant''.
@@ -180,6 +181,7 @@ Our taint analysis implementation becomes unsound in the presence of static init
 
 A static initializer is invoked only once, before the instance creation of a class or the access of a static member of that class.
 Static initializers are invoked lazily by the Java Virtual Machine~\cite{lindholmjava}. This makes finding out at which program point a static initializer is invoked undecidable~\cite{hubert2009soundly}. To account for static initializers in the analysis would require modifying WALA's control-flow supergraph (which does not have edges to static initializers) or using a data-flow analysis for static initialization. Since the primary purpose of the taint-analysis implementation was to test the correlated-call analysis, we did not include a static-initializer analysis in this work.
+\end{mdelete}
 
 \paragraph{Correlated-Calls-Analysis Correctness}
 We tested the implementation of the correlated-calls analysis by converting the taint analysis into an IDE problem with an implementation of $\transCC_\rcc$.

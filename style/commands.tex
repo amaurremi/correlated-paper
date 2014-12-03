@@ -1,8 +1,3 @@
-% inline todo
-\newcommand{\comment}[1]{\todo[size=\tiny,noline,backgroundcolor=-red!75!green!50!blue]{#1}}
-% side-note todo
-\newcommand{\TODO}[1]{\todo[inline,backgroundcolor=Peach]{#1}}
-
 % brackets for denotations
 \newcommand{\denote}[1]{\left\llbracket#1\right\rrbracket}
 
@@ -111,3 +106,48 @@
 \newcommand{\efek}{\ccedgefn R(e_k)(\mpdkm)(r)}
 
 \newcommand{\id}{\textsf{id}}
+
+\newcommand{\comment}[3]{\todo[size=\tiny,color=#3]{#1 \textbf{(#2)}}}
+\newcommand{\mtodo}[1]{\comment{#1}{M}{mcomment}}
+\newcommand{\ftodo}[1]{\comment{#1}{F}{fcomment}}
+\newcommand{\otodo}[1]{\comment{#1}{O}{ocomment}}
+
+\makeatletter
+\newcommand*{\savecbcolor}{%
+  \let\saved@cb@current@color\cb@current@color
+}
+\newcommand*{\restorecbcolor}{%
+  \global\let\cb@current@color\saved@cb@current@color
+}
+\makeatother
+
+\newenvironment{mdelete}{%
+  \savecbcolor
+  \begin{changebar}%
+  \cbcolor{mcomment}%
+  \addtolength{\changebarsep}{2mm}%
+  \setlength{\changebarwidth}{2mm}%
+}{
+  \end{changebar}%
+  \restorecbcolor
+}
+
+\newenvironment{odelete}{%
+  \savecbcolor
+  \begin{changebar}%
+  \cbcolor{ocomment}%
+  \addtolength{\changebarsep}{2mm}%
+}{%
+  \end{changebar}%
+  \restorecbcolor
+}
+
+\newenvironment{fdelete}{%
+  \savecbcolor
+  \begin{changebar}%
+  \cbcolor{fcomment}%
+  \addtolength{\changebarsep}{2mm}%
+}{%
+  \end{changebar}%
+  \restorecbcolor
+}

@@ -593,9 +593,10 @@ for all $l\in L$.
 
 In IDE problems, the auxiliary fact analogous to $\mathbf0$ in IFDS is denoted as $\Lambda$.
 
+\begin{mdelete}
 \begin{example}\label{ex:constprop}
   One version of the constant propagation analysis that can be encoded with IDE is \textit{linear constant propagation}. A linear constant propagation analysis can detect constants of the form $a\cdot x+b$, where $a$ and $b$ are integers and $x$ is a variable. In particular, a variable can only be considered constant if it depends on at most one other constant variable: even if $y$ and $z$ are variables that are considered constant, the variable $x=y+z$ will be considered not constant. If we encoded the analysis in a way to handle non-linear constant assignments, we would have to use non-distributive flow functions, which would violate the requirements of the IDE algorithm.
-
+  
   For linear constant propagation, the $L$ lattice consists of the set of integers $\mathbb Z$, a top element denoting ``not a constant'', and a bottom element denoting an unknown value.
   The meet of two lattice elements is defined as follows: for any lattice element $l\in L$,
   \[
@@ -652,6 +653,7 @@ In IDE problems, the auxiliary fact analogous to $\mathbf0$ in IFDS is denoted a
     \{(\texttt u,\,5),\ (\texttt v,\,3),\ (\texttt w,\,\top)\}.
   \]
 \end{example}
+
 \begin{figure}
   \centering
     \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt,sm]
@@ -699,6 +701,7 @@ In IDE problems, the auxiliary fact analogous to $\mathbf0$ in IFDS is denoted a
   \caption[A labeled exploded supergraph for a constant-propagation analysis described in Example~\ref{ex:constprop}]{A labeled exploded supergraph for a constant-propagation analysis described in Example~\ref{ex:constprop}. The dashed edges are edges not reachable from the entry node.}%
   \label{fig:constprop}%
   \end{figure}
+\end{mdelete}
   
 In this way, each edge in the exploded graph is labeled with a micro function. The mapping from exploded-graph edges to the corresponding micro functions is stored in \textit{edge functions},  denoted as \textsf{EdgeFn}$:\,E^\#\to(L\to L)$.
 
