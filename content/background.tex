@@ -55,11 +55,14 @@ A control-flow supergraph allows us to model the control flow in inter-procedura
 
 \begin{example}
   Consider the program in Listing~\ref{list:examplejava}. The supergraph corresponding to that program is shown in Figure~\ref{fig:examplesupergraph}.
-  \begin{listing}
-  \inputMinted{java}{examplesupergraph.java}
+\begin{figure}
+  \centering
+  \begin{minipage}{\textwidth}
+    \inputMinted{java}{examplesupergraph.java}
+  \end{minipage}
   \caption{An example Java program}
-  \label{list:examplejava}  
-  \end{listing}
+  \label{list:examplejava}
+\end{figure}
   
   \begin{figure}%
   \centering
@@ -628,6 +631,7 @@ In IDE problems, the auxiliary fact analogous to $\mathbf0$ in IFDS is denoted a
   When $M$ is applied to an edge whose source node contains an assignment for a variable $x$, $M$ returns an environment transformer that updates the argument environment with a new value for $x$. 
 
   Consider the following program:
+
 \inputMinted{java}{constprop.java}
   For the edges $e_1,\,e_2,\,e_3$, and $e_4$ that start at the first, second, third, and fourth instruction, $M$ creates the following environment transformers:
   \begin{align*}

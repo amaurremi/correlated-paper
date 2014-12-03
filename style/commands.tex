@@ -7,12 +7,17 @@
 \newcommand{\denote}[1]{\left\llbracket#1\right\rrbracket}
 
 %\renewcommand{\theFancyVerbLine}{\sffamily \textcolor[rgb]{0.5,0.5,0.5}{\scriptsize \oldstylenums{\arabic{FancyVerbLine}}}}
-\newcommand{\inputMinted}[2]{\par\inputminted[fontsize=\footnotesize,linenos=true,bgcolor=white,numberblanklines=false,mathescape,samepage=true]{#1}{code/#2}\\ \ \\}
+
+\newcommand{\inputMinted}[2]{\lstinputlisting[language=#1]{code/#2}
+
+}
+
+%\newcommand{\inputMinted}[2]{\par\inputminted[fontsize=%\footnotesize,linenos=true,bgcolor=white,numberblanklines=false,mathescape,samepage=true]{#1}{code/#2}\\ \ \\}
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
-%\usemintedstyle{manni}     % comci comca
-%\usemintedstyle{borland}   % pretty strict style
-%\usemintedstyle{vim}       % together with fruity and native only with dark bg!
-\usemintedstyle{bw}         % strict, too
+%%\usemintedstyle{manni}     % comci comca
+%%\usemintedstyle{borland}   % pretty strict style
+%%\usemintedstyle{vim}       % together with fruity and native only with dark bg!
+%\usemintedstyle{bw}         % strict, too
 
 \counterwithout{footnote}{chapter}
 

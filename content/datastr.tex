@@ -110,65 +110,19 @@ As we show later, normalization guarantees that each update function has a uniqu
 We will now show that micro functions can be checked for equality if their representations use normalized update functions.
 
 First, let us show that normalization does not change the behaviour of an update function. This means that the normalized and non-normalized versions of an update function always denote the same function.
-
-\newpage    
+   
 \begin{lemma}\label{lem:normeq}
     $\denote{\mathcal N(\updfun f^*)}=\denote{\updfun f^*}.$
 \end{lemma}
 
-\begin{proof}
-    Let $\updfun f^*=\setpair I U$.
-    For any $\tau\in T,$
-    \[
-        \begin{aligned}
-            \denote{\mathcal N(\updfun f^*)}(\tau)
-            &=\denote{\mathcal N(\langle I,\ U\rangle)}(\tau)\\
-            &=\denote{\setpair{I\cup U}U}(\tau)\\
-            &=\tau\cap(I\cup U)\cup U\\
-            &=(\tau\cap I)\cup(\tau\cap U)\cup U\\
-            &=\tau\cap I\cup U\\
-            &=\denote{\setpair IU}(\tau)\\
-            &=\denote{\updfun f^*}(\tau)\,.
-        \end{aligned}
-    \]
-    Thus, $\denote{\mathcal N(\updfun f^*)}=\denote{\updfun f^*}$.
-\end{proof}
 
 Let us show that two update functions are equal if and only if their normalized representations are equal.
 
 It is obvious that two functions represented with the same pairs of sets are equal. Let us prove that two different pairs of sets represent different update functions.
 
-\begin{lemma}
+\begin{lemma}\label{lem:normuneq}
     Let $\setpair IU$ and $\setpair{I'}{U'}$ be two normalized update functions such that $\setpair IU\ne\setpair {I'}{U'}$. Then $\denote{\setpair IU}\ne\denote{\setpair {I'}{U'}}$.
 \end{lemma}
-
-\begin{proof}
-    Let us show that there always exists a set $\tau\subseteq T$ such that $\denote{\setpair IU}(\tau)\ne\denote{\setpair{I'}{U'}}(\tau)$. There are two cases:
-    \begin{enumerate}
-        \item $U\ne U'$. Then for the empty set $\tau=\varnothing$,
-            \[
-                \denote{\setpair IU}(\tau)=\denote{\setpair IU}(\varnothing)=(\varnothing\cap I)\cup U=U\,,
-            \]
-            whereas 
-            \[ 
-                \denote{\setpair {I'}{U'}}(\tau)=\denote{\setpair {I'}{U'}}(\varnothing)=(\varnothing\cap I')\cup U'=U'.
-            \]
-            Hence, $\denote{\setpair IU}\ne\denote{\setpair {I'}{U'}}$.
-        \item $I\ne I'$. Then for the set of all types $\tau=T$,
-            \[
-                \denote{\setpair IU}(\tau)=\denote{\setpair IU}(T)=(T\cap I)\cup U=I\cup U\,.
-            \]
-            Since $\setpair IU$ is normalized, $U\subseteq I$, and
-            \[
-                I\cup U= I\,.
-            \]
-            At the same time,
-            \[
-                \denote{\setpair {I'}{U'}}(\tau)=\denote{\setpair {I'}{U'}}(T)=(T\cap I')\cup U'=I'\cup U'=I'\,.
-            \]
-            Since $I\ne I'$, it follows that $\denote{\setpair IU}\ne \denote{\setpair {I'}{U'}}$. \qedhere
-    \end{enumerate}
-\end{proof}
 
 We have shown that transfer functions can be represented using update maps. 
 

@@ -39,11 +39,14 @@ The call \verb'a.foo()' can be dispatched to either \verb'A.foo' or \verb'B.foo'
 A concrete execution path for the main method might therefore go through \verb'A.foo' and \verb'A.bar', or through \verb'B.foo' and \verb'B.bar'.
 However, there cannot be an execution path through \verb'A.foo' and \verb'B.bar' or through \verb'B.foo' and \verb'A.bar'.
 
-  \begin{listing}[h]
+\begin{figure}
+  \centering
+  \begin{minipage}{\textwidth}
     \inputMinted{java}{ccexample.java}
-    \caption{Example program containing correlated calls}
-    \label{list:ccexample}
-  \end{listing}
+  \end{minipage}
+  \caption{Example program containing correlated calls}
+  \label{list:ccexample}
+\end{figure}
 
 We call the invocations to methods \verb'foo' and \verb'bar' \textit{correlated}.
 More generally, correlated calls occur when more than one polymorphic call is invoked on the same receiver variable.

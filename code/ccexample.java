@@ -18,7 +18,7 @@ class B extends A {
 
 class Main {
   public static void main(String[] args) {
-    A a = args == null ? new A() : new B(); // a has runtime type A or B$\label{line:newa}$
+    A a = args == null ? new A() : new B();
     String v = a.foo();
     a.bar(v);
   }
