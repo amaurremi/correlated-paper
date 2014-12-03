@@ -7,4 +7,6 @@
 *.out
 *.pyg
 *.synctex.gz
+*.cb
+*.cb2
 
