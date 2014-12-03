@@ -34,7 +34,7 @@ We improve the precision of IFDS problem solutions by eliminating infeasible pat
 Consider a call site~$r.m()$ in an object-oriented programming language, where the variable~$r$ is the \textit{receiver} variable of the call site and $m$ is the name of the invoked method\footnote{We assume an internal representation of the program in which for each call site $e_r.m()$, the expression~$e_r$ has been evaluated to the variable~$r$.}. In the rest of the paper, we use the general term \textit{receiver} to mean a receiver variable.
 At runtime, the actual method that will be invoked by the call site depends on the runtime type of the object referenced by $r$. If the call site $r.m()$ can be associated with more than one method at compile time, we will say that the call site is \textit{polymorphic}.
 
-For example, in Listing~\ref{list:ccexample}, it is not possible to infer statically whether the runtime type of the variable \verb'a' in line~\ref{line:newa} is \verb'A' or \verb'B'.
+For example, in Listing~\ref{list:ccexample}, it is not possible to infer statically whether the runtime type of the variable \verb'a' in the \texttt{main} method is \verb'A' or \verb'B'.
 The call \verb'a.foo()' can be dispatched to either \verb'A.foo' or \verb'B.foo', and \verb'a.bar(v)' can be dispatched to either \verb'A.bar' or \verb'B.bar'.
 A concrete execution path for the main method might therefore go through \verb'A.foo' and \verb'A.bar', or through \verb'B.foo' and \verb'B.bar'.
 However, there cannot be an execution path through \verb'A.foo' and \verb'B.bar' or through \verb'B.foo' and \verb'A.bar'.
