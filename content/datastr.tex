@@ -274,6 +274,7 @@ The following Lemma states that the representation of micro functions is efficie
   The correlated-call representation of a micro function is efficient.
 \end{lemma}
 
+\begin{mdelete}
 \paragraph{Final Remarks}
 
 A straightforward solution to representing micro functions would be to use the function constructs that are provided by many programming languages. The efficiency requirement prohibits us from doing so.
@@ -288,6 +289,7 @@ instead of
   f=\lambda x\,.\,x+3.
 \]
 Having a compact representation for function composition is especially important for the first phase of the IDE algorithm, in the computation of jump functions~\cite{sagiv1996precise}. The same argument applies to computing function meets.
+\end{mdelete}
 
 \subsubsection{Edge Function Representation}  \label{sec:edgefnrep}
 We will now show the representations for the correlated-call micro functions $\ccedgefn{\rcc}(e)$, described in Definition~\ref{def:edgefn}. Let $\textsf{identity}=\setpair{\bot_T}{\top_T}$ represent the identity function $\id$ and $\textsf{bottom}=\setpair{\bot_T}{\bot_T}$ represent the function $\lambda t\,.\,\bot_T$.
