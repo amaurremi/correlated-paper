@@ -79,32 +79,6 @@ from IFDS to IDE problems:
 In each case we also show how to convert the result of the generated IDE problem to a result of the original IFDS problem.
 
 An overview of the transformations is shown in Figure~\ref{fig:transformations}.
-\begin{figure}
-  \centering
-    \tikzset{
-  ashadow/.style={opacity=.25, shadow xshift=0.07, shadow yshift=-0.07},
-}
-  \tikzstyle{problem}=[fill=greyblue,text width=2.3cm,rounded corners,font=\small,text=charcoal,drop shadow={ashadow, color=greyblue}]
-  \tikzstyle{result}=[fill=bisque,text width=1.8cm,rounded corners,font=\small,text=charcoal,drop shadow={ashadow, color=greyblue}]
-\begin{tikzpicture}
-    \node [problem] (ifds) {IFDS problem};
-    \node [problem] (equiv) [above right=0.9cm and .7\dist of ifds.east] {Equivalent IDE problem};
-    \node [problem] (ccide)[below=3cm of equiv.west, anchor=west] {Correlated-calls IDE problem};
-    \node [result] (equivres) [right=\dist of equiv.east] {Equivalence-IDE result};
-    \node [result] (ccres) [below=3cm of equivres.west,anchor=west] {Correlated-calls result};
-    \node [result] (ifdsres) [right=\dist of equivres.east] {IFDS result};
-    \node [result] (improved) [right=\dist of ccres.east] {Improved IFDS result};
-    \path[->] (equivres) edge node[above]{$\backEq$} (ifdsres);
-    \path[->] (ccres) edge node[above] {$\backCC$} (improved);
-    \path[->] (ccres) edge[out=30,in=240] node[above] {$\backEq$} (ifdsres);
-    \path[->] (ifds) edge[out=40,in=190] node[above] {$\transEq$} (equiv);
-    \path[->] (ifds) edge[out=-60,in=165] node[above] {$\transCC$} (ccide);
-    \path[->] (equiv) edge node[above]{$\result$} (equivres);
-    \path[->] (ccide) edge node[above]{$\result$} (ccres);
-\end{tikzpicture}
-  \caption{Transformations between IFDS and IDE problems and their results}%
-  \label{fig:transformations}%
-\end{figure}
 
 \subsubsection{Equivalence Transformation}\label{sec:equivtrans}
 We start with an equivalence transformation $\transEq$ to present a simple IFDS-to-IDE conversion that does not change the result of the original IFDS problem. We will compare the correlated-calls transformation with the equivalence transformation, and use the latter to show  that the correlated-calls analysis results in a
@@ -343,8 +317,8 @@ In the above definition, the purpose of the set $S$ is to limit the set of consi
 The micro functions returned by a correlated-calls edge function can be described as follows. Along $\Lambda$-edges, the micro functions are identity functions. All other functions can be described with $\varepsilon_S$. On ``diagonal'' edges from $\Lambda$ facts to non-$\Lambda$ facts, $\varepsilon_S$ creates edge-specific mappings for a set of receivers, and maps all the other receivers to the set of all types $\bot_T$. On all other edges, $\varepsilon_S$ modifies the mappings for a set of receivers and leaves the mappings for the other receivers unchanged.
 
 \begin{example}
-  Consider the program Listing~\ref{list:ccexample}. The exploded supergraph for that program is shown in Figure~\ref{fig:cc_edgefn_example}.
-  \otodo{Can we combine the IDE Figure 7 with the IFDS Figure 4? It should be the same figure, just that Figure 7 has labels on the edges. We can initially tell the reader to ignore the labels until later.}
+  Consider the program Listing~\ref{list:ccexample}. The exploded supergraph for that program is shown in Figure~\ref{fig:cc_edgefn_example}.\mtodo{Move Figure~\ref{fig:cc_edgefn_example} up to where it's mentioned first? If yes, the caption won't make sense.}
+  \otodo{Can we combine the IDE Figure\ref{fig:cc_edgefn_example} with the IFDS Figure 4? It should be the same figure, just that Figure\ref{fig:cc_edgefn_example} has labels on the edges. We can initially tell the reader to ignore the labels until later.}
 
   Returning a secret value in method \verb'A.foo' creates a ``diagonal'' edge from the $\Lambda$-fact to the secret fact $\psi$. 
   The diagonal edge is labeled with the micro function $\lambda m\,.\,\botcc$. Thus, at the end node of the method, every receiver is mapped to the set of all types~$\bot_T$.

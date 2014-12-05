@@ -32,7 +32,7 @@ The IFDS algorithm is a general data-flow algorithm that can compute solutions t
 We improve the precision of IFDS problem solutions by eliminating infeasible paths that occur in object-oriented programs in the presence of \textit{correlated method calls}~--- polymorphic calls that are invoked on the same object~\cite{DBLP:journals/scp/Tip15}.
 \end{odelete}
 
-\subsection{Correlated Calls}
+\section{Motivating Example}
 
 Consider a call site~$r.m()$ in an object-oriented programming language, where the variable~$r$ is the \textit{receiver} variable of the call site and $m$ is the name of the invoked method\footnote{We assume an internal representation of the program in which for each call site $e_r.m()$, the expression~$e_r$ has been evaluated to the variable~$r$.}. In the rest of the paper, we use the general term \textit{receiver} to mean a receiver variable.
 At runtime, the actual method that will be invoked by the call site depends on the runtime type of the object referenced by $r$. If the call site $r.m()$ can be associated with more than one method at compile time, we will say that the call site is \textit{polymorphic}.
@@ -64,36 +64,45 @@ Our technique for improving the precision of an IFDS result is based on transfor
 
 To improve the precision of IFDS results, given an IFDS problem $P$, we convert it into an IDE problem $Q$ that accounts for correlated calls. We then use the IDE algorithm to obtain a solution to $Q$. Finally, we convert the IDE result into a IFDS result. In the presence of correlated calls, the obtained IFDS result can be more precise than the solution that the IFDS algorithm would compute for $P$.
 
-\subsection{IFDS and IDE}
-\otodo{This section should be moved to the Background section (and suitably merged with the text there).}
-The IFDS framework is a precise and efficient algorithm for data-flow analysis. IFDS was developed in 1995 by T.\,Reps, S.\,Horwitz, and M.\,Sagiv at the University of Wisconsin and has been used to solve a variety of data-flow analysis problems~\cite{bodden2013spl,naeem2008typestate,DBLP:conf/birthday/KreikerRRSWY13,tripp2009taj}. The IFDS analysis is a version of the classic \textit{functional approach} to data-flow analysis proposed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}.
-
-Given a data-flow problem that satisfies the restrictions of IFDS, the algorithm provides a \textit{context-sensitive} solution in polynomial time. In other data-flow algorithms not based on the functional approach, the result of the analysis at the entry of a procedure ``merges'' the incoming data obtained from all callers of the procedure. As a consequence, there is one global data-flow result computed at the end of the procedure. Context-sensitivity, however, allows an analysis to compute the data-flow result for a given procedure as a \textit{function} of the data-flow value at the start of the procedure. 
-In other words, the analysis result for a procedure varies depending on where the procedure was called from. This significantly improves the precision of a data-flow analysis, which is why context-sensitivity is an important advantage of IFDS over classic data-flow algorithms.
-
-Compared to IFDS, most data-flow analyses are either general but do not run in polynomial time~\cite{knoop1992interprocedural,pnueli1981two} or handle a very specific set of problems~\cite{knoop1993efficient}.
-
-The IFDS algorithm is applicable to problems which can be expressed with data-flow functions that satisfy certain restrictions. \textit{Inter-procedural} flow functions specify how data flows from the invocation of a procedure to its start, and from the procedure's end back to its call site. \textit{Distributive} flow functions are those that distribute over the confluence operator. In the context of IFDS, the confluence operator is called meet, and it can be either union or intersection. The data-flow facts on which the analysis operates must be a \textit{finite} set $D$. Each flow function operates on a \textit{subset} of $D$ (for example, the set of variables in the program) which makes the domain of the flow functions the power set of $D$. We describe the IFDS restrictions in detail in Section~\ref{sec:suitableifds}.
-
-The IDE framework is an expressive extension to IFDS that was created by the same authors in 1996.
-The problems that IDE can solve include, but are not limited to, IFDS problems. Just as the IFDS algorithm, the IDE algorithm is suitable for data-flow analyses that can be encoded with inter-procedural, distributive flow functions. However, in IDE, the domain of the flow functions is not restricted to sets $D$ of data-flow facts. The IDE domain of a flow function consists of \textit{environments} that map data-flow facts from the set $D$ to lattice elements.
-
-As an example, in a constant propagation problem, an IDE environment would map each variable to the (possibly) constant value that it is bound to. To illustrate the distinction between IFDS and IDE we could say that IFDS can find out which variables in a program are constants, whereas IDE can additionally retrieve the values of the constant variables.
-
-\subsection{Paper Outline}
-
 The goal of the correlated-calls analysis presented in this work is to modify the output of an IFDS analysis to account for correlated calls. Specifically, the correlated-calls analysis improves the precision of IFDS problem results by eliminating infeasible execution paths caused by correlated calls. This is done by converting the input-IFDS problem to an IDE problem that detects infeasible paths, and converting the IDE result back to a more precise IFDS result.
 
 The contributions of this work are:
 \begin{itemize}
   \item A transformation from IFDS to IDE problems that considers correlated calls.
   \item An implementation in Scala of the correlated-calls transformation and the IDE algorithm which is based on the WALA framework for static analysis on Java bytecode~\cite{fink2012wala}.
-\end{itemize}
+\end{itemize}\mtodo{Reference the figure here.}
+
+\begin{figure}
+  \centering
+    \tikzset{
+  ashadow/.style={opacity=.25, shadow xshift=0.07, shadow yshift=-0.07},
+}
+  \tikzstyle{problem}=[fill=greyblue,text width=2.3cm,rounded corners,font=\small,text=charcoal,drop shadow={ashadow, color=greyblue}]
+  \tikzstyle{result}=[fill=bisque,text width=1.8cm,rounded corners,font=\small,text=charcoal,drop shadow={ashadow, color=greyblue}]
+\begin{tikzpicture}
+    \node [problem] (ifds) {IFDS problem};
+    \node [problem] (equiv) [above right=0.9cm and .7\dist of ifds.east] {Equivalent IDE problem};
+    \node [problem] (ccide)[below=3cm of equiv.west, anchor=west] {Correlated-calls IDE problem};
+    \node [result] (equivres) [right=\dist of equiv.east] {Equivalence-IDE result};
+    \node [result] (ccres) [below=3cm of equivres.west,anchor=west] {Correlated-calls result};
+    \node [result] (ifdsres) [right=\dist of equivres.east] {IFDS result};
+    \node [result] (improved) [right=\dist of ccres.east] {Improved IFDS result};
+    \path[->] (equivres) edge node[above]{$\backEq$} (ifdsres);
+    \path[->] (ccres) edge node[above] {$\backCC$} (improved);
+    \path[->] (ccres) edge[out=30,in=240] node[above] {$\backEq$} (ifdsres);
+    \path[->] (ifds) edge[out=40,in=190] node[above] {$\transEq$} (equiv);
+    \path[->] (ifds) edge[out=-60,in=165] node[above] {$\transCC$} (ccide);
+    \path[->] (equiv) edge node[above]{$\result$} (equivres);
+    \path[->] (ccide) edge node[above]{$\result$} (ccres);
+\end{tikzpicture}
+  \caption{Transformations between IFDS and IDE problems and their results}%
+  \label{fig:transformations}%
+\end{figure}
 
   We prove that the solution to an IDE problem that considers correlated calls is more precise than the solution to the original IFDS problem.
-  We also show that the correlated-calls analysis is sound, i.e. that it never considers concrete execution paths as infeasible.
+  We also show that the correlated-calls analysis is sound, i.e. that it never considers concrete execution paths as infeasible.\mtodo{As discussed on the phone, we want to talk more about the results here.}
  
  Finally, we evaluate the effectiveness of the correlated-calls analysis using an implementation of taint analysis as the source IFDS problem.
 
-\mtodo{Reference appendix?}The remainder of this paper is organized as follows. In the next section, we describe the IFDS and IDE analyses in detail. In Section~\ref{chapter:cca} we present the correlated-calls analysis as a transformation of IFDS problems into a special kind of IDE problem. Section~\ref{sec:ccdatastr} describes an efficient representation of the data structures that are required to define a correlated-calls IDE transformation.
-In Section~\ref{chapter:eval} we address some implementation aspects of the correlated-calls analysis and present an evaluation of its results. Section~\ref{chapter:concl} contains concluding remarks.
+The remainder of this paper is organized as follows. In the next section, we describe the IFDS and IDE analyses in detail. In Section~\ref{chapter:cca} we present the correlated-calls analysis as a transformation of IFDS problems into a special kind of IDE problem. Section~\ref{sec:ccdatastr} describes an efficient representation of the data structures that are required to define a correlated-calls IDE transformation.
+In Section~\ref{chapter:eval} we address some implementation aspects of the correlated-calls analysis and present an evaluation of its results. Section~\ref{chapter:concl} contains concluding remarks. The proofs for the lemmas in the paper are provided in the Appendix.\mtodo{Reference appendix like this?}
