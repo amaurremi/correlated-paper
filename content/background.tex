@@ -2,6 +2,7 @@
 The purpose of the correlated-calls analysis is to solve IFDS problems more precisely than using the standard IFDS algorithm by ruling out some infeasible paths. The correlated-calls analysis works by transforming an IFDS problem to an IDE problem, solving the IDE problem, and transforming the IDE result to a solution to the original IFDS problem. This section describes the general ideas underlying IFDS and IDE.
 
 \subsection{Related Work}
+\otodo{should we move Related Work to near the end of the paper?}
 IFDS is a version of the functional approach to data-flow analysis developed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}. Their algorithm is based on computing \textit{summary functions} that return the data-flow value at the end of a procedure, given the data-flow value at the start of the procedure. IFDS problems form a more restricted set of data-flow problems: unlike in the functional approach, IFDS flow functions have to be distributive, and the set of data-flow facts $D$ has to be finite. However, the IFDS algorithm is more general than Sharir's and Pnueli's algorithm in that it can handle programs containing local variables and parameters in recursive methods.
 
 IFDS has been used to encode a variety of data-flow problems. More complex examples of applications include typestate analysis (determining which operations can be performed on an object at a given program point)~\cite{naeem2008typestate} or shape analysis (detecting errors and validating properties of programs at compile time)~\cite{DBLP:conf/birthday/KreikerRRSWY13}.
@@ -55,6 +56,8 @@ A control-flow supergraph allows us to model the control flow in inter-procedura
 
 \begin{example}
   Consider the program in Listing~\ref{list:examplejava}. The supergraph corresponding to that program is shown in Figure~\ref{fig:examplesupergraph}.
+  \otodo{Can we merge the examples from Figures 1 and 2 into a single example program?}
+\otodo{I think we can remove the supergraph Figure 3.}
 \begin{figure}
   \centering
   \begin{minipage}{\textwidth}

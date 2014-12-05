@@ -1,4 +1,6 @@
 \section{Introduction}
+\otodo{This section should be shrunk a lot (not completely deleted)}
+\begin{odelete}
 Static program analysis aims to discover properties of computer programs without running them.
 Static analysis has applications in compiler optimization, development of programming tools, and computer security, among others.
 As an example, we might want to analyze a program to know which variables are constants. 
@@ -28,6 +30,7 @@ Our goal is to improve the precision of solutions to problems that can be solved
 The IFDS algorithm is a general data-flow algorithm that can compute solutions to various data-flow problems, like reaching definitions, available expressions, and taint analysis.
 
 We improve the precision of IFDS problem solutions by eliminating infeasible paths that occur in object-oriented programs in the presence of \textit{correlated method calls}~--- polymorphic calls that are invoked on the same object~\cite{DBLP:journals/scp/Tip15}.
+\end{odelete}
 
 \subsection{Correlated Calls}
 
@@ -62,6 +65,7 @@ Our technique for improving the precision of an IFDS result is based on transfor
 To improve the precision of IFDS results, given an IFDS problem $P$, we convert it into an IDE problem $Q$ that accounts for correlated calls. We then use the IDE algorithm to obtain a solution to $Q$. Finally, we convert the IDE result into a IFDS result. In the presence of correlated calls, the obtained IFDS result can be more precise than the solution that the IFDS algorithm would compute for $P$.
 
 \subsection{IFDS and IDE}
+\otodo{This section should be moved to the Background section (and suitably merged with the text there).}
 The IFDS framework is a precise and efficient algorithm for data-flow analysis. IFDS was developed in 1995 by T.\,Reps, S.\,Horwitz, and M.\,Sagiv at the University of Wisconsin and has been used to solve a variety of data-flow analysis problems~\cite{bodden2013spl,naeem2008typestate,DBLP:conf/birthday/KreikerRRSWY13,tripp2009taj}. The IFDS analysis is a version of the classic \textit{functional approach} to data-flow analysis proposed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}.
 
 Given a data-flow problem that satisfies the restrictions of IFDS, the algorithm provides a \textit{context-sensitive} solution in polynomial time. In other data-flow algorithms not based on the functional approach, the result of the analysis at the entry of a procedure ``merges'' the incoming data obtained from all callers of the procedure. As a consequence, there is one global data-flow result computed at the end of the procedure. Context-sensitivity, however, allows an analysis to compute the data-flow result for a given procedure as a \textit{function} of the data-flow value at the start of the procedure. 

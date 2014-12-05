@@ -9,7 +9,9 @@ To retrieve information about an input program, such as its control-flow supergr
 
 Since WALA currently only contains an implementation of IFDS, we implemented IDE from scratch. Instead of using WALA's IFDS implementation, to run an IFDS problem, we converted it to an IDE problem and used our own IDE solver.
 
+\begin{odelete}
 \subsubsection{IFDS}
+\otodo{We should incorporate the four functions into the explanation of IFDS in the background. Then we don't need them here.}
 As described in Section~\ref{sec:ifdsdef}, an IFDS problem is defined in terms of an exploded supergraph. The control-flow supergraph of an input program can be retrieved using WALA. Hence, our implementation of an IFDS problem should be able to convert a control-flow supergraph into an exploded supergraph.
 
 We represent an IFDS problem with a trait, or protocol, that contains declarations of four \textit{flow functions}. Each function has type 
@@ -26,6 +28,7 @@ The four functions are:
   \item \textsf{end-return}, for inter-procedural edges from the end node of a method to the return node of the callee;
   \item \textsf{default}, for all other intra-procedural edges.
 \end{itemize}
+\end{odelete}
 
 \paragraph{Taint Analysis}
 Using this representation of an IFDS problem, we implemented an IFDS problem instance for taint analysis. We used it as a sample IFDS problem on which to evaluate the correlated-calls-IDE construction.
@@ -72,6 +75,7 @@ If $n_1$ is a call node that calls method $m$, and $n_2$ is $m$'s start node,
   \textsf{default}(n_1,\,d_1,\,n_2)&=\{d_1\}.
 \end{align*}
 
+\begin{odelete}
 \begin{example}
   Consider the supergraph in Figure~\ref{fig:exampleexploded}. The call-to-start flow function from method \verb'main' to \verb'f' looks as follows:
   \begin{align*}
@@ -81,6 +85,7 @@ If $n_1$ is a call node that calls method $m$, and $n_2$ is $m$'s start node,
   \end{align*}
   We can see that correspondingly, the exploded supergraph contains an edge from $(\highlight{\textsf{call}_{\texttt{A.f}}}{greyblue},\,\texttt a)$ to $(\highlight{\textsf{start}_\texttt{f}}{lightsalmonpink},\,\texttt s)$.
 \end{example}
+\end{odelete}
 
 \subsubsection{IDE}
 The correlated-calls analysis was implemented as an IDE problem instance.
@@ -101,6 +106,7 @@ The other flow functions are defined analogously.
 \subsection{Testing}
 In this section we assess the correctness and effectiveness of the correlated-calls analysis.
 
+\begin{odelete}
 \subsubsection{Conversion from IFDS to IDE}
 We implemented the equivalence transformation $\transEq$ and the correlated-calls transformation $\transCC_\rcc$ from IFDS to IDE described in Section~\ref{sec:equivtrans}. To run an IFDS problem, we converted it to an IDE problem using $\transEq$ and $\transCC_\rcc$ and used our IDE analysis algorithm to run the latter.
 
@@ -120,6 +126,7 @@ where $\epsilon$ is the bottom function on an edge from a $\Lambda$-fact to a no
 \]
 
 We also implemented a correlated-call transformation from IFDS into IDE problems that consider correlated calls. This transformation is described in Section~\ref{sec:cctrans}.
+\end{odelete}
 
 \subsubsection{Regression Testing}
 We used regression tests to assess the correctness of the implemented analyses. Each test involves running a certain analysis on one input Java program.
@@ -193,6 +200,10 @@ We then added test cases that contained correlated calls. We added a new asserti
 Separately, we used unit tests to check the implementation correctness of micro functions. We wrote assertions for the results of the equality, meet, and composition operations on all possible combinations of the identity, top, bottom, and constant functions.
 
 \subsubsection{Benchmark Testing}
+\otodo{We need to decide what exactly we want to include in the evaluation.
+    The numbers of correlated calls are interesting. But I think we want
+    to leave out all mention of the taint analysis. Perhaps we should
+    have no empirical results at all (and only the theory/proofs)?}
 To assess the benefit of the correlated-calls analysis, we counted the frequencies of correlated-call occurrences in the Dacapo benchmarks~\cite{blackburn2006dacapo}. We then ran the normal- and correlated-call-taint analysis on the Dacapo benchmarks to see what improvement we would get from the correlated-calls analysis.
 
 \paragraph{Occurrences of Correlated Calls}
@@ -284,7 +295,9 @@ This explains why, specifically for a taint analysis as the client analysis, and
 \label{tab:stringstat}
 \end{table}
 
+\begin{odelete}
 \subsection{Future Work}
+\otodo{We should convert this section into two or three sentences to be added to the conclusion. They should focus especially on the interprocedurally-correlated receivers.}
 In this section we point out the limitations of the correlated-calls analysis and suggest improvements to the analysis for future work. 
 
 One limitation of the analysis is that it only works for IFDS problems like taint analysis, reachable definitions, or available expressions. The correlated-call analysis is not applicable to IDE problems like copy- or linear-constant propagation. Therefore, a possible direction for future work is to create a correlated-calls analysis that transforms an original IDE problem into one that considers correlated calls (with a modified lattice and edge function definition), and then transforms the correlated-calls result into a more precise result of the original IDE problem.
@@ -301,3 +314,5 @@ One limitation of the analysis is that it only works for IFDS problems like tain
 Another constraint of the algorithm is that it only accounts for intra-procedurally-correlated receivers, or receivers on which correlated calls occur within one method. For example, in Listing~\ref{list:interProcRec}, \verb'a' is a correlated-call receiver, since there are two polymorphic method invocations on \verb'a'. However, the first one, \verb'a.setString()', is inside method \verb'main', and the second one, \verb'a.printString()', is inside method \verb'propagate'. Therefore, we do not treat \verb'a' as a correlated-call receiver, and the analysis would not improve the original IFDS result for this program.
 
 Finally, correlated calls can occur on multiple receivers and other scenarios discussed in~\cite{DBLP:journals/scp/Tip15} that are not handled in this work.
+
+\end{odelete}

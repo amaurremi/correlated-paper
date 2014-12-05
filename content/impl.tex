@@ -344,6 +344,7 @@ The micro functions returned by a correlated-calls edge function can be describe
 
 \begin{example}
   Consider the program Listing~\ref{list:ccexample}. The exploded supergraph for that program is shown in Figure~\ref{fig:cc_edgefn_example}.
+  \otodo{Can we combine the IDE Figure 7 with the IFDS Figure 4? It should be the same figure, just that Figure 7 has labels on the edges. We can initially tell the reader to ignore the labels until later.}
 
   Returning a secret value in method \verb'A.foo' creates a ``diagonal'' edge from the $\Lambda$-fact to the secret fact $\psi$. 
   The diagonal edge is labeled with the micro function $\lambda m\,.\,\botcc$. Thus, at the end node of the method, every receiver is mapped to the set of all types~$\bot_T$.
