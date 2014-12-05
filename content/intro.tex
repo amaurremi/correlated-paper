@@ -27,7 +27,7 @@ One way to improve the precision of a data-flow analysis is to detect and elimin
 Our goal is to improve the precision of solutions to problems that can be solved by the \textit{Inter-procedural Finite Distributive Subset} (IFDS) algorithm~\cite{reps1995precise}.
 The IFDS algorithm is a general data-flow algorithm that can compute solutions to various data-flow problems, like reaching definitions, available expressions, and taint analysis.
 
-We improve the precision of IFDS problem solutions by eliminating infeasible paths that occur in object-oriented programs in the presence of \textit{correlated method calls}~--- polymorphic calls that are invoked on the same object~\cite{frank2014correlated}.
+We improve the precision of IFDS problem solutions by eliminating infeasible paths that occur in object-oriented programs in the presence of \textit{correlated method calls}~--- polymorphic calls that are invoked on the same object~\cite{DBLP:journals/scp/Tip15}.
 
 \subsection{Correlated Calls}
 

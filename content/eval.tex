@@ -300,4 +300,4 @@ One limitation of the analysis is that it only works for IFDS problems like tain
 
 Another constraint of the algorithm is that it only accounts for intra-procedurally-correlated receivers, or receivers on which correlated calls occur within one method. For example, in Listing~\ref{list:interProcRec}, \verb'a' is a correlated-call receiver, since there are two polymorphic method invocations on \verb'a'. However, the first one, \verb'a.setString()', is inside method \verb'main', and the second one, \verb'a.printString()', is inside method \verb'propagate'. Therefore, we do not treat \verb'a' as a correlated-call receiver, and the analysis would not improve the original IFDS result for this program.
 
-Finally, correlated calls can occur on multiple receivers and other scenarios discussed in~\cite{frank2014correlated} that are not handled in this work.
+Finally, correlated calls can occur on multiple receivers and other scenarios discussed in~\cite{DBLP:journals/scp/Tip15} that are not handled in this work.
