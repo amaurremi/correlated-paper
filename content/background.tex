@@ -535,18 +535,19 @@ There exists an entire class of data-flow problems that cannot be formulated as 
 The questions asked by constant propagation are of the form ``if property $X$ \textit{($v$ being a constant)} is true at program point~$Y$, what is the value of some property~$Z$ \textit{(the value of the constant)} corresponding to~$X$?''. It turns out that problems with such questions can often be solved by the IDE algorithm.
 
 The IDE framework is an expressive extension to IFDS that was created by the same authors in 1996.
-The problems that IDE can solve include, but are not limited to, IFDS problems. Just as the IFDS algorithm, the IDE algorithm is suitable for data-flow analyses that can be encoded with inter-procedural, distributive flow functions. However, in IDE, the domain of the flow functions is not restricted to sets $D$ of data-flow facts. The IDE domain of a flow function consists of \textit{environments} that map data-flow facts from the set $D$ to lattice elements.
+The problems that IDE can solve include, but are not limited to, IFDS problems~\cite{reps1995precise}. Just as the IFDS algorithm, the IDE algorithm is suitable for data-flow analyses that can be encoded with inter-procedural, distributive flow functions. However, in IDE, the domain of the flow functions is not restricted to sets $D$ of data-flow facts. The IDE domain of a flow function consists of \textit{environments} that map data-flow facts from the set $D$ to lattice elements.
 
 As an example, in a constant propagation problem, an IDE environment would map each variable to the (possibly) constant value that it is bound to. To illustrate the distinction between IFDS and IDE we could say that IFDS can find out which variables in a program are constants, whereas IDE can additionally retrieve the values of the constant variables.
-
 Instead of just telling us whether a fact holds or not, the IDE analysis can provide us with additional information about facts. 
 
 Just as in the IFDS analysis, the IDE algorithm reduces a data-flow problem to a graph-reachability problem. Additionally, for each program point, the algorithm computes an \textit{environment} $\textsf{Env}(D,\,L)$, where data-flow facts are mapped to values of a lattice $L$.
 
+\begin{mdelete}
 For example, using the IDE analysis, we can encode a restricted version of a constant-propagation analysis\footnote{%
   In the general case, constant propagation cannot be encoded with distributive flow functions and is therefore not suitable for an IDE analysis~\cite{muller2001complexity}.
 }. The data-flow facts  correspond to program variables, and the lattice incorporates all possible values for constants. 
 If a fact $d$ in the exploded supergraph is reachable at node $n$, and $\textsf{Env}(d)\notin\{\bot,\,\top\}$, it means that the variable associated with $d$ is a constant. Furthermore, the value of the constant can be inferred from the environment for the corresponding node and is equal to $\textsf{Env}(d)$.
+\end{mdelete}
 
 Formally, an IDE problem is defined as a four-tuple
 \begin{equation}
@@ -565,8 +566,9 @@ where $M_\textsf{Env}$ is extended to paths by composition and
   \Omega=\lambda d\,.\,\top
 \end{equation}
 is the top element in the environment lattice~$\mathsf{Env}(D,\,L)$.
-
+\commentout{
 The IDE analysis is a generalization of the IFDS analysis: every IFDS problem can be converted into an equivalent IDE problem~\cite{reps1995precise}. The equivalent problem can be solved by the IDE algorithm, and the result converted into an IFDS result. In~an~IFDS-equivalent IDE problem, the~graph~$G^*$ and the~set~$D$ of~data-flow facts remain the~same. The $L$ lattice is a two-point lattice: if a fact is mapped to the top (bottom) element, then it is reachable (unreachable). The conversion between IFDS and IDE problems is discussed in detail in Section~\ref{seq:transIfdsIde}.
+}
 
 \subsubsection{Environment Transformers}
 For each node in the control-flow graph, the result of an IDE analysis computes an environment $\textsf{Env}(D,\,L)$, which is a map from data-flow facts to lattice elements.
@@ -577,7 +579,7 @@ From Section~\ref{sec:overviewifds} we know that flow functions can be represent
 \footnote{See~Sagiv et al.~\cite{sagiv1996precise} for a formal definition of the representation relation for environment transformers.}
 $f:\,L\to L$. A~micro function shows how to change a lattice element for a given node and fact.
 
-If an IDE problem is equivalent to an IFDS problem, the edges of the exploded supergraph are the same for both problems. In the IDE problem, the edges of the exploded supergraph are labeled with identity micro functions.
+For instance, if an IDE problem is equivalent to an IFDS problem, the edges of the exploded supergraph are the same for both problems. In the IDE problem, the edges of the exploded supergraph are labeled with identity micro functions.
 
 We extend the meet operator to work on micro functions by defining
 \begin{equation}
