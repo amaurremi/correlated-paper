@@ -212,7 +212,7 @@ An available-expressions problem asks, for each expression $e$, ``does $e$ have 
 
 Formally, a data-flow analysis problem is suitable for an IFDS analysis if it can be encoded as an IFDS problem
 \begin{equation}
-  G^*,\,D,\,F,\,M_F,\,\sqcap)\,,
+  (G^*,\,D,\,F,\,M_F,\,\sqcap)\,,
 \end{equation} where $G^*=(N^*,\,E^*)$ is the supergraph of the input program with nodes $N^*$ and edges $E^*$, $D$ is a finite set of \textit{data-flow facts}, $F$ is a set of distributive dataflow functions of type $2^D\to2^D$, $M_F:\,E^*\to F$ is a function that maps supergraph edges to dataflow functions, and $M_F$ is extended to paths by composition\footnote{%
   Let $A$ be a set and $f:\,E^*\to(A\to A)$ a function from supergraph edges to functions on $A$.
   We say that $f$ is extended to  paths by composition to denote that for a path $q$ consisting of the edges $e_1,\,\dots,\,e_k$, $f(q)=f(e_k)\circ\ldots\circ f(e_1)\circ\id$.
@@ -239,9 +239,9 @@ In this way, the IFDS algorithm reduces the input data-flow problem to a graph-r
 \begin{example}
   In a taint analysis, $D$ is the set of variables in the program. If a fact $d\in D$ is reachable at a given node, then the variable is considered secret at that node. Otherwise, it is considered not secret. The question ``is $d$ secret at node $n$?'' becomes ``is there a realizable path from (\textsf{start}$_\texttt{main}$,\,\textbf{0}) to $(n,\,d)$?''.
 \end{example}
-\begin{example} 
+\commentout{\begin{example} 
   In an available-expressions analysis, $D$ is the set of all expressions in the program. If an expression $d\in D$ is reachable at a certain node, it means that it does not need to be recomputed at that node. 
-\end{example}
+\end{example}}
 \begin{example}
   The exploded supergraph for Listing~\ref{list:ccexample} is shown in Figure~\ref{fig:cc_edgefn_example}.
   We can see that there is a realizable path
@@ -519,12 +519,14 @@ On the exploded graph, the composition of two functions is represented by the pa
   \end{center}
 \end{example}
 
+\begin{mdelete}\mtodo{We never use the interpretation function}
 To convert a representation relation $R_f$ back into the original flow function $f$, we can use the \textit{interpretation} function $\denote {R_f}$:
 \begin{align}
   f&=\denote{R_f}\notag\\
   &=\lambda D_1\,.\,\left(\left\{d_2\ |\ \exists d_1\in D_1:\,(d_1,\,d_2)\in R_f\right\}\cup\{d_2\ |\ (\mathbf0,\,d_2)\in R_f\}\right)
   \setminus\{\mathbf0\}\,.
 \end{align}
+\end{mdelete}
 
 We presented an overview of the IFDS analysis. IFDS problems are transformed into IDE problems by the correlated-calls analysis. The IDE analysis is described in the next section.
 
@@ -706,7 +708,7 @@ The overall idea behind computing the lattice elements $l_{n,\,d}$ is the follow
 \[
   p=\left[(\startmain,\,\Lambda),\,(n_1,\,d_1),\,\dots,\,(n_k,\,d_k)\right]
 \]
- that starts with the entrypoint of the exploded supergraph, we compute the function $f_p$ that corresponds to $p$. The micro function consists of the composition of all individual micro functions with which the edges of $p$ are labeled:
+ that starts with the entrypoint of the exploded supergraph, we compute the micro function $f_p$ that corresponds to $p$. The micro function consists of the composition of all individual micro functions with which the edges of $p$ are labeled:
 \begin{align}
   f_p=\textsf{EdgeFn}((n_{k-1},\,d_{k-1}),\,(n_k,\,d_k))\,\circ\ldots\circ
       \textsf{EdgeFn}(\startmain,\,\Lambda),\,(n_1,\,d_1))\,.
@@ -718,7 +720,6 @@ Let the lattice element that $(n,\,d)$ is mapped to according to path $p$ be den
 \end{equation}
 
 Let $Q$ be the set of paths that start at the entry point and end at the given node $(n,\,d)$.
-
 The lattice element $l_{n,\,d}$ is the meet of the lattice elements corresponding to all the paths in $Q$:
 \[
   l_{n,\,d}=\bigsqcap_{q\in Q}l^q_{n,\,d}\,.
