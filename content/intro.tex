@@ -1,6 +1,103 @@
 \section{Introduction}
-\otodo{This section should be shrunk a lot (not completely deleted)}
-\begin{odelete}
+
+Data-flow analysis computes an approximation of how values may flow  
+through a program, and has applications in compiler optimization, 
+programming tools, and computer security, and many other areas.
+Data-flow analyses operate on \textit{control-flow graphs} (CFGs) that model 
+the order in which the instructions of a program are executed. This is
+typically done by associating \textit{flow functions} that represent how 
+data is propagated with the edges of the control-flow graph.  A 
+\textit{confluence operator} specifies how the data facts that have been 
+computed along different paths should be merged when the paths join.
+
+Since a control-flow graph is an over-approximation of the possible flows 
+of control in concrete executions of a program, it may contain \textit{infeasible} 
+paths that cannot occur at runtime. The precision of a data-flow analysis algorithm
+depends critically on its ability to detect and disregard such infeasible paths.
+The popular \textit{Interprocedural Finite Distributive Subset} (IFDS) algorithm 
+by  Reps, Horwitz, and Sagiv \cite{reps1995precise} is a general data-flow analysis
+algorithm for computing solutions to finite distributive data-flow problems such 
+as reaching definitions, available expressions, and taint analysis. A distinguishing 
+characteristic of IFDS is that it avoids infeasible interprocedural paths in which calls 
+and returns to/from functions are not properly matched. Sagiv, Reps, and Horwitz
+also presented the \textit{Interprocedural Distributive Environment} (IDE) algorithm
+\cite{sagiv1996precise} that similarly only considers properly matched call/return
+edges, but that supports a broader range of dataflow problems by expanding the 
+domain of flow functions to \textit{environments} that go beyond the data-flow facts 
+considered by IFDS.
+
+This paper presents an approach to dataflow analysis that avoids a type
+of infeasible path that arises in object-oriented programs when two or more
+methods are dynamically dispatched on the same receiver object. In such cases, if the
+method calls are polymorphic (i.e., if they dispatch to different method definitions 
+depending on the type of the receiver expression at run time), then their dispatch 
+behaviors will be correlated. A recent paper \cite{DBLP:journals/scp/Tip15} identified
+this problem but did not present a concrete solution or algorithm, and we are not aware 
+of any existing dataflow analysis that is capable of avoiding infeasible paths that arise 
+in the presence of correlated method calls.
+
+\input{figures/fig-transformation}
+
+The approach taken in our work is to transform a standard IFDS problem into an
+IDE problem that precisely accounts for infeasible paths due to correlated calls. 
+The results of this IDE problem can be mapped back to the dataflow domain of the 
+original IFDS problem.
+
+We present a formalization of the transformation and prove its correctness
+as follows. First, we derive an ``Equivalence IDE problem'' from the original 
+IFDS problem by associating the identity environment functions with all edges,
+and show that the solution to this Equivalence IDE problem can be mapped back
+to the solution of the original IFDS problem. Then, we derive a ``Correlated Calls 
+IDE Problem' from the original IFDS problem and show how a solution to this problem 
+can be mapped to the solution to the original IFDS problem, but also how an
+more precise IFDS result can be derived from it. 
+We also show that the correlated-calls analysis is sound, i.e., that it never considers concrete execution paths as infeasible.
+This is illustrated schematically
+in Figure~\ref{fig:transformations}%
+\footnote{ 
+  The labels $\result$, $\backEq$, $\backCC$, $\transEq$, and $\transCC$ on edges in 
+  Figure~\ref{fig:transformations} reflect a number of mappings and projections 
+  that will be defined in Section~\TODO{ref} and that can be ignored here.
+}.  
+\ftodo{would it make sense to add an edge in Figure~\ref{fig:transformations} from the IFDS problem to the IFDS result?}
+
+We implemented the correlated-calls transformation and the IDE algorithm in Scala,
+on top of the WALA framework for static analysis of JVM bytecode~\cite{fink2012wala}.
+We also report on preliminary experiments in which our correlated-calls transformation
+is applied to an IFDS formulation of a simple taint analysis. Our results show that
+solving the resulting IDE problem avoids infeasible paths due to correlated calls as
+expected.  
+\mtodo{As discussed on the phone, we want to talk more about the results here.}   
+
+In summary, the contributions of this paper are as follows:
+\begin{itemize}
+  \item
+    We present a general approach for transforming IFDS problems into corresponding
+    IDE problems that avoid infeasible paths due to correlated method calls and
+    prove its correctness. 
+  \item
+    We implemented the approach in Scala, on top of the WALA program analysis framework
+    and report on preliminary experiments. 
+\end{itemize}
+
+The remainder of this paper is organized as follows.
+%
+Section~\ref{sec:MotivatingExample} presents a motivating example.
+%
+Section~\ref{sec:bg} reviews the IFDS and IDE algorithms.
+%
+Section~\ref{sec:ccdatastr} presents the correlated-calls transformation
+and a proof of its correctness.
+%
+The implementation of our approach and preliminary experiments are discussed
+in Section~\ref{chapter:eval}.
+%
+Related work is discussed in Section~\TODO{ref}.
+%
+Finally, conclusions and directions for future work are presented in Section~\TODO{ref}.
+ 
+ 
+\commentout{
 Static program analysis aims to discover properties of computer programs without running them.
 Static analysis has applications in compiler optimization, development of programming tools, and computer security, among others.
 As an example, we might want to analyze a program to know which variables are constants. 
@@ -30,79 +127,5 @@ Our goal is to improve the precision of solutions to problems that can be solved
 The IFDS algorithm is a general data-flow algorithm that can compute solutions to various data-flow problems, like reaching definitions, available expressions, and taint analysis.
 
 We improve the precision of IFDS problem solutions by eliminating infeasible paths that occur in object-oriented programs in the presence of \textit{correlated method calls}~--- polymorphic calls that are invoked on the same object~\cite{DBLP:journals/scp/Tip15}.
-\end{odelete}
-
-\section{Motivating Example}
-
-Consider a call site~$r.m()$ in an object-oriented programming language, where the variable~$r$ is the \textit{receiver} variable of the call site and $m$ is the name of the invoked method\footnote{We assume an internal representation of the program in which for each call site $e_r.m()$, the expression~$e_r$ has been evaluated to the variable~$r$.}. In the rest of the paper, we use the general term \textit{receiver} to mean a receiver variable.
-At runtime, the actual method that will be invoked by the call site depends on the runtime type of the object referenced by $r$. If the call site $r.m()$ can be associated with more than one method at compile time, we will say that the call site is \textit{polymorphic}.
-
-For example, in Listing~\ref{list:ccexample}, it is not possible to infer statically whether the runtime type of the variable \verb'a' in the \texttt{main} method is \verb'A' or \verb'B'.
-The call \verb'a.foo()' can be dispatched to either \verb'A.foo' or \verb'B.foo', and \verb'a.bar(v)' can be dispatched to either \verb'A.bar' or \verb'B.bar'.
-A concrete execution path for the main method might therefore go through \verb'A.foo' and \verb'A.bar', or through \verb'B.foo' and \verb'B.bar'.
-However, there cannot be an execution path through \verb'A.foo' and \verb'B.bar' or through \verb'B.foo' and \verb'A.bar'.
-
-\begin{figure}
-  \centering
-  \begin{minipage}{\textwidth}
-    \inputMinted{java}{ccexample.java}
-  \end{minipage}
-  \caption{Example program containing correlated calls}
-  \label{list:ccexample}
-\end{figure}
-
-We call the invocations to methods \verb'foo' and \verb'bar' \textit{correlated}.
-More generally, correlated calls occur when more than one polymorphic call is invoked on the same receiver variable.
-
-Suppose we wanted to perform a taint analysis on the program in Listing~\ref{list:ccexample}.
-Most dataflow-analysis algorithms, including IFDS, would conservatively assume that the call \verb'a.bar' could be dispatched to both \verb'A.bar' and \verb'B.bar', independently of what \verb'a.foo' had been dispatched to in the previous line.
-
-As a result, 
-such an analysis would consider a path through \verb'A.foo' and \verb'B.bar' feasible. This means that the variable \verb'v' would be considered secret. We would conclude that a secret value is passed to \verb'B.bar' and printed to the user. In other words, we would consider the program to leak secret information, which it does not do in any concrete execution.
-
-Our technique for improving the precision of an IFDS result is based on transforming the original IFDS problem into a more expressive \textit{Inter-procedural Distributive Environment} (IDE) problem. IDE problems can be solved with the IDE algorithm which is a generalization of IFDS~\cite{sagiv1996precise}. The IDE algorithm can, for instance, solve certain versions of the constant propagation problem that IFDS cannot.
-
-To improve the precision of IFDS results, given an IFDS problem $P$, we convert it into an IDE problem $Q$ that accounts for correlated calls. We then use the IDE algorithm to obtain a solution to $Q$. Finally, we convert the IDE result into a IFDS result. In the presence of correlated calls, the obtained IFDS result can be more precise than the solution that the IFDS algorithm would compute for $P$.
-
-The goal of the correlated-calls analysis presented in this work is to modify the output of an IFDS analysis to account for correlated calls. Specifically, the correlated-calls analysis improves the precision of IFDS problem results by eliminating infeasible execution paths caused by correlated calls. This is done by converting the input-IFDS problem to an IDE problem that detects infeasible paths, and converting the IDE result back to a more precise IFDS result.
-
-The contributions of this work are:
-\begin{itemize}
-  \item A transformation from IFDS to IDE problems that considers correlated calls.
-  \item An implementation in Scala of the correlated-calls transformation and the IDE algorithm which is based on the WALA framework for static analysis on Java bytecode~\cite{fink2012wala}.
-\end{itemize}\mtodo{Reference the figure here.}
-
-\begin{figure}
-  \centering
-    \tikzset{
-  ashadow/.style={opacity=.25, shadow xshift=0.07, shadow yshift=-0.07},
 }
-  \tikzstyle{problem}=[fill=greyblue,text width=2.3cm,rounded corners,font=\small,text=charcoal,drop shadow={ashadow, color=greyblue}]
-  \tikzstyle{result}=[fill=bisque,text width=1.8cm,rounded corners,font=\small,text=charcoal,drop shadow={ashadow, color=greyblue}]
-\begin{tikzpicture}
-    \node [problem] (ifds) {IFDS problem};
-    \node [problem] (equiv) [above right=0.3cm and .7\dist of ifds.east] {Equivalent IDE problem};
-    \node [problem] (ccide)[below=1.6cm of equiv.west, anchor=west] {Correlated-calls IDE problem};
-    \node [result] (equivres) [right=\dist of equiv.east] {Equivalence-IDE result};
-    \node [result] (ccres) [below=1.6cm of equivres.west,anchor=west] {Correlated-calls result};
-    \node [result] (ifdsres) [right=\dist of equivres.east] {IFDS result};
-    \node [result] (improved) [right=\dist of ccres.east] {Improved IFDS result};
-    \path[->] (equivres) edge node[above]{$\backEq$} (ifdsres);
-    \path[->] (ccres) edge node[above] {$\backCC$} (improved);
-    \path[->] (ccres) edge[out=25,in=210] node[above] {$\backEq$} (ifdsres);
-    \path[->] (ifds) edge[out=40,in=179] node[above] {$\transEq$} (equiv);
-    \path[->] (ifds) edge[out=-40,in=173] node[below] {$\transCC$} (ccide);
-    \path[->] (equiv) edge node[above]{$\result$} (equivres);
-    \path[->] (ccide) edge node[above]{$\result$} (ccres);
-\end{tikzpicture}
-  \caption{Transformations between IFDS and IDE problems and their results}%
-  \label{fig:transformations}%
-\end{figure}
 
-  We prove that the solution to an IDE problem that considers correlated calls is more precise than the solution to the original IFDS problem.
-  We also show that the correlated-calls analysis is sound, i.e. that it never considers concrete execution paths as infeasible.\mtodo{As discussed on the phone, we want to talk more about the results here.}
- 
- Finally, we evaluate the effectiveness of the correlated-calls analysis using an implementation of taint analysis as the source IFDS problem.
-
-The remainder of this paper is organized as follows. In the next section, we describe the IFDS and IDE analyses in detail. In Section~\ref{chapter:cca} we present the correlated-calls analysis as a transformation of IFDS problems into a special kind of IDE problem. Section~\ref{sec:ccdatastr} describes an efficient representation of the data structures that are required to define a correlated-calls IDE transformation.
-In Section~\ref{chapter:eval} we address some implementation aspects of the correlated-calls analysis and present an evaluation of its results. Section~\ref{chapter:concl} contains concluding remarks. The proofs for the lemmas in the paper are provided in the Appendix.\mtodo{Reference appendix like this?}

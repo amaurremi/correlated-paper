@@ -1,0 +1,52 @@
+\section{Motivating Example}
+  \label{sec:MotivatingExample}
+  
+\ftodo{This section is current under revision. Please do not edit..}
+
+Consider a call site~$r.m()$ in an object-oriented programming language, where the variable~$r$ is the \textit{receiver} variable of the call site and $m$ is the name of the invoked method\footnote{We assume an internal representation of the program in which for each call site $e_r.m()$, the expression~$e_r$ has been evaluated to the variable~$r$.}. In the rest of the paper, we use the general term \textit{receiver} to mean a receiver variable.
+At runtime, the actual method that will be invoked by the call site depends on the runtime type of the object referenced by $r$. If the call site $r.m()$ can be associated with more than one method at compile time, we will say that the call site is \textit{polymorphic}.
+
+For example, in Listing~\ref{list:ccexample}, it is not possible to infer statically whether the runtime type of the variable \verb'a' in the \texttt{main} method is \verb'A' or \verb'B'.
+The call \verb'a.foo()' can be dispatched to either \verb'A.foo' or \verb'B.foo', and \verb'a.bar(v)' can be dispatched to either \verb'A.bar' or \verb'B.bar'.
+A concrete execution path for the main method might therefore go through \verb'A.foo' and \verb'A.bar', or through \verb'B.foo' and \verb'B.bar'.
+However, there cannot be an execution path through \verb'A.foo' and \verb'B.bar' or through \verb'B.foo' and \verb'A.bar'.
+
+\begin{figure}
+  \centering
+  \begin{minipage}{\textwidth}
+    \inputMinted{java}{ccexample.java}
+  \end{minipage}
+  \caption{Example program containing correlated calls}
+  \label{list:ccexample}
+\end{figure}
+
+We call the invocations to methods \verb'foo' and \verb'bar' \textit{correlated}.
+More generally, correlated calls occur when more than one polymorphic call is invoked on the same receiver variable.
+
+Suppose we wanted to perform a taint analysis on the program in Listing~\ref{list:ccexample}.
+Most dataflow-analysis algorithms, including IFDS, would conservatively assume that the call \verb'a.bar' could be dispatched to both \verb'A.bar' and \verb'B.bar', independently of what \verb'a.foo' had been dispatched to in the previous line.
+
+As a result, 
+such an analysis would consider a path through \verb'A.foo' and \verb'B.bar' feasible. This means that the variable \verb'v' would be considered secret. We would conclude that a secret value is passed to \verb'B.bar' and printed to the user. In other words, we would consider the program to leak secret information, which it does not do in any concrete execution.
+
+\commentout{
+Our technique for improving the precision of an IFDS result is based on transforming the original IFDS problem into a more expressive \textit{Inter-procedural Distributive Environment} (IDE) problem. IDE problems can be solved with the IDE algorithm which is a generalization of IFDS~\cite{sagiv1996precise}. The IDE algorithm can, for instance, solve certain versions of the constant propagation problem that IFDS cannot.
+
+To improve the precision of IFDS results, given an IFDS problem $P$, we convert it into an IDE problem $Q$ that accounts for correlated calls. We then use the IDE algorithm to obtain a solution to $Q$. Finally, we convert the IDE result into a IFDS result. In the presence of correlated calls, the obtained IFDS result can be more precise than the solution that the IFDS algorithm would compute for $P$.
+
+The goal of the correlated-calls analysis presented in this work is to modify the output of an IFDS analysis to account for correlated calls. Specifically, the correlated-calls analysis improves the precision of IFDS problem results by eliminating infeasible execution paths caused by correlated calls. This is done by converting the input-IFDS problem to an IDE problem that detects infeasible paths, and converting the IDE result back to a more precise IFDS result.
+
+The contributions of this work are:
+\begin{itemize}
+  \item A transformation from IFDS to IDE problems that considers correlated calls.
+  \item An implementation in Scala of the correlated-calls transformation and the IDE algorithm which is based on the WALA framework for static analysis on Java bytecode~\cite{fink2012wala}.
+\end{itemize}\mtodo{Reference the figure here.}
+
+  We prove that the solution to an IDE problem that considers correlated calls is more precise than the solution to the original IFDS problem.
+  We also show that the correlated-calls analysis is sound, i.e. that it never considers concrete execution paths as infeasible.\mtodo{As discussed on the phone, we want to talk more about the results here.}
+
+ Finally, we evaluate the effectiveness of the correlated-calls analysis using an implementation of taint analysis as the source IFDS problem.
+
+The remainder of this paper is organized as follows. In the next section, we describe the IFDS and IDE analyses in detail. In Section~\ref{chapter:cca} we present the correlated-calls analysis as a transformation of IFDS problems into a special kind of IDE problem. Section~\ref{sec:ccdatastr} describes an efficient representation of the data structures that are required to define a correlated-calls IDE transformation.
+In Section~\ref{chapter:eval} we address some implementation aspects of the correlated-calls analysis and present an evaluation of its results. Section~\ref{chapter:concl} contains concluding remarks. The proofs for the lemmas in the paper are provided in the Appendix.\mtodo{Reference appendix like this?}
+}
