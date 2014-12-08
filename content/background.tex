@@ -186,29 +186,28 @@ We will denote the identity function $\lambda x\,.x$ by $\textsf{id}$.
 We will use a typed version of this function in various contexts, where the type of $x$ will vary with
 the context.
 
-\subsection{IFDS and IDE}\mtodo{I will merge this section with the following two sections}
-The IFDS framework is a precise and efficient algorithm for data-flow analysis. IFDS was developed in 1995 by T.\,Reps, S.\,Horwitz, and M.\,Sagiv at the University of Wisconsin and has been used to solve a variety of data-flow analysis problems~\cite{bodden2013spl,naeem2008typestate,DBLP:conf/birthday/KreikerRRSWY13,tripp2009taj}. The IFDS analysis is a version of the classic \textit{functional approach} to data-flow analysis proposed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}.
+\subsection{IFDS}\label{sec:bgifds}
+The IFDS framework is a precise and efficient algorithm for data-flow analysis. IFDS was developed in 1995 by T.\,Reps, S.\,Horwitz, and M.\,Sagiv at the University of Wisconsin and has been used to solve a variety of data-flow analysis problems~\cite{bodden2013spl,naeem2008typestate,DBLP:conf/birthday/KreikerRRSWY13,tripp2009taj}\mtodo{
+The four references take away space in the References section. Remove some of them?
+}. 
+\commentout{The IFDS analysis is a version of the classic \textit{functional approach} to data-flow analysis proposed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}.}
+\commentout{In other data-flow algorithms not based on the functional approach, the result of the analysis at the entry of a procedure ``merges'' the incoming data obtained from all callers of the procedure. As a consequence, there is one global data-flow result computed at the end of the procedure. Context-sensitivity, however, allows an analysis to compute the data-flow result for a given procedure as a \textit{function} of the data-flow value at the start of the procedure. 
+In other words, the analysis result for a procedure varies depending on where the procedure was called from. This significantly improves the precision of a data-flow analysis, which is why context-sensitivity is an important advantage of IFDS over classic data-flow algorithms.}
+\mtodo{I'm not saying any more that IFDS is a version of Sharir\&Pnueli's functional approach.}
+\mtodo{I also removed the comparison of IFDS with other algorithms. I'm not pointing out the benefits of IFDS any more, so we might fail to show the importance of the algorithm.}
 
-Given a data-flow problem that satisfies the restrictions of IFDS, the algorithm provides a \textit{context-sensitive} solution in polynomial time. In other data-flow algorithms not based on the functional approach, the result of the analysis at the entry of a procedure ``merges'' the incoming data obtained from all callers of the procedure. As a consequence, there is one global data-flow result computed at the end of the procedure. Context-sensitivity, however, allows an analysis to compute the data-flow result for a given procedure as a \textit{function} of the data-flow value at the start of the procedure. 
-In other words, the analysis result for a procedure varies depending on where the procedure was called from. This significantly improves the precision of a data-flow analysis, which is why context-sensitivity is an important advantage of IFDS over classic data-flow algorithms.
+The IFDS algorithm is applicable to problems which can be expressed with data-flow functions that satisfy certain restrictions. \textit{Inter-procedural} flow functions specify how data flows from the invocation of a procedure to its start, and from the procedure's end back to its call site. \textit{Distributive} flow functions are those that distribute over the confluence operator. In the context of IFDS, the confluence operator is called meet, and it can be either union or intersection. The data-flow facts on which the analysis operates must be a \textit{finite} set $D$. Each flow function operates on a \textit{subset} of $D$ (for example, the set of variables in the program) which makes the domain of the flow functions the power set of $D$.
 
+\commentout{The purpose of the IFDS framework is to solve a special subset of inter-procedural, flow-sensitive, context-sensitive data-flow-analysis problems. The main idea of IFDS is to encode the data-flow analysis problem into a graph-reachability problem.}
+
+Given a data-flow problem that satisfies the restrictions of IFDS, the algorithm provides a \textit{context-sensitive} \mtodo{Provide reference explaining context sensitivity?} solution in polynomial time.
 Compared to IFDS, most data-flow analyses are either general but do not run in polynomial time~\cite{knoop1992interprocedural,pnueli1981two} or handle a very specific set of problems~\cite{knoop1993efficient}.
 
-The IFDS algorithm is applicable to problems which can be expressed with data-flow functions that satisfy certain restrictions. \textit{Inter-procedural} flow functions specify how data flows from the invocation of a procedure to its start, and from the procedure's end back to its call site. \textit{Distributive} flow functions are those that distribute over the confluence operator. In the context of IFDS, the confluence operator is called meet, and it can be either union or intersection. The data-flow facts on which the analysis operates must be a \textit{finite} set $D$. Each flow function operates on a \textit{subset} of $D$ (for example, the set of variables in the program) which makes the domain of the flow functions the power set of $D$. We describe the IFDS restrictions in detail in Section~\ref{sec:suitableifds}.
-
-The IDE framework is an expressive extension to IFDS that was created by the same authors in 1996.
-The problems that IDE can solve include, but are not limited to, IFDS problems. Just as the IFDS algorithm, the IDE algorithm is suitable for data-flow analyses that can be encoded with inter-procedural, distributive flow functions. However, in IDE, the domain of the flow functions is not restricted to sets $D$ of data-flow facts. The IDE domain of a flow function consists of \textit{environments} that map data-flow facts from the set $D$ to lattice elements.
-
-As an example, in a constant propagation problem, an IDE environment would map each variable to the (possibly) constant value that it is bound to. To illustrate the distinction between IFDS and IDE we could say that IFDS can find out which variables in a program are constants, whereas IDE can additionally retrieve the values of the constant variables.
-
-\subsection{IFDS}\label{sec:bgifds}
-The purpose of the IFDS framework is to solve a special subset of inter-procedural, flow-sensitive, context-sensitive data-flow-analysis problems. The main idea of IFDS is to encode the data-flow analysis problem into a graph-reachability problem.
-
 \subsubsection{Data-Flow Problems Suitable for IFDS}\label{sec:suitableifds}
-In this section we describe the data-flow problems that can be solved by an IFDS analysis. We will start with an intuitive definition and later on formalize the notion of an IFDS-suitable problem.
+\commentout{In this section we describe the data-flow problems that can be solved by an IFDS analysis. We will start with an intuitive definition and later on formalize the notion of an IFDS-suitable problem.}
 
 Informally, an IFDS analysis can only solve decision problems. An IFDS analysis answers questions of the following kind: ``is property $X$ true at program point~$Y$?''. For example, a taint-analysis problem asks, for each variable $v$ in the program, ``is $v$ secret at a given program point?''. 
-An available-expressions problem asks, for each expression $e$, ``does $e$ have to be recomputed at a given program point?''.
+\commentout{An available-expressions problem asks, for each expression $e$, ``does $e$ have to be recomputed at a given program point?''.}
 
 Formally, a data-flow analysis problem is suitable for an IFDS analysis if it can be encoded as an IFDS problem
 \begin{equation}
@@ -221,7 +220,7 @@ Formally, a data-flow analysis problem is suitable for an IFDS analysis if it ca
 Without loss of generality, we will take meet to denote union. It can be shown that any problem where meet is defined as intersection can be reformulated into an equivalent one where meet is defined as union~\cite{reps1995precise}.
 
 \subsubsection{Overview of the IFDS Algorithm}\label{sec:overviewifds}
-Formally, given an IFDS problem, for each node $n\in N^*$ the IFDS algorithm computes the \textit{meet-over-all-valid-paths} solution
+Given an IFDS problem, for each node $n\in N^*$ the IFDS algorithm computes the \textit{meet-over-all-valid-paths} solution
 \begin{equation}
  \mvp{F}(n)=\bigsqcap_{q\in\ivp(n)}M_F(q)(\varnothing)\,.
 \end{equation}
@@ -468,8 +467,8 @@ For two representation relations $R_{f_1},\,R_{f_2}$, the composition and meet o
 
 The representation relation distributes over composition and meet:
 \begin{align}
-  R_{f_1}\circ R_{f_2}=R_{f_1\circ f_2}\,,
-\intertext{and}
+  R_{f_1}\circ R_{f_2}=R_{f_1\circ f_2}\,,\qquad
+\text{and}\qquad
   R_{f_1}\sqcap R_{f_2}=R_{f_1\sqcap f_2}\,.
 \end{align}
 
@@ -519,20 +518,26 @@ On the exploded graph, the composition of two functions is represented by the pa
   \end{center}
 \end{example}
 
-\begin{mdelete}\mtodo{We never use the interpretation function}
+\mtodo{We never use the interpretation function, so I deleted it, too}
+\commentout{
 To convert a representation relation $R_f$ back into the original flow function $f$, we can use the \textit{interpretation} function $\denote {R_f}$:
 \begin{align}
   f&=\denote{R_f}\notag\\
   &=\lambda D_1\,.\,\left(\left\{d_2\ |\ \exists d_1\in D_1:\,(d_1,\,d_2)\in R_f\right\}\cup\{d_2\ |\ (\mathbf0,\,d_2)\in R_f\}\right)
   \setminus\{\mathbf0\}\,.
 \end{align}
-\end{mdelete}
+}
 
-We presented an overview of the IFDS analysis. IFDS problems are transformed into IDE problems by the correlated-calls analysis. The IDE analysis is described in the next section.
+We presented an overview of the IFDS analysis. IFDS problems are transformed into IDE problems by the correlated-calls analysis. The IDE framework is described in the next section.
 
 \subsection{IDE}\label{sec:bgide}
 There exists an entire class of data-flow problems that cannot be formulated as IFDS problems. Informally, the problems cannot be formulated as decision problems. For instance, a constant-propagation problem asks, for each variable $v$ in the program, ``if $v$ is a constant at a given program point, what is $v$'s value?''.
 The questions asked by constant propagation are of the form ``if property $X$ \textit{($v$ being a constant)} is true at program point~$Y$, what is the value of some property~$Z$ \textit{(the value of the constant)} corresponding to~$X$?''. It turns out that problems with such questions can often be solved by the IDE algorithm.
+
+The IDE framework is an expressive extension to IFDS that was created by the same authors in 1996.
+The problems that IDE can solve include, but are not limited to, IFDS problems. Just as the IFDS algorithm, the IDE algorithm is suitable for data-flow analyses that can be encoded with inter-procedural, distributive flow functions. However, in IDE, the domain of the flow functions is not restricted to sets $D$ of data-flow facts. The IDE domain of a flow function consists of \textit{environments} that map data-flow facts from the set $D$ to lattice elements.
+
+As an example, in a constant propagation problem, an IDE environment would map each variable to the (possibly) constant value that it is bound to. To illustrate the distinction between IFDS and IDE we could say that IFDS can find out which variables in a program are constants, whereas IDE can additionally retrieve the values of the constant variables.
 
 Instead of just telling us whether a fact holds or not, the IDE analysis can provide us with additional information about facts. 
 
