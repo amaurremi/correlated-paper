@@ -603,16 +603,6 @@ In the following lemma we show that the result of an IDE problem obtained throug
       \result_{\text{IFDS}}(P)(n)\,.
     \end{equation}
 \end{lemma}
-\otodo{We agreed to move the proofs to the appendix.}
-\begin{proof}
-  The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
-  \begin{align*}
-    \backCC\left(\result(\transCC_R(P))\right)(n)&=\{(n',\,D_n'^\Subset(\result(\transCC_R(P))))\ |\ n\in N^*\}(n)\\
-      &=D_n^\Subset(\result(\transCC_R(P)))\\
-      &\subseteq\mvp F(n)\\
-      &=\result_\text{IFDS}(P)(n)\,.\qedhere
-  \end{align*}
-\end{proof}
 
 We will next show that our analysis is sound, i.e. that the result of an IDE problem obtained through a correlated-calls transformation removes only facts that occur on infeasible paths. 
 
