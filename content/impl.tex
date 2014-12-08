@@ -1,334 +1,3 @@
-\section{Correlated Calls Analysis}\label{chapter:cca}
-The correlated-calls analysis is presented as a transformation from an arbitrary IFDS problem to a corresponding IDE problem.
-
-After solving the generated IDE problem, its result can be converted to an IFDS result. If the input program contains correlated calls, the converted IFDS result can be more precise than the original IFDS result.
-
-In this section, we first discuss what is necessary to define IFDS and IDE problems. Next we describe how to convert any IFDS problem into an equivalent IDE problem, and, given a solution to the generated IDE problem, how to obtain the result of the original IFDS problem. We then show how to transform an IFDS problem into an IDE problem using the correlated-calls transformation, and how to convert the solution to the latter IDE problem into a more precise IFDS result.
-
-\subsection{Defining IFDS and IDE Problems}
-In Section~\ref{sec:bg}, we defined what IFDS and IDE problems are, their applications, and their constraints. In this section, we describe how to create instances of IFDS and IDE problems.
-
-\subsubsection{Defining an IFDS Problem}\label{sec:ifdsdef}
-Recall that an IFDS problem instance is defined as a five-tuple
-\[
-    (G^*,\ D,\ F,\ M_F,\,\sqcap)\,,
-\]
-where $G^*=(N^*,\,E^*)$ is the control-flow supergraph of the program, $D$ is the set of dataflow facts, $F\subseteq2^D\to2^D$ is a set of distributive dataflow functions, and the function $$M_F:\,E^*\to(2^D\to2^D)$$ maps the supergraph edges to dataflow functions, and is extended to paths by composition.
-
-In practice, an IFDS problem can be defined by providing an exploded supergraph
-$G^\#=(N^\#,\,E^\#)$. Each node of $G^\#$ is a pair $(n,\ d)$, where $n\in N^*$ is a node in the control-flow supergraph and $d\in (D\cup\{\mathbf{0}\}),\ \mathbf0\notin D$, where $\mathbf0$ is an auxiliary fact that is necessary for the IFDS algorithm.
-
-The meaning of an edge in the exploded supergraph is the following.
-Let $(n_1,\,d_1)$ and $(n_2,\,d_2)$ be two nodes in the exploded supergraph $G^\#$. Furthermore, assume that if fact $d_1$ at node~$n_1$ holds, then the fact~$d_2$ at node~$n_2$ also holds. Then there is an edge $(n_1,\,d_1),\,(n_2,\,d_2)\in E^\#$.
-
-\subsubsection{Defining an IDE Problem}\label{sec:defide}
-An IDE problem instance is a four-tuple
-\[
-    (G^*,\ D,\ L,\ \menv),
-\]
-where $G^*$ and $D$ are defined in the same way as for IFDS. $L$ is a finite-height lattice that represents the values to which dataflow facts are mapped in an IDE problem. An environment $Env(D, L)$ maps dataflow facts to lattice elements. Finally, the map $$M_{\textsf{Env}}:\,E^*\to(\textsf{Env}(D, L)\to \textsf{Env}(D, L))$$ is a function from the control-flow-supergraph edges to environment transformers, extended to paths by composition.
-
-An IDE problem can be defined with a labeled exploded supergraph\footnote{
-    The exploded supergraph in an IDE problem is defined in the same way as in an IFDS problem. The only difference is that the $\mathbf0$ fact is denoted as $\Lambda$~\cite{reps1995precise,sagiv1996precise}.
-}, in which an edge function
-\begin{equation}
-  \edgefn:\ E^\#\to(L\to L)
-\end{equation}
-pairs edges with \textit{micro functions}, and is extended to paths by composition.
-
-The set of micro functions of an IDE problem is a subset of $L\to L$ that is closed under function meet and composition.
-
-The meaning of an edge in the labeled exploded supergraph is the following. Let $e=((n_1,\,d_1),\,(n_2,\,d_2))\in E^\#$ be an edge in the exploded supergraph with label $f=\mathsf{EdgeFn}(e)$. Then
-\begin{itemize}
-%	\item the fact that $d_1$ holds at node $n_1$ implies that $d_2$ holds at $n_2$;
-  \item if at node $n_1$ the fact $d_1$ was mapped to a lattice element $l_1$ by an environment $Env(D,\,L)$, then the fact $d_2$ at node $n_2$ should be mapped to $f(l_1)$.
-\end{itemize}
-
-As shown in~Sagiv et al.~\cite{sagiv1996precise}, the relationship between environment transformers and edge functions can be described with the following equations. For individual edges $(n_1,\,n_2)\in E^*$,
-\begin{align}\label{eq:envTransToEdgeFnEdge}
-  \menv&((n_1,\,n_2))(\textsf{env})(d)\notag\\
-  &=\edgefn((n_1,\,\Lambda),\,(n_2,\,d))(\top)\sqcap\bigsqcap_{d'\in D}\edgefn((n_1,\,d'),\,(n_2,\,d))(\textsf{env}(d'))\,,
-\end{align}
-where $\textsf{env}$ is an environment $\textsf{Env}(D,\,L)$. Informally, for a given control-flow-supergraph edge $e$ and data-flow fact $d$, the $M_\textsf{Env}$ function captures the meet of the edge function applied to all possible exploded-graph edges along $e$.
-
-For paths $p$ that start with the entry point~$\startmain$,
-\begin{equation}\label{eq:envTransToEdgefn}
-  \menv(p)(\Omega)(d)=\bigsqcap_{r\in\mathsf{RP}(p,\,d)}\edgefn(r)(\top)\,,
-\end{equation}
-where $n\in N^*$, $d\in D$, $p\in\ivp(n)$, and $\mathsf{RP}$ is the set of all inter-procedurally realizable paths.
-
-To summarize, an IDE problem can be defined by a labeled exploded supergraph 
-\begin{equation}(G^\#,\,L,\,\mathsf{EdgeFn})\,,\end{equation}
-where each edge of the exploded supergraph corresponds to a micro function.
-
-\subsection{Transformations Between IFDS and IDE}\label{seq:transIfdsIde}
-
-The correlated-call analysis transforms an existing IFDS problem into a special kind of IDE problem. We described what is necessary to define IFDS and IDE problems independently.
-
-Let $P=(G^\#)$ be an IFDS problem and $Q=(G^\#,\,\edgefn)$ an IDE problem obtained by a conversion from $P$.
-
-We will look at two kinds of transformations
-\begin{equation}
-  \mathcal T:\ (G^\#)\to (G^\#,\,\edgefn)
-\end{equation}
-from IFDS to IDE problems:
-\begin{itemize}
-	\item an equivalence transformation $\transEq$ (pronounced as ``t-equiv''), in which we show how to transform IFDS problems into equivalent IDE problems;
-  \item a correlated-call transformation $\transCC$ (pronounced as ``t-c-c''), where we show how to convert IFDS problems into a special form of IDE problems that help eliminate infeasible paths.
-\end{itemize}
-In each case we also show how to convert the result of the generated IDE problem to a result of the original IFDS problem.
-
-An overview of the transformations is shown in Figure~\ref{fig:transformations}.
-
-\subsubsection{Equivalence Transformation}\label{sec:equivtrans}
-We start with an equivalence transformation $\transEq$ to present a simple IFDS-to-IDE conversion that does not change the result of the original IFDS problem. We will compare the correlated-calls transformation with the equivalence transformation, and use the latter to show  that the correlated-calls analysis results in a
-precision improvement of the original IFDS problem result.
-
-\paragraph{Converting IFDS problems to IDE problems}
-Since IDE is a generalization of IFDS, any IFDS problem can be converted into an equivalent IDE problem~\cite{sagiv1996precise}.
-For an equivalence transformation $\transEq$, the generated lattice $L^\equiv$ consists of two elements, bottom and top:
-\[
-    L^\equiv=\{\bot,\ \top\}\,,
-\]
-where $\bot$ means ``reachable'', and $\top$ means ``not reachable''. 
-
- All micro functions are identity functions.
-
- 
-Given an exploded supergraph $G^\#$ provided by an IFDS problem, we want to create an edge function $\edgefn^\equiv$ that maps $G^\#$'s edges $E^\#$ to micro functions $L^\equiv\to L^\equiv$.
-
-The edge functions $\edgefn^\equiv$ are defined as
-\begin{equation}
-    \edgefn^\equiv=
-    \begin{cases}
-      \lambda e\,.\,\lambda m\,.\,\bot&\text{if $d_1(e)=\Lambda$ and $d_2(e)\ne\Lambda$;}\\
-      \lambda e\,.\,\id&\text{otherwise,}
-    \end{cases}
-\end{equation}
-where $d_1(e)$ is the source fact of an edge $e$ and $d_2(e)$ is its target fact. At a ``diagonal'' edge from a $\Lambda$-fact to a non-$\Lambda$-fact $d$, the micro function is a constant function that returns $\bot$, which makes it a bottom element in the $L\to L$ lattice. Since the initial lattice element passed to the micro function at the start node is the top element (see~\eqref{eq:envTransToEdgefn}), the bottom function at the diagonal edge swaps the top element to bottom to make the fact $d$ reachable.
-
-The resulting equivalence transformation looks as follows:
-\begin{equation}
-  \transEq((G^\#))=(G^\#,\,L^\equiv,\,\mathsf{EdgeFn}^\equiv).
-\end{equation}
-
-Thus, in $\transEq$, all non-diagonal edges in the original IFDS problem are mapped to identity functions.
-
-\paragraph{Converting IDE Results to IFDS Results}
-
-The output of an IFDS analysis states whether a node is reachable in the exploded supergraph. This means that for an IFDS problem $P$, the IFDS-analysis result $\result_{\text{IFDS}}(P):\ N^*\to 2^D$ is a map from nodes of the control-flow supergraph to sets of facts:
-\begin{equation}
-  \result_{\text{IFDS}}(P)=\{(n,\,\mvp F(n))\,|\,n\in N^*\}\,.
-\end{equation}
-
-\begin{mdelete}
-\begin{example}\label{ex:ifdsresult}
-  The solution to the taint-analysis IFDS problem $\mathcal P$ in Listing~\ref{list:examplejava} whose exploded supergraph is presented in Figure~\ref{fig:exampleexploded} looks as follows:
-  \small\begin{align*}
-    \result_\text{IFDS}(\mathcal P)=\{&(\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\{\texttt a\}),
-      &(\highlight{\textsf{start}_\texttt f}{lightsalmonpink},\,\{\texttt s\}),
-      &\qquad\qquad(\highlight{\textsf{return}_\texttt f}{lightsalmonpink},\,\{\texttt r,\,\texttt s\}),\\
-%      
-      &(\highlight{\textsf{call}_\texttt{A.f}}{greyblue},\,\{\texttt a\}),
-      &(\highlight{\texttt{if(s==null)}}{lightsalmonpink},\,\{\texttt s\}),
-      &\qquad\qquad(\highlight{\texttt{return r}}{lightsalmonpink},\,\{\texttt r,\,\texttt s\}),\\
-%
-      &(\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\{\texttt a,\,\texttt b\}),
-      &(\highlight{\textsf{call}_\texttt f}{lightsalmonpink},\,\{\texttt s\}),
-      &\qquad\qquad(\highlight{\textsf{end}_\texttt f}{lightsalmonpink},\,\{\texttt r,\,\texttt s\})\}.\\
-%
-      &(\highlight{\textsf{end}_\texttt{main}}{greyblue},\,\{\texttt a,\,\texttt b\}),&(\highlight{\texttt{return s}}{lightsalmonpink},\,\{\texttt s\}),
-  \end{align*}\normalsize
-  All other nodes of the control-flow supergraph are mapped to the empty set.
-\end{example}
-\end{mdelete}
-
- The IDE analysis associates a lattice element with each node in the exploded supergraph. For an IDE problem $Q$, the result $\result(Q):\ N^\#\to L$ maps nodes of the exploded supergraph to lattice elements (see~\eqref{eq:mvpdef}):
-\begin{equation}\label{eq:ideresult}
-  \result(Q)=\{((n,\,d),\,\mvp{\textsf{Env}}(n,\,d))\ |\ n\in N^*,\,d\in D\}\,.
-\end{equation}
-In other words, for each fact $d\in D$ at a given node $n\in N^*$, $\result(Q)(n,\,d)$ returns a lattice element. If a fact $d\in D$ is unreachable, $\result(Q)(n,\,d)=\top$.
-
-In the case of an equivalence transformation from IFDS to IDE, if a node in the IFDS result is reachable, it will be also reachable in the IDE result, and it will be mapped to the bottom lattice element. For an exploded node in the IDE result, being mapped to the top element means being not reachable.
-
-The~domain of an equivalence-IDE result 
-\begin{equation}
-  \resultEq=\result(\transEq(P))
-\end{equation}
-consists of pairs of control-flow-supergraph nodes and data-flow facts. The range of the result is the set of lattice elements. To transform an IDE result to an IFDS result, we need to map each control-flow-supergraph node to the set of facts with which it is paired, provided that the pair is mapped to the bottom lattice element.
-
-\begin{mdelete}
-\begin{example}\label{ex:ideresult}
-  Converting the IFDS problem $\mathcal P$ from Example~\ref{ex:ifdsresult} into an equivalent IDE problem and solving it will yield the following result:
-    \small\begin{align*}
-    \result(\transEq(\mathcal P))=\{&((\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\texttt a),\,\bot),\\
-      &((\highlight{\textsf{call}_\texttt{A.f}}{greyblue},\,\texttt a),\,\bot),\\
-      &((\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\texttt a),\,\bot),\\
-      &((\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\texttt b),\,\bot),\\
-      &\dots\}.\\
-    \end{align*}\normalsize
-  Suppose that for a pair $(n,\,d)$, where $n\in N^*$ and $d\in D$, there is no corresponding result in ~$\result_\text{IFDS}(\mathcal P)$ (see Example~\ref{ex:ifdsresult}). Then $(n,\,d)$ appears in $\result(\transEq(\mathcal P))$ as $((n,\,d),\,\top)$.
-\end{example}
-\end{mdelete}
-
-Let $\rho$ be the result of an equivalence-IDE analysis for an IFDS problem $P$:
-\[
-  \rho=\result(\transEq(P)).
-\]
-For a node $n\in N^*$, let $D_n^\equiv(\rho)$ be a set of data-flow facts such that
-\begin{equation}
-  D_n^\equiv(\rho)=\{d\ |\ d\in D\,\wedge\,\rho(n,\,d)\ne\top\}\,.
-\end{equation}
-Then the transformation function
-$\backEq:\,(N^\#\to L)\to(N^*\to2^D)$
-from an IDE result to~an~IFDS result looks as follows:
-\begin{equation}
-  \backEq\left(\rho\right)=
-    \left\{(n,\,D_n^\equiv(\rho))\ |\ n\in N^*\right\}\,.
-\end{equation}
-
-Obviously, if applied to the result of an equivalence-IDE problem, $\backEq$ returns a result equivalent to the original IFDS problem result. In other words, for any IFDS problem $P$ with supergraph $N^*$, and any node $n\in N^*$,
-\begin{equation}
-  \backEq\left(\result(\transEq(P))\right)(n)=\result_{\text{IFDS}}(P)(n)\,.
-\end{equation}
-
-\begin{example}
-  Converting the result in Example~\ref{ex:ideresult} with the equivalence-transformation from an IDE result to an IFDS result $\backEq$ will yield the same result as in Example~\ref{ex:ifdsresult}.
-\end{example}
-\subsubsection{Correlated-Call Transformation}\label{sec:cctrans}
-
-To improve the precision of an IFDS problem, we can convert it to a special type of IDE problem, and use lattice elements to provide us with additional information about a node.
-When converting the IDE result to an IFDS result, lattice elements will tell us whether to make the corresponding exploded nodes reachable. This is the idea of the correlated-calls analysis.
-
-\paragraph{Lattice Elements}
-Just like in the equivalence transformation $\transEq$, the exploded supergraph for $\transCC$ is the same as in the original IFDS problem. The elements of the correlated-calls lattice $\lcc$ are functions that map receivers to sets of types:
-\[
-    \lcc=\left\{\,m:\ R\to2^T\right\},
-\]
-where $R$ is the set of receivers and $T$ is the set of all types in the program. 
-The type power set $2^T$ is also a lattice with a bottom element 
-\begin{align*}
-\bot_T&=T
-\intertext{and top element}
-\top_T&=\varnothing.
-\intertext{The top element of the function lattice}
-\topcc&=\lambda r.\top_T
-\intertext{is a function that maps any receiver to the empty set\footnote{%
-  We prove that $\lcc$ is a lattice in the Proof of Lemma~\ref{lem:efficient}%
-}. 
-The bottom element}
-\botcc&=\lambda r.\bot_T
-\end{align*}
-maps any receiver to all types in the program.
-
-To understand the meaning of lattice elements in a correlated-call analysis, suppose that an IFDS problem has been converted to an IDE problem using the correlated-calls transformation. 
-Assume also that $s$ is the entrypoint of the program, $n$ is a node in the exploded supergraph, and that in the IDE result, $n$ is mapped to a lattice element $l\in \lcc$. 
-Then the purpose of $l$ is to provide information about the set of types of the objects that may be referenced by each receiver at runtime at a path from $s$ to $n$. 
-If a receiver is mapped to the empty set $\top_T$, it means that for the given program point, the receiver cannot reference an object of any type.
-In other words, the corresponding data-flow fact is considered not reachable.
-
-\paragraph{Micro Functions}\label{sec:micro}
-Unlike in the equivalence transformation, the micro functions returned by the edge function $\edgefn^\Subset$ are not always identity functions.
-
-Let $e=(n_1,\,n_2)\in E^\#$ be an edge in the exploded supergraph.
-$\edgefn^\Subset(e)$ returns a micro function $f\subset\lcc\to \lcc$.
-Given a micro function (a map from receivers to sets of types) $m\in \lcc$, $f(m)$ returns a new map from receivers to sets of types.
-In other words, $f$ shows how to update the map from receivers to sets of types when we encounter program point $n_1$.
-
-Let $f_1$ and $f_2$ be two micro functions such that ${f_1=\lambda m\,.\,\lambda r\,.\,t_1(r)}$ and ${f_2={\lambda m\,.\,\lambda r\,.\,t_2(r)}}$. We define the meet operation on micro-functions as follows:
-\begin{equation}\label{eq:micromeet}
-  \lambda m\,.\,\lambda r\,.\,t_1(r)\sqcap\lambda m\,.\,\lambda r\,.\,t_2(r)
-  =\lambda m\,.\,\lambda r\,.\,t_1(r)\cup t_2(r)\,.
-\end{equation}
-
-The composition of micro functions is defined as ordinary function composition.
-
-\paragraph{Edge Functions}\label{sec:ef}
-
-Let $\mathcal F$ be the set of methods in a program with a signature $s_\mathcal F$.
-\begin{definition}
-  Let $r.c()$ be a call site on a receiver $r\in R$ with runtime type $t\in T$.
-  Let~$s_\mathcal F$ be the method signature corresponding to the call $c()$.
-  For $s_\mathcal F$ and $t$, a \textit{lookup function} returns the method implementation $f\in\mathcal F$ to which the call $r.c()$ is dispatched:
-  \begin{equation}
-    \textsf{lookup}(s_\mathcal F,\,t)=f.
-  \end{equation}
-\end{definition}
-
-\begin{definition}
-  For a method signature $s_\mathcal F$ and a method implementation $f\in\mathcal F$, the static-type function $\tau$ returns the set of types for which the lookup function yields $f$:
-  \begin{equation}
-    \tau(s_\mathcal F,\,f)=\{\,t\ |\ \textsf{lookup}(s_\mathcal F,\,t)=f\}\,.
-  \end{equation}
-\end{definition}
-In other words, $\tau$ computes the set of types for which calls to methods
-with signatures~$s_\mathcal F$ are dispatched to~$f$.
-
-If there is a supergraph path from a method call with signature $s_\mathcal F$ to the start of $f$, then the set $\tau(s_\mathcal F,\,f)$ is always non-empty.
-
-\begin{definition}\label{def:momopoly}
-  A call site is called monomorphic if it can be dispatched to only one method. If a call site can be dispatched to more than one method it is called polymorphic.
-\end{definition}
-
-  Let $r.c()$ be a call on a receiver $r\in R$ with a method signature $s_\mathcal F$ to a function $f\in\mathcal F$.
-  If the call site is monomorphic, then $\tau(s_\mathcal F,\,f)$ contains all types $T'\subseteq T$ that are compatible with the static type of $r$.
-  If the call site is polymorphic, then $\tau(s_\mathcal F,\,f)\subset T'$, since some types $t\in T'$ cause dispatch to a method other than $f$.
-
-\begin{definition}\label{def:edgefn}
-  For an edge $e$, let $n_1(e)$ and $n_2(e)$ be the source and target nodes of $e$, and $d_1(e)$ and $d_2(e)$ be its source and target facts. A correlated-call edge function for the set $S\subseteq R$ is defined as follows:
-  \begin{equation}\label{eq:edgefndef}
-    \ccedgefn S=\lambda e\,.\,
-        \begin{cases}
-          \id  &\text{if $d_1(e)=d_2(e)=\Lambda$},\\
-          \lambda m\,.\,\varepsilon_S(e)(\botcc) &\text{if $d_1(e)=\Lambda$ and $d_2(e)\ne\Lambda$},\\
-          \lambda m\,.\,\varepsilon_S(e)(m)  &\text{otherwise,}
-        \end{cases}
-  \end{equation}
-  where $\varepsilon_S:\,E\to(L\to L)$ is a function defined as
-  \begin{equation}\label{eq:varepsilon}
-    \varepsilon_S=\lambda e\,.\,
-        \begin{cases}
-            \lambda m\,.\,m[r\to m(r)\cap \tau(s_\mathcal F,\,f)],
-                &\text{if $e$ is a call-start edge. $r.c()$ is}\\
-                &\text{the call site at $n_1(e)$, $f$ is the called}\\
-                &\text{procedure with signature $s_\mathcal F$,}\\
-                &\text{and $r\in S$;}\\
-            \lambda m\,.\,m[r\to m(r)\cap \tau(s_\mathcal F,\,f)]
-                &\text{if $e$ is an end-return edge.}\\
-            \textcolor{white}{\lambda m\,.\,m}[v_1\to\bot_T]
-                &\text{$v_1,\,\dots,\,v_k\in S$ are the local variables}\\
-            \textcolor{white}{\lambda m\,.\,m}\dots
-                &\text{in the callee method, $r.c()$ is the call}\\
-            \textcolor{white}{\lambda m\,.\,m}[v_k\to\bot_T],
-                &\text{corresponding to the return node}\\
-                &\text{at $n_2(e)$, $f$ is the called method with}\\
-                &\text{signature $s_\mathcal F$, and $r\in S$;}\\
-            \lambda m\,.\,m\left[r\to \bot_T\right],
-                &\text{if $n_1(e)$ contains an assignment}\\
-                &\text{for $r\in S$;}\\
-            \id
-                &\text{otherwise.}
-        \end{cases}
-  \end{equation}
-  We define both $\ccedgefn S$ and $\varepsilon_S$ to be extended to paths by composition.
-\end{definition}
-In the above definition, the purpose of the set $S$ is to limit the set of considered receivers. We will use $S$ in Section~\ref{sec:ccreceivers}.
-
-The micro functions returned by a correlated-calls edge function can be described as follows. Along $\Lambda$-edges, the micro functions are identity functions. All other functions can be described with $\varepsilon_S$. On ``diagonal'' edges from $\Lambda$ facts to non-$\Lambda$ facts, $\varepsilon_S$ creates edge-specific mappings for a set of receivers, and maps all the other receivers to the set of all types $\bot_T$. On all other edges, $\varepsilon_S$ modifies the mappings for a set of receivers and leaves the mappings for the other receivers unchanged.
-
-\begin{example}
-  Consider the program Listing~\ref{list:ccexample}. The exploded supergraph for that program is shown in Figure~\ref{fig:cc_edgefn_example}.\mtodo{Move Figure~\ref{fig:cc_edgefn_example} up to where it's mentioned first? If yes, the caption won't make sense.}
-  \otodo{Can we combine the IDE Figure\ref{fig:cc_edgefn_example} with the IFDS Figure 4? It should be the same figure, just that Figure\ref{fig:cc_edgefn_example} has labels on the edges. We can initially tell the reader to ignore the labels until later.}
-
-  Returning a secret value in method \verb'A.foo' creates a ``diagonal'' edge from the $\Lambda$-fact to the secret fact $\psi$. 
-  The diagonal edge is labeled with the micro function $\lambda m\,.\,\botcc$. Thus, at the end node of the method, every receiver is mapped to the set of all types~$\bot_T$.
-  
-On the end-return edge from \verb'A.foo' to \verb'main', we need to restrict the set of types for the receiver \verb'a' by labeling the end-return edge from the fact $\psi$ to the fact \verb'v' with the micro function $\lambda m\,.\,m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$.
-
-Similarly, on the call-start edge from method \verb'main' to method \verb'B.bar', from fact \verb'v' to \verb's', we restrict the type of the receiver \verb'a' to the set \{\texttt B\} with the micro function~$\lambda m\,.\,m[\texttt a\to m(\texttt a)\cap\{\texttt B\}]$.
-
-After we have shown the definitions for the meet and composition operations, we will show in Example~\ref{ex:cc} how the correlated-calls analysis uses the presented micro functions to detect infeasible paths.
-  
 \begin{figure}%
   \centering
     \tikzstyle{supergraph}=[
@@ -472,22 +141,419 @@ After we have shown the definitions for the meet and composition operations, we 
     \path[->,dashed](end_b_bar_z) edge [out=210,in=-40,color=lightsalmonpink] (return_bar_z);    
 }
 \end{tikzpicture}
-  \caption[An example program demonstrating correlated-call edge functions on the $\Lambda$-node path for Listing~\ref{list:ccexample}]{An example program demonstrating correlated-call edge functions on the $\Lambda$-node path for Listing~\ref{list:ccexample}. All non-labeled edges are implicitly labeled with identity functions $\id$. The variable corresponding to an initial secret value is denoted as $\psi$.}%
+\caption[An example program demonstrating correlated-call edge functions on the $\Lambda$-node path for Listing~\ref{list:ccexample}]{An example program demonstrating correlated-call edge functions on the $\Lambda$-node path for Listing~\ref{list:ccexample}. All non-labeled edges are implicitly labeled with identity functions $\id$. The variable corresponding to an initial secret value is denoted as $\psi$.}%
   \label{fig:cc_edgefn_example}%
   \end{figure}
-\end{example}
+\otodo{we agreed to move this figure to the initial example section}
+  \mtodo{Move Figure~\ref{fig:cc_edgefn_example} up to where it's mentioned first? If yes, the caption won't make sense.}
+  \otodo{Can we combine the IDE Figure\ref{fig:cc_edgefn_example} with the IFDS Figure 4? It should be the same figure, just that Figure\ref{fig:cc_edgefn_example} has labels on the edges. We can initially tell the reader to ignore the labels until later.}
 
+\otodo{The following definitions are very general, and not related to the transformation.
+    Can we move them somewhere earlier?}
+\paragraph{Edge Functions}\label{sec:ef}
+
+Let $\mathcal F$ be the set of methods in a program with a signature $s_\mathcal F$.
 \begin{definition}
-  For an IFDS problem $P=(G^\#)$ and a set $S$, the correlated-calls transformation $\transCC_S$ is defined as
+  Let $r.c()$ be a call site on a receiver $r\in R$ with runtime type $t\in T$.
+  Let~$s_\mathcal F$ be the method signature corresponding to the call $c()$.
+  For $s_\mathcal F$ and $t$, a \textit{lookup function} returns the method implementation $f\in\mathcal F$ to which the call $r.c()$ is dispatched:
   \begin{equation}
-    \transCC_S((G^\#))=\left(G^\#,\,\lcc_S,\,\ccedgefn S\right),
+    \textsf{lookup}(s_\mathcal F,\,t)=f.
   \end{equation}
-  where $\lcc_S:\,S\to2^T$.
 \end{definition}
 
-Then, for an edge $e$, the correlated-call micro functions can be defined as $\ccedgefn R$ and a correlated-calls transformation is defined as $\transCC_R$.
+\begin{definition}
+  For a method signature $s_\mathcal F$ and a method implementation $f\in\mathcal F$, the static-type function $\tau$ returns the set of types for which the lookup function yields $f$:
+  \begin{equation}
+    \tau(s_\mathcal F,\,f)=\{\,t\ |\ \textsf{lookup}(s_\mathcal F,\,t)=f\}\,.
+  \end{equation}
+\end{definition}
+In other words, $\tau$ computes the set of types for which calls to methods
+with signatures~$s_\mathcal F$ are dispatched to~$f$.
 
-\paragraph{Converting IDE Results to IFDS Results}
+If there is a supergraph path from a method call with signature $s_\mathcal F$ to the start of $f$, then the set $\tau(s_\mathcal F,\,f)$ is always non-empty.
+
+\begin{definition}\label{def:momopoly}
+  A call site is called monomorphic if it can be dispatched to only one method. If a call site can be dispatched to more than one method it is called polymorphic.
+\end{definition}
+
+  Let $r.c()$ be a call on a receiver $r\in R$ with a method signature $s_\mathcal F$ to a function $f\in\mathcal F$.
+  If the call site is monomorphic, then $\tau(s_\mathcal F,\,f)$ contains all types $T'\subseteq T$ that are compatible with the static type of $r$.
+  If the call site is polymorphic, then $\tau(s_\mathcal F,\,f)\subset T'$, since some types $t\in T'$ cause dispatch to a method other than $f$.
+
+\otodo{incorporate into previous section}
+\subsection{Defining IFDS and IDE Problems}
+In Section~\ref{sec:bg}, we defined what IFDS and IDE problems are, their applications, and their constraints. In this section, we describe how to create instances of IFDS and IDE problems.
+
+\subsubsection{Defining an IFDS Problem}\label{sec:ifdsdef}
+Recall that an IFDS problem instance is defined as a five-tuple
+\[
+    (G^*,\ D,\ F,\ M_F,\,\sqcap)\,,
+\]
+where $G^*=(N^*,\,E^*)$ is the control-flow supergraph of the program, $D$ is the set of dataflow facts, $F\subseteq2^D\to2^D$ is a set of distributive dataflow functions, and the function $$M_F:\,E^*\to(2^D\to2^D)$$ maps the supergraph edges to dataflow functions, and is extended to paths by composition.
+
+In practice, an IFDS problem can be defined by providing an exploded supergraph
+$G^\#=(N^\#,\,E^\#)$. Each node of $G^\#$ is a pair $(n,\ d)$, where $n\in N^*$ is a node in the control-flow supergraph and $d\in (D\cup\{\mathbf{0}\}),\ \mathbf0\notin D$, where $\mathbf0$ is an auxiliary fact that is necessary for the IFDS algorithm.
+
+The meaning of an edge in the exploded supergraph is the following.
+Let $(n_1,\,d_1)$ and $(n_2,\,d_2)$ be two nodes in the exploded supergraph $G^\#$. Furthermore, assume that if fact $d_1$ at node~$n_1$ holds, then the fact~$d_2$ at node~$n_2$ also holds. Then there is an edge $(n_1,\,d_1),\,(n_2,\,d_2)\in E^\#$.
+
+\subsubsection{Defining an IDE Problem}\label{sec:defide}
+An IDE problem instance is a four-tuple
+\[
+    (G^*,\ D,\ L,\ \menv),
+\]
+where $G^*$ and $D$ are defined in the same way as for IFDS. $L$ is a finite-height lattice that represents the values to which dataflow facts are mapped in an IDE problem. An environment $Env(D, L)$ maps dataflow facts to lattice elements. Finally, the map $$M_{\textsf{Env}}:\,E^*\to(\textsf{Env}(D, L)\to \textsf{Env}(D, L))$$ is a function from the control-flow-supergraph edges to environment transformers, extended to paths by composition.
+
+An IDE problem can be defined with a labeled exploded supergraph\footnote{
+    The exploded supergraph in an IDE problem is defined in the same way as in an IFDS problem. The only difference is that the $\mathbf0$ fact is denoted as $\Lambda$~\cite{reps1995precise,sagiv1996precise}.
+}, in which an edge function
+\begin{equation}
+  \edgefn:\ E^\#\to(L\to L)
+\end{equation}
+pairs edges with \textit{micro functions}, and is extended to paths by composition.
+
+The set of micro functions of an IDE problem is a subset of $L\to L$ that is closed under function meet and composition.
+
+The meaning of an edge in the labeled exploded supergraph is the following. Let $e=((n_1,\,d_1),\,(n_2,\,d_2))\in E^\#$ be an edge in the exploded supergraph with label $f=\mathsf{EdgeFn}(e)$. Then
+\begin{itemize}
+%	\item the fact that $d_1$ holds at node $n_1$ implies that $d_2$ holds at $n_2$;
+  \item if at node $n_1$ the fact $d_1$ was mapped to a lattice element $l_1$ by an environment $Env(D,\,L)$, then the fact $d_2$ at node $n_2$ should be mapped to $f(l_1)$.
+\end{itemize}
+
+As shown in~Sagiv et al.~\cite{sagiv1996precise}, the relationship between environment transformers and edge functions can be described with the following equations. For individual edges $(n_1,\,n_2)\in E^*$,
+\begin{align}\label{eq:envTransToEdgeFnEdge}
+  \menv&((n_1,\,n_2))(\textsf{env})(d)\notag\\
+  &=\edgefn((n_1,\,\Lambda),\,(n_2,\,d))(\top)\sqcap\bigsqcap_{d'\in D}\edgefn((n_1,\,d'),\,(n_2,\,d))(\textsf{env}(d'))\,,
+\end{align}
+where $\textsf{env}$ is an environment $\textsf{Env}(D,\,L)$. Informally, for a given control-flow-supergraph edge $e$ and data-flow fact $d$, the $M_\textsf{Env}$ function captures the meet of the edge function applied to all possible exploded-graph edges along $e$.
+
+For paths $p$ that start with the entry point~$\startmain$,
+\begin{equation}\label{eq:envTransToEdgefn}
+  \menv(p)(\Omega)(d)=\bigsqcap_{r\in\mathsf{RP}(p,\,d)}\edgefn(r)(\top)\,,
+\end{equation}
+where $n\in N^*$, $d\in D$, $p\in\ivp(n)$, and $\mathsf{RP}$ is the set of all inter-procedurally realizable paths.
+
+To summarize, an IDE problem can be defined by a labeled exploded supergraph 
+\begin{equation}(G^\#,\,L,\,\mathsf{EdgeFn})\,,\end{equation}
+where each edge of the exploded supergraph corresponds to a micro function.
+
+
+\section{Correlated Calls Analysis}\label{chapter:cca}
+The correlated-calls analysis is defined as a transformation from an arbitrary IFDS problem to a corresponding IDE problem. The solution of the IDE problem is converted to a solution of the original IFDS problem. The converted IFDS result can be more precise than the original IFDS result because it avoids infeasible paths corresponding to correlated calls.
+
+%In this section, we first discuss what is necessary to define IFDS and IDE problems. Next we describe how to convert any IFDS problem into an equivalent IDE problem, and, given a solution to the generated IDE problem, how to obtain the result of the original IFDS problem. We then show how to transform an IFDS problem into an IDE problem using the correlated-calls transformation, and how to convert the solution to the latter IDE problem into a more precise IFDS result.
+
+\subsection{Transformations from IFDS to IDE}\label{seq:transIfdsIde}
+
+%The correlated-call analysis transforms an existing IFDS problem into a special kind of IDE problem. We described what is necessary to define IFDS and IDE problems independently.
+
+%Let $P=(G^\#)$ be an IFDS problem and $Q=(G^\#,\,\edgefn)$ an IDE problem obtained by a conversion from $P$.
+\otodo{Here, you defined the output of a transformation as just G\# and an edge function. Later, you also include the lattice. Should we include the lattice here?}
+Let $G^\#$ be the exploded supergraph of an IFDS problem. A \emph{transformation}
+$\mathcal T:\ (G^\#)\to (G^\#,\,\edgefn)$
+converts it into an equivalent IDE problem. We consider two transformations:
+\begin{itemize}
+	\item an equivalence transformation $\transEq$ (pronounced ``t-equiv'') that generates IDE problems with the same precision as the original IFDS problem, and
+  \item a correlated-call transformation $\transCC$ (pronounced ``t-c-c'') that generates IDE problems that exclude infeasible paths.
+\end{itemize}
+Both transformations keep the exploded supergraph $G^\#$ the same, and only generate different edge functions.
+%In each case we also show how to convert the result of the generated IDE problem to a result of the original IFDS problem.
+
+%An overview of the transformations is shown in Figure~\ref{fig:transformations}.
+
+\subsubsection{Equivalence Transformation}\label{sec:equivtrans}
+%We start with an equivalence transformation $\transEq$ to present a simple IFDS-to-IDE conversion that does not change the result of the original IFDS problem. We will compare the correlated-calls transformation with the equivalence transformation, and use the latter to show  that the correlated-calls analysis results in a
+%precision improvement of the original IFDS problem result.
+
+%\paragraph{Converting IFDS problems to IDE problems}
+%Since IDE is a generalization of IFDS, any IFDS problem can be converted into an equivalent IDE problem~\cite{sagiv1996precise}.
+The lattice
+for the equivalence transformation $\transEq$ 
+is the two-point lattice
+    $L^\equiv=\{\bot,\ \top\}$,
+where $\bot$ means ``reachable'', and $\top$ means ``not reachable''. 
+The edge functions $\edgefn^\equiv$ are defined as
+\begin{equation}
+    \edgefn^\equiv=
+    \begin{cases}
+      \lambda e\,.\,\lambda m\,.\,\bot&\text{if $d_1(e)=\Lambda$ and $d_2(e)\ne\Lambda$;}\\
+      \lambda e\,.\,\id&\text{otherwise,}
+    \end{cases}
+\end{equation}
+where $d_1(e)$ is the source fact of an edge $e$ and $d_2(e)$ is its target fact. 
+At a ``diagonal'' edge from a $\Lambda$-fact to a non-$\Lambda$-fact
+$d$, the micro function returns $\bot$
+to make
+the fact $d$ reachable. All other micro-functions are the identity.
+The equivalence transformation is thus defined as:
+  $\transEq((G^\#))=(G^\#,\,L^\equiv,\,\mathsf{EdgeFn}^\equiv)$.
+
+%Thus, in $\transEq$, all non-diagonal edges in the original IFDS problem are mapped to identity functions.
+
+\subsubsection{Correlated-Calls Transformation}\label{sec:cctrans}
+
+%To improve the precision of an IFDS problem, we can convert it to a special type of IDE problem, and use lattice elements to provide us with additional information about a node.
+%When converting the IDE result to an IFDS result, lattice elements will tell us whether to make the corresponding exploded nodes reachable. This is the idea of the correlated-calls analysis.
+
+%\paragraph{Lattice Elements}
+In the correlated-calls transformation, the 
+%Just like in the equivalence transformation $\transEq$, the exploded supergraph for $\transCC$ is the same as in the original IFDS problem. The 
+lattice elements are maps from receivers to sets of types:
+    $\lcc=\left\{\,m:\ R\to2^T\right\}$,
+where $R$ is the set of receivers and $T$ is the set of all types.
+For each receiver $r$, the map gives an overapproximation of the possible
+runtime types of $r$.
+Sets of types are ordered by the superset relation, and this is lifted to maps from receivers
+to sets of types, so the bottom element $\botcc$ maps every receiver to the set of all types,
+and the top element $\topcc$ maps every receiver to the empty set of types.
+During an actual execution, every receiver $r$ points to an object of some
+runtime type. \otodo{What if $r$ points to null?} Therefore, a data flow fact
+is unreachable along any feasible path if its corresponding lattice element
+maps any receiver to the empty set of types.
+
+\commentout{
+The type power set $2^T$ is also a lattice with a bottom element 
+\begin{align*}
+\bot_T&=T
+\intertext{and top element}
+\top_T&=\varnothing.
+\intertext{The top element of the function lattice}
+\topcc&=\lambda r.\top_T
+\intertext{is a function that maps any receiver to the empty set\footnote{%
+  We prove that $\lcc$ is a lattice in the Proof of Lemma~\ref{lem:efficient}%
+}. 
+The bottom element}
+\botcc&=\lambda r.\bot_T
+\end{align*}
+maps any receiver to all types in the program.
+
+To understand the meaning of lattice elements in a correlated-call analysis, suppose that an IFDS problem has been converted to an IDE problem using the correlated-calls transformation. 
+Assume also that $s$ is the entrypoint of the program, $n$ is a node in the exploded supergraph, and that in the IDE result, $n$ is mapped to a lattice element $l\in \lcc$. 
+Then the purpose of $l$ is to provide information about the set of types of the objects that may be referenced by each receiver at runtime at a path from $s$ to $n$. 
+If a receiver is mapped to the empty set $\top_T$, it means that for the given program point, the receiver cannot reference an object of any type.
+In other words, the corresponding data-flow fact is considered not reachable.
+}
+
+%\paragraph{Micro Functions}\label{sec:micro}
+%Unlike in the equivalence transformation, the micro functions returned by the edge function $\edgefn^\Subset$ are not always identity functions.
+
+A micro-function $f\in\lcc\to \lcc$ defines how the map from receivers to types should
+be updated when an instruction is executed.
+The micro-function for most kinds of instructions is the identity.
+On a call to and return from a specific method $m$ called on receiver $r$,
+the micro-function restricts the receiver-to-type map to map $r$ only to
+types consistent with the polymorphic dispatch to method $m$.
+Finally, when an instruction assigns an object of unknown type to a receiver
+$r$, the corresponding micro-function updates the map to map $r$ to the
+set of all types. This is made precise by the following definition:
+\begin{definition}\label{def:microfn}
+Given a previously fixed set $S \subseteq R$ of receivers, the micro-function $\varepsilon_S(e)$
+of a supergraph edge $e$ is defined as:
+                    \otodo{define $n_1(e)$ globally somewhere early on, and consider using a more decriptive name like src instead of $n_1$}
+  \begin{align}\label{eq:varepsilon}
+      &\varepsilon_S(e)= \lambda m\,.\,\\
+        &\begin{cases}
+            m[r\to m(r)\cap \tau(s_\mathcal F,\,f)],
+            &\text{\parbox{75mm}{
+                if $e$ is a call-start edge, $r.c()$ is
+                the call site at $n_1(e)$, $f$ is the called
+                procedure with signature $s_\mathcal F$,
+                and $r\in S$;}}\\[3ex]
+        \parbox{30mm}{\[\begin{array}{l}
+                m[r\to m(r)\cap \tau(s_\mathcal F,\,f)]\\
+            [v_1\to\bot_T] \ldots [v_k\to\bot_T],
+        \end{array}
+        \]
+        }
+        &
+        \text{\parbox{75mm}{
+                if $e$ is an end-return edge,
+                $r.c()$ is the call
+                corresponding to the return node
+                at $n_2(e)$,
+                $f$ is the called method with
+                signature $s_\mathcal F$,
+                $v_1,\,\dots,\,v_k\in S$ are the local variables
+                in $f$,
+                and $r\in S$;}}\\
+            m\left[r\to \bot_T\right],
+            &\text{\parbox{75mm}{if $n_1(e)$ contains an assignment
+                    for $r\in S$;}}\\
+            m
+                &\text{otherwise.}
+        \end{cases}
+  \end{align}
+\end{definition}
+
+In the above definition, the purpose of the set $S$ is to limit the set of considered receivers. We will use $S$ in Section~\ref{sec:ccreceivers}.
+
+%Let $e=(n_1,\,n_2)\in E^\#$ be an edge in the exploded supergraph.
+%$\edgefn^\Subset(e)$ returns a micro function $f\subset\lcc\to \lcc$.
+%Given a micro function (a map from receivers to sets of types) $m\in \lcc$, $f(m)$ returns a new map from receivers to sets of types.
+%In other words, $f$ shows how to update the map from receivers to sets of types when we encounter program point $n_1$.
+
+%Let $f_1$ and $f_2$ be two micro functions such that ${f_1=\lambda m\,.\,\lambda r\,.\,t_1(r)}$ and ${f_2={\lambda m\,.\,\lambda r\,.\,t_2(r)}}$. We define the meet operation on micro-functions as follows:
+%\begin{equation}\label{eq:micromeet}
+  %\lambda m\,.\,\lambda r\,.\,t_1(r)\sqcap\lambda m\,.\,\lambda r\,.\,t_2(r)
+  %=\lambda m\,.\,\lambda r\,.\,t_1(r)\cup t_2(r)\,.
+%\end{equation}
+%
+%The composition of micro functions is defined as ordinary function composition.
+
+We can now define $\edgefn$, which assigns a micro-function to each edge in
+the exploded supergraph. 
+Along a $\Lambda$-edge, the micro function is the identity. 
+All other functions can be described with $\varepsilon_S$.
+On a ``diagonal'' edge from $\Lambda$ to a non-$\Lambda$ fact that corresponds
+to some data flow fact becoming reachable, $\varepsilon_S(e)$ is applied to the initial
+map $\botcc$ that conservatively allows every receiver to point to an object of any type.
+On all other edges, $\varepsilon_S(e)$ is applied to the existing map before the edge.
+The is formalized in the following definition.
+\begin{definition}\label{def:edgefn}
+For each edge $e = (n_1,d_1) \to (n_2,d_2)$, $\ccedgefn S(e)$ is defined as follows:
+  \begin{equation}\label{eq:edgefndef}
+      \ccedgefn S(e)=
+        \begin{cases}
+          \id  &\text{if $d_1=d_2=\Lambda$},\\
+          \lambda m\,.\,\varepsilon_S(e)(\botcc) &\text{if $d_1=\Lambda$ and $d_2\ne\Lambda$},\\
+          \lambda m\,.\,\varepsilon_S(e)(m)  &\text{otherwise.}
+        \end{cases}
+  \end{equation}
+  %We define both $\ccedgefn S$ and $\varepsilon_S$ to be extended to paths by composition.
+\end{definition}
+
+
+\begin{example}
+  Consider the program from Listing~\ref{list:ccexample}, whose exploded supergraph appeared in Figure~\ref{fig:cc_edgefn_example}.
+
+  Returning a secret value in method \verb'A.foo' creates a ``diagonal'' edge from the $\Lambda$-fact to the secret fact $\psi$. 
+  The diagonal edge is labeled with the micro function $\lambda m\,.\,\botcc$. Thus, at the end node of the method, every receiver is mapped to the set of all types~$\bot_T$.
+  
+On the end-return edge from \verb'A.foo' to \verb'main', the set of types for the receiver \verb'a' is restricted by the micro function $\lambda m\,.\,m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$ on the edge corresponding to the assignment of the return value $\psi$ to \verb'v'.
+
+Similarly, on the call-start edge from \verb'main' to \verb'B.bar', the possible types
+of the receiver \verb'a' are further restricted by the micro-function
+$\lambda m\,.\,m[\texttt a\to m(\texttt a)\cap\{\texttt B\}]$.
+on the edge that passes the argument \verb'v' to the parameter \verb's'.
+
+The composition of these micro functions results in the empty set as the possible
+types of the receiver \verb'a', indicating that this data flow path that would
+result in an information leak is actually infeasible.
+\end{example}
+
+%After we have shown the definitions for the meet and composition operations, we will show in Example~\ref{ex:cc} how the correlated-calls analysis uses the presented micro functions to detect infeasible paths.
+
+Finally, the correlated-calls transformation is defined as
+    $\transCC_S((G^\#))=\left(G^\#,\,\lcc_S,\,\ccedgefn S\right)$.
+
+%Then, for an edge $e$, the correlated-call micro functions can be defined as $\ccedgefn R$ and a correlated-calls transformation is defined as $\transCC_R$.
+
+\subsection{Converting IDE Results to IFDS Results}
+
+\todo{What does the notation $N^*$ and $N^\#$ mean? What is the difference between the two?}
+
+For each program point $n$, the result of an IFDS analysis gives
+a set of facts $d$ that may be reached at $n$. The result of an IDE analysis
+pairs each such fact $d$ with a lattice element $\ell$. Formally,
+for an IFDS problem $P$, the result $\result_{\text{IFDS}}$ has type
+$N \to D$. Similarly, for an IFDS problem $Q$, the result $\result_{\text{IDE}}$
+has type $N \to D \times L$.
+
+Recall that in the equivalence transformation lattice $L^\equiv$, $\bot$ means reachable
+and $\top$ means unreachable. Therefore, a result $\rho$ of the equivalence IDE analysis
+is converted to an IFDS result as follows:
+$\backEq(\rho) = \lambda n.\{d\mid\rho(n) = (d,\top)\}$.
+
+In the correlated-calls transformation lattice $\lcc$, a map that maps any receiver
+to the empty set of possible types means that the corresponding data flow path is
+infeasible. Therefore, a result $\rho$ of the correlated-calls IDE analysis is
+converted to an IFDS result as follows:
+$\backCC(\rho) = \lambda n.\{d\mid\rho(n) = (d,\ell), \forall r\,.\, \ell(r) \neq \top\}$.
+
+\commentout{
+
+The output of an IFDS analysis states whether a node is reachable in the exploded supergraph. This means that for an IFDS problem $P$, the IFDS-analysis result $\result_{\text{IFDS}}(P):\ N^*\to 2^D$ is a map from nodes of the control-flow supergraph to sets of facts:
+\begin{equation}
+  \result_{\text{IFDS}}(P)=\{(n,\,\mvp F(n))\,|\,n\in N^*\}\,.
+\end{equation}
+
+\begin{mdelete}
+\begin{example}\label{ex:ifdsresult}
+  The solution to the taint-analysis IFDS problem $\mathcal P$ in Listing~\ref{list:examplejava} whose exploded supergraph is presented in Figure~\ref{fig:exampleexploded} looks as follows:
+  \small\begin{align*}
+    \result_\text{IFDS}(\mathcal P)=\{&(\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\{\texttt a\}),
+      &(\highlight{\textsf{start}_\texttt f}{lightsalmonpink},\,\{\texttt s\}),
+      &\qquad\qquad(\highlight{\textsf{return}_\texttt f}{lightsalmonpink},\,\{\texttt r,\,\texttt s\}),\\
+%      
+      &(\highlight{\textsf{call}_\texttt{A.f}}{greyblue},\,\{\texttt a\}),
+      &(\highlight{\texttt{if(s==null)}}{lightsalmonpink},\,\{\texttt s\}),
+      &\qquad\qquad(\highlight{\texttt{return r}}{lightsalmonpink},\,\{\texttt r,\,\texttt s\}),\\
+%
+      &(\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\{\texttt a,\,\texttt b\}),
+      &(\highlight{\textsf{call}_\texttt f}{lightsalmonpink},\,\{\texttt s\}),
+      &\qquad\qquad(\highlight{\textsf{end}_\texttt f}{lightsalmonpink},\,\{\texttt r,\,\texttt s\})\}.\\
+%
+      &(\highlight{\textsf{end}_\texttt{main}}{greyblue},\,\{\texttt a,\,\texttt b\}),&(\highlight{\texttt{return s}}{lightsalmonpink},\,\{\texttt s\}),
+  \end{align*}\normalsize
+  All other nodes of the control-flow supergraph are mapped to the empty set.
+\end{example}
+\end{mdelete}
+
+ The IDE analysis associates a lattice element with each node in the exploded supergraph. For an IDE problem $Q$, the result $\result(Q):\ N^\#\to L$ maps nodes of the exploded supergraph to lattice elements (see~\eqref{eq:mvpdef}):
+\begin{equation}\label{eq:ideresult}
+  \result(Q)=\{((n,\,d),\,\mvp{\textsf{Env}}(n,\,d))\ |\ n\in N^*,\,d\in D\}\,.
+\end{equation}
+In other words, for each fact $d\in D$ at a given node $n\in N^*$, $\result(Q)(n,\,d)$ returns a lattice element. If a fact $d\in D$ is unreachable, $\result(Q)(n,\,d)=\top$.
+
+In the case of an equivalence transformation from IFDS to IDE, if a node in the IFDS result is reachable, it will be also reachable in the IDE result, and it will be mapped to the bottom lattice element. For an exploded node in the IDE result, being mapped to the top element means being not reachable.
+
+The~domain of an equivalence-IDE result 
+\begin{equation}
+  \resultEq=\result(\transEq(P))
+\end{equation}
+consists of pairs of control-flow-supergraph nodes and data-flow facts. The range of the result is the set of lattice elements. To transform an IDE result to an IFDS result, we need to map each control-flow-supergraph node to the set of facts with which it is paired, provided that the pair is mapped to the bottom lattice element.
+
+\begin{mdelete}
+\begin{example}\label{ex:ideresult}
+  Converting the IFDS problem $\mathcal P$ from Example~\ref{ex:ifdsresult} into an equivalent IDE problem and solving it will yield the following result:
+    \small\begin{align*}
+    \result(\transEq(\mathcal P))=\{&((\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\texttt a),\,\bot),\\
+      &((\highlight{\textsf{call}_\texttt{A.f}}{greyblue},\,\texttt a),\,\bot),\\
+      &((\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\texttt a),\,\bot),\\
+      &((\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\texttt b),\,\bot),\\
+      &\dots\}.\\
+    \end{align*}\normalsize
+  Suppose that for a pair $(n,\,d)$, where $n\in N^*$ and $d\in D$, there is no corresponding result in ~$\result_\text{IFDS}(\mathcal P)$ (see Example~\ref{ex:ifdsresult}). Then $(n,\,d)$ appears in $\result(\transEq(\mathcal P))$ as $((n,\,d),\,\top)$.
+\end{example}
+\end{mdelete}
+
+Let $\rho$ be the result of an equivalence-IDE analysis for an IFDS problem $P$:
+\[
+  \rho=\result(\transEq(P)).
+\]
+For a node $n\in N^*$, let $D_n^\equiv(\rho)$ be a set of data-flow facts such that
+\begin{equation}
+  D_n^\equiv(\rho)=\{d\ |\ d\in D\,\wedge\,\rho(n,\,d)\ne\top\}\,.
+\end{equation}
+Then the transformation function
+$\backEq:\,(N^\#\to L)\to(N^*\to2^D)$
+from an IDE result to~an~IFDS result looks as follows:
+\begin{equation}
+  \backEq\left(\rho\right)=
+    \left\{(n,\,D_n^\equiv(\rho))\ |\ n\in N^*\right\}\,.
+\end{equation}
+
+Obviously, if applied to the result of an equivalence-IDE problem, $\backEq$ returns a result equivalent to the original IFDS problem result. In other words, for any IFDS problem $P$ with supergraph $N^*$, and any node $n\in N^*$,
+\begin{equation}
+  \backEq\left(\result(\transEq(P))\right)(n)=\result_{\text{IFDS}}(P)(n)\,.
+\end{equation}
+
+\begin{example}
+  Converting the result in Example~\ref{ex:ideresult} with the equivalence-transformation from an IDE result to an IFDS result $\backEq$ will yield the same result as in Example~\ref{ex:ifdsresult}.
+\end{example}
+
+
 
 Let $P$ be an IFDS problem. 
 Let $E:\,N\times D$ be the domain of the IDE result $\result(Q)$.
@@ -504,10 +570,34 @@ Then, for a set $S\subseteq R$, the~correlated-calls-conversion function from a~
   \backCC\left(\rho\right)=
     \left\{(n,\,D_n^\Subset(\rho)\ | \ n\in N^*\right\}.
 \end{equation}
+}
+
+\subsection{Implementation of Correlated Calls Micro-Functions}
+\otodo{move material from following section here}
+
+Conceptually, micro-functions are functions from $L$ to $L$, where $L$
+is the IDE lattice, either $L^\equiv$ or $\lcc$ in our context. However,
+the IDE algorithm requires an efficient representation of micro-functions.
+The chosen representation needs to support the basic micro-functions that
+we presented in Section~\ref{seq:transIfdsIde}. The representation must also
+support function application, comparison, and be closed under function composition
+and meet. We now propose such a representation for the correlated-calls micro-functions.
+
+The representation of a micro-function is a map from receivers to pairs $\setpair{I}{U}$,
+where we require $U \subseteq I$.
+The meaning of such a map $\lambda r\,.\,\setpair{I_r}{U_r}$ is the micro-function
+$\lambda m\,.\,\lambda r\,.\,(m(r)\cap I_r) \cup U_r$. All of the micro-functions
+in definition \ref{def:microfn} can be represented in this form. \otodo{Say
+    how application, comparison, composition, and meet are implemented. Decide
+    how much detail and how much proof to give. Also need to introduce normalization.}
+
+\subsection{Theoretical Results}
 
 In the following lemma we show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.
 
 \begin{lemma}[Precision]\label{lem:subsetifds}
+    \otodo{Should we say $\result_{\text{IDE}}$ instead of $\result$ everywhere, to
+        be consistent with $\result_{\text{IFDS}}$?}
     For an IFDS problem $P$ and all ${n\in N^*}$,
     \begin{equation}\label{eq:correct}
       \backCC\left(\result(\transCC_R(P))\right)(n)
@@ -515,6 +605,7 @@ In the following lemma we show that the result of an IDE problem obtained throug
       \result_{\text{IFDS}}(P)(n)\,.
     \end{equation}
 \end{lemma}
+\otodo{We agreed to move the proofs to the appendix.}
 \begin{proof}
   The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
   \begin{align*}
@@ -536,7 +627,8 @@ We will next show that our analysis is sound, i.e. that the result of an IDE pro
   \end{equation}
 \end{lemma}
 
-\paragraph{Correlated-Call Receivers}\label{sec:ccreceivers}
+\subsection{Correlated-Call Receivers}\label{sec:ccreceivers}
+\otodo{should this be a section or subsection? should it be moved somewhere else (or maybe not included at all)?}
 We will now show that in a correlated-calls transformation, it is enough to consider only some of the receivers of set $R$.
 
 \begin{definition}
@@ -560,4 +652,4 @@ To summarize, Lemma~\ref{lem:sound} shows that the result $\resultCC$ of a corre
 We have also shown in Lemma~\ref{lem:subsetifds} that the correlated-calls analysis improves the precision of the original IFDS result $\result_\text{IFDS}$, because the correlated-calls result $\resultCC$ underapproximates an equivalence-IDE result $\resultEq=\result_\text{IFDS}$.
 Finally, we showed in Lemma~\ref{lem:onlycorrrec} that a correlated-call transformation to IDE that considers only correlated-call receivers $\rcc$ achieves the same result $\resultCC$ that is obtained when considering all receivers $R$.
 
-This is the general idea of the correlated-calls analysis. The analysis involves a transformation from IFDS to IDE problems. To implement an IDE problem, it is necessary to define a representation of lattice elements and micro functions. An efficient representation of those data structures for the correlated-calls analysis is presented in the next section.
+%This is the general idea of the correlated-calls analysis. The analysis involves a transformation from IFDS to IDE problems. To implement an IDE problem, it is necessary to define a representation of lattice elements and micro functions. An efficient representation of those data structures for the correlated-calls analysis is presented in the next section.
