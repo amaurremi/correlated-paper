@@ -251,8 +251,8 @@ The correlated-calls analysis is defined as a transformation from an arbitrary I
 %Let $P=(G^\#)$ be an IFDS problem and $Q=(G^\#,\,\edgefn)$ an IDE problem obtained by a conversion from $P$.
 \otodo{Here, you defined the output of a transformation as just G\# and an edge function. Later, you also include the lattice. Should we include the lattice here?}
 Let $G^\#$ be the exploded supergraph of an IFDS problem. A \emph{transformation}
-$\mathcal T:\ (G^\#)\to (G^\#,\,\edgefn)$
-converts it into an equivalent IDE problem. We consider two transformations:
+$\mathcal T:\ (G^\#)\to (G^\#,\,(\top,\,\bot),\,\edgefn)$
+converts it into an equivalent IDE problem with a two-point lattice. We consider two transformations:
 \begin{itemize}
 	\item an equivalence transformation $\transEq$ (pronounced ``t-equiv'') that generates IDE problems with the same precision as the original IFDS problem, and
   \item a correlated-call transformation $\transCC$ (pronounced ``t-c-c'') that generates IDE problems that exclude infeasible paths.
@@ -357,7 +357,7 @@ of a supergraph edge $e$ is defined as:
             m[r\to m(r)\cap \tau(s_\mathcal F,\,f)],
             &\text{\parbox{75mm}{
                 if $e$ is a call-start edge, $r.c()$ is
-                the call site at $n_1(e)$, $f$ is the called
+                the call site at $\src e$, $f$ is the called
                 procedure with signature $s_\mathcal F$,
                 and $r\in S$;}}\\[3ex]
         \parbox{30mm}{\[\begin{array}{l}
@@ -371,14 +371,14 @@ of a supergraph edge $e$ is defined as:
                 if $e$ is an end-return edge,
                 $r.c()$ is the call
                 corresponding to the return node
-                at $n_2(e)$,
+                at $\target e$,
                 $f$ is the called method with
                 signature $s_\mathcal F$,
                 $v_1,\,\dots,\,v_k\in S$ are the local variables
                 in $f$,
                 and $r\in S$;}}\\
             m\left[r\to \bot_T\right],
-            &\text{\parbox{75mm}{if $n_1(e)$ contains an assignment
+            &\text{\parbox{75mm}{if $\src e$ contains an assignment
                     for $r\in S$;}}\\
             m
                 &\text{otherwise.}

@@ -15,6 +15,8 @@ in which each procedure $p$ is augmented with an additional \textit{start node} 
 A control-flow supergraph allows us to model the control flow in inter-procedural paths.
  The flow from the caller to the callee is represented using an edge \[(\textsf{call}_{c_q},\,\textsf{start}_q)\,.\] The control flow from the callee back to the caller goes through an edge \[(\textsf{end}_q,\,\textsf{return}_{c_q})\,.\]
 
+We will denote the source and end nodes of an edge $e$ as $\src e$ and $\target e$.
+
 \commentout{
 \begin{example}
   Consider the program in Listing~\ref{list:examplejava}. The supergraph corresponding to that program is shown in Figure~\ref{fig:examplesupergraph}.
@@ -170,11 +172,6 @@ A \textit{meet semilattice} $L=(S,\,\sqcap)$ is defined by a set $S$ and a meet 
   The meet operation induces a partial order $(S,\,\sqsubseteq)$ where every subset contains  a greatest lower bound: For all $x,\,y\in S$, $x\sqsubseteq y$ if $x\sqcap y=x$. The greatest lower bound, or top element, of the semilattice is denoted as $\top$.
   If $k$ is the length of the longest chains of elements in the semilattice, then the \textit{height} of the semilattice is~$k-1$.
 
-Finally, we introduce the notion of \textit{distributivity}. Given a set $D$, a function $f:2^D\to2^D$ is distributive if $\forall x_1,\,x_2\in 2^D$,
-\begin{equation}
-  f(x_1\cup x_2)=f(x_1)\cup f(x_2).
-\end{equation}
-
 In this work, we will denote a map from a set of keys $K$ to values from set $V$ as
 \begin{equation}
   \{(k,\,v)\,|\,k\in K,\,v\in V\}.
@@ -185,6 +182,11 @@ To avoid excessive parentheses, we write $\left(m[x_1\to y_1]\right)[x_2\to y_2]
 We will denote the identity function $\lambda x\,.x$ by $\textsf{id}$.
 We will use a typed version of this function in various contexts, where the type of $x$ will vary with
 the context.
+
+Finally, we introduce the notion of \textit{distributivity}. Given a set $D$, a function $f:2^D\to2^D$ is distributive if $\forall x_1,\,x_2\in 2^D$,
+\begin{equation}
+  f(x_1\cup x_2)=f(x_1)\cup f(x_2).
+\end{equation}
 
 \subsection{IFDS}\label{sec:bgifds}
 The IFDS framework is a precise and efficient algorithm for data-flow analysis. IFDS was developed in 1995 by T.\,Reps, S.\,Horwitz, and M.\,Sagiv at the University of Wisconsin and has been used to solve a variety of data-flow analysis problems~\cite{bodden2013spl,naeem2008typestate,DBLP:conf/birthday/KreikerRRSWY13,tripp2009taj}\mtodo{
