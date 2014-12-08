@@ -242,7 +242,7 @@ In this way, the IFDS algorithm reduces the input data-flow problem to a graph-r
   In an available-expressions analysis, $D$ is the set of all expressions in the program. If an expression $d\in D$ is reachable at a certain node, it means that it does not need to be recomputed at that node. 
 \end{example}}
 \begin{example}
-  The exploded supergraph for Listing~\ref{list:ccexample} is shown in Figure~\ref{fig:cc_edgefn_example}.
+  The exploded supergraph for Listing~\ref{list:ccexample} is shown in Figure~\ref{fig:cc_edgefn_example}.\mtodo{Tell the reader here to ignore the labels on the edges of the graph?}
   We can see that there is a realizable path
   from the start node of the exploded graph to the variable \verb's' at~the~node~$\textsf{print(s)}$ in the \verb'B.bar' method. This means that at that node, \verb's' is considered secret.
 
