@@ -148,6 +148,7 @@
 \otodo{we agreed to move this figure to the initial example section}
   \mtodo{Move Figure~\ref{fig:cc_edgefn_example} up to where it's mentioned first? If yes, the caption won't make sense.}
 
+  \commentout{
 \otodo{The following definitions are very general, and not related to the transformation.
     Can we move them somewhere earlier?}
 \paragraph{Edge Functions}\label{sec:ef}
@@ -180,11 +181,13 @@ If there is a supergraph path from a method call with signature $s_\mathcal F$ t
   Let $r.c()$ be a call on a receiver $r\in R$ with a method signature $s_\mathcal F$ to a function $f\in\mathcal F$.
   If the call site is monomorphic, then $\tau(s_\mathcal F,\,f)$ contains all types $T'\subseteq T$ that are compatible with the static type of $r$.
   If the call site is polymorphic, then $\tau(s_\mathcal F,\,f)\subset T'$, since some types $t\in T'$ cause dispatch to a method other than $f$.
+  }
 
 \otodo{incorporate into previous section}
 \subsection{Defining IFDS and IDE Problems}
-In Section~\ref{sec:bg}, we defined what IFDS and IDE problems are, their applications, and their constraints. In this section, we describe how to create instances of IFDS and IDE problems.
+%In Section~\ref{sec:bg}, we defined what IFDS and IDE problems are, their applications, and their constraints. In this section, we describe how to create instances of IFDS and IDE problems.
 
+\commentout{
 \subsubsection{Defining an IFDS Problem}\label{sec:ifdsdef}
 Recall that an IFDS problem instance is defined as a five-tuple
 \[
@@ -197,6 +200,7 @@ $G^\#=(N^\#,\,E^\#)$. Each node of $G^\#$ is a pair $(n,\ d)$, where $n\in N^*$ 
 
 The meaning of an edge in the exploded supergraph is the following.
 Let $(n_1,\,d_1)$ and $(n_2,\,d_2)$ be two nodes in the exploded supergraph $G^\#$. Furthermore, assume that if fact $d_1$ at node~$n_1$ holds, then the fact~$d_2$ at node~$n_2$ also holds. Then there is an edge $(n_1,\,d_1),\,(n_2,\,d_2)\in E^\#$.
+}
 
 \subsubsection{Defining an IDE Problem}\label{sec:defide}
 An IDE problem instance is a four-tuple
@@ -249,10 +253,9 @@ The correlated-calls analysis is defined as a transformation from an arbitrary I
 %The correlated-call analysis transforms an existing IFDS problem into a special kind of IDE problem. We described what is necessary to define IFDS and IDE problems independently.
 
 %Let $P=(G^\#)$ be an IFDS problem and $Q=(G^\#,\,\edgefn)$ an IDE problem obtained by a conversion from $P$.
-\otodo{Here, you defined the output of a transformation as just G\# and an edge function. Later, you also include the lattice. Should we include the lattice here?}
 Let $G^\#$ be the exploded supergraph of an IFDS problem. A \emph{transformation}
-$\mathcal T:\ (G^\#)\to (G^\#,\,(\top,\,\bot),\,\edgefn)$
-converts it into an equivalent IDE problem with a two-point lattice. We consider two transformations:
+$\mathcal T:\ (G^\#)\to (G^\#,\,L,\,\edgefn)$
+converts it into an equivalent IDE problem. We consider two transformations:
 \begin{itemize}
 	\item an equivalence transformation $\transEq$ (pronounced ``t-equiv'') that generates IDE problems with the same precision as the original IFDS problem, and
   \item a correlated-call transformation $\transCC$ (pronounced ``t-c-c'') that generates IDE problems that exclude infeasible paths.

@@ -9,6 +9,7 @@ To retrieve information about an input program, such as its control-flow supergr
 
 Since WALA currently only contains an implementation of IFDS, we implemented IDE from scratch. Instead of using WALA's IFDS implementation, to run an IFDS problem, we converted it to an IDE problem and used our own IDE solver.
 
+\commentout{
 \begin{odelete}
 \subsubsection{IFDS}
 \otodo{We should incorporate the four functions into the explanation of IFDS in the background. Then we don't need them here.}
@@ -29,6 +30,7 @@ The four functions are:
   \item \textsf{default}, for all other intra-procedural edges.
 \end{itemize}
 \end{odelete}
+}
 
 \paragraph{Taint Analysis}
 Using this representation of an IFDS problem, we implemented an IFDS problem instance for taint analysis. We used it as a sample IFDS problem on which to evaluate the correlated-calls-IDE construction.
