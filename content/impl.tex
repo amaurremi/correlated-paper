@@ -581,13 +581,73 @@ we presented in Section~\ref{seq:transIfdsIde}. The representation must also
 support function application, comparison, and be closed under function composition
 and meet. We now propose such a representation for the correlated-calls micro-functions.
 
-The representation of a micro-function is a map from receivers to pairs $\setpair{I}{U}$,
-where we require $U \subseteq I$.
-The meaning of such a map $\lambda r\,.\,\setpair{I_r}{U_r}$ is the micro-function
-$\lambda m\,.\,\lambda r\,.\,(m(r)\cap I_r) \cup U_r$. All of the micro-functions
-in definition \ref{def:microfn} can be represented in this form. \otodo{Say
-    how application, comparison, composition, and meet are implemented. Decide
-    how much detail and how much proof to give. Also need to introduce normalization.}
+The representation of a micro-function is a map from receivers to pairs of sets of
+types $I(r)$ and $U(r)$, where $U(r)$ is required to be a subset of $I(r)$. We use the notation
+$\setpair{I}{U}$ to represent such a map, and $I(r)$ and $U(r)$ to look up the
+sets corresponding to a particular receiver $r$. We define the meaning $\denote{\setpair{I}{U}}$
+of a representation $\setpair{I}{U}$ as follows: $\denote{\setpair{I}{U}} = \lambda m\,.\,\lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.
+In words, the micro-function represented by $\setpair{I}{U}$ takes an existing map $m$
+from receivers to sets of types, and returns a map that maps each receiver $r$ to
+the set $m(r)$ given by the original map $m$ intersected with $I(r)$ and unioned
+with $U(r)$.
+
+All of the basic micro-functions defined in Definition~\ref{def:microfn} can be expressed
+in this representation.
+
+The implementation of function application follows directly from the definition of
+the representation: $\setpair{I}{U}(m) = \lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.
+
+To compare two micro-functions for equality, it suffices to compare the corresponding
+sets $I(r)$ and $U(r)$ for all receivers $r$. The following lemma shows that this
+implementation of comparison corresponds to equality of the represented micro-functions:
+\begin{lemma}\label{lem:equal}
+    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
+    \[
+        \forall r\,.\,I(r) = I'(r) \land U(r) = U'(r)
+        \iff
+        \denote{\setpair{I}{U}} = \denote{\setpair{I'}{U'}}
+    \] 
+\end{lemma}
+\otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
+
+\otodo{The normalization function $\mathcal N$ was only needed in composition. I therefore
+    ``inlined'' it into composition to save space. This makes composition a bit harder to intuitively
+    verify, but saves complexity here. The verification can be in the proof in the supplementary appendix.}
+The composition of two micro-function representations is defined as follows:
+$\setpair{I}{U} \circ \setpair{I'}{U'} = \setpair{\lambda r\,.\,(I(r) \cap I'(r))\cup U(r)}{\lambda r\,.\,(I(r)\cap U'(r))\cup U(r)}$.
+The following lemma shows that this implementation corresponds to the composition
+of the denoted functions:
+\begin{lemma}\label{lem:equal}
+    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
+    \[
+        \denote{\setpair{I}{U}} \circ \denote{\setpair{I'}{U'}}
+        = 
+        \denote{\setpair{I}{U}} \circ \denote{\setpair{I'}{U'}}
+    \]
+\end{lemma}
+\otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
+
+The meet of two micro-function representations is defined as follows:
+$\setpair{I}{U} \sqcap \setpair{I'}{U'} = \setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}$.
+The following lemma shows that this implementation corresponds to the meet
+of the denoted functions:
+\begin{lemma}\label{lem:equal}
+    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
+    \[
+        \denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}
+        = 
+        \denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}
+    \]
+\end{lemma}
+\otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
+
+\otodo{Sagiv et al. define a notion of an ``efficient'' implementation of micro-functions.
+    If the micro-functions are ``efficient'', then the asymptotic complexity bounds proven by
+    Sagiv hold. Our implementation is ``efficient'' if we assume that the number of correlated
+    receivers is a constant independent of the size of the program. That seems a stretch. If
+    it's linear in the size of the program, then we would need to add a factor to their complexity
+    bounds. Their bound is $O(ED^3)$, while ours would be $O(ED^3R)$. But then we can't directly use their complexity proof; we would have to adapt it.
+    I'm leaning towards leaving out any mention of ``efficient'' implementation.}
 
 \subsection{Theoretical Results}
 
