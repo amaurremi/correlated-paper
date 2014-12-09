@@ -3,7 +3,10 @@
 Data-flow analysis computes an approximation of how values may flow  
 through a program, and has applications in compiler optimization, 
 programming tools, and computer security, and many other areas.
-Data-flow analyses operate on \textit{control-flow graphs} (CFGs) that model 
+Data-flow analyses operate on \textit{control-flow graphs} (CFGs)
+\mtodo{If we introduce this abbreviation, should we replace the uses of
+``control-flow graph'' with ``CFG'' in the paper?}
+that model 
 the order in which the instructions of a program are executed. This is
 typically done by associating \textit{flow functions} that represent how 
 data is propagated with the edges of the control-flow graph.  A 
@@ -44,7 +47,13 @@ The results of this IDE problem can be mapped back to the dataflow domain of the
 original IFDS problem.
 
 We present a formalization of the transformation and prove its correctness
-as follows. First, we derive an ``Equivalence IDE problem'' from the original 
+as follows. First, we derive an ``Equivalence IDE problem''%
+\mtodo{The IDE paper already states that each IFDS problem can be solved with IDE.
+I wonder if this sounds like the equivalence transformation was our contribution.
+We just use the equivalence transformation to explain the CC transformation, and for the
+proofs.
+}
+from the original 
 IFDS problem by associating the identity environment functions with all edges,
 and show that the solution to this Equivalence IDE problem can be mapped back
 to the solution of the original IFDS problem. Then, we derive a ``Correlated Calls 
@@ -68,8 +77,7 @@ on top of the WALA framework for static analysis of JVM bytecode~\cite{fink2012w
 We also report on preliminary experiments in which our correlated-calls transformation
 is applied to an IFDS formulation of a simple taint analysis. Our results show that
 solving the resulting IDE problem avoids infeasible paths due to correlated calls as
-expected.  
-\mtodo{As discussed on the phone, we want to talk more about the results here.}   
+expected.
 
 In summary, the contributions of this paper are as follows:
 \begin{itemize}
