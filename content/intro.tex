@@ -20,7 +20,11 @@ depends critically on its ability to detect and disregard such infeasible paths.
 The popular \textit{Interprocedural Finite Distributive Subset} (IFDS) algorithm 
 by  Reps, Horwitz, and Sagiv \cite{reps1995precise} is a general data-flow analysis
 algorithm for computing solutions to finite distributive data-flow problems such 
-as reaching definitions, available expressions, and taint analysis. A distinguishing 
+as reaching definitions, available expressions, and taint analysis.
+\mtodo{Should we include any references here for people who don't know what these analyses refer to?}
+\mtodo{We should define somewhere what taint analysis is, since it's currently
+commented out.}
+A distinguishing 
 characteristic of IFDS is that it avoids infeasible interprocedural paths in which calls 
 and returns to/from functions are not properly matched. Sagiv, Reps, and Horwitz
 also presented the \textit{Interprocedural Distributive Environment} (IDE) algorithm
