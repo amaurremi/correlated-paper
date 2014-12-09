@@ -1,21 +1,39 @@
 \section{Background}\label{sec:bg}
-The purpose of the correlated-calls analysis is to solve IFDS problems more precisely than using the standard IFDS algorithm by ruling out some infeasible paths. The correlated-calls analysis works by transforming an IFDS problem to an IDE problem, solving the IDE problem, and transforming the IDE result to a solution to the original IFDS problem. This section describes the general ideas underlying IFDS and IDE.
+%The purpose of the correlated-calls analysis is to solve IFDS problems more precisely than using the standard IFDS algorithm by ruling out some infeasible paths. The correlated-calls analysis works by transforming an IFDS problem to an IDE problem, solving the IDE problem, and transforming the IDE result to a solution to the original IFDS problem. 
+This section defines basic terminology and presents the IFDS and IDE algorithms.
 
 \subsection{Terminology and Notation}
-We will start by introducing several concepts used by the IFDS and IDE analyses.
+%We will start by introducing several concepts used by the IFDS and IDE analyses.
+The \textit{control-flow graph} of a procedure is a directed graph whose nodes are instructions, and which contains an edge from $n_1$ to $n_2$ whenever
+$n_2$ may execute immediately after $n_1$. A control-flow graph has a distinguished \textit{start node} \textsf{start}$_p$ and \textit{end node} \textsf{end}$_p$.
+%and edges represent transfer of control between the instructions during an execution of the program. 
+%A control-flow graph has a unique start node, $\startmain$, which is the node corresponding to the program entrypoint.
+%An \textit{intra-procedural} path is a path in a control-flow graph whose nodes are in the same procedure. By contrast, an \textit{inter-procedural path} is one that contains nodes from different procedures. 
+The \textit{control-flow supergraph} of a program contains the control-flow graphs of all of the procedures as
+subgraphs. In addition, for each call instruction $c$, the supergraph contains a \textit{call-to-start} edge to the start node of every procedure that
+may be called from $c$, and an \textit{end-to-return} edge from the end node of the procedure back to the call instruction.
+\otodo{do we really need to extra "return nodes" that the IFDS/IDE papers add?}
+%is a control-flow graph
+%in which each procedure $p$ is augmented with an additional \textit{start node} \textsf{start}$_p$ and \textit{end node} \textsf{end}$_p$, and for each call $c_q$ to a procedure $q$, there is a \textit{call node} \textsf{call}$_{c_q}$ and subsequent \textit{return node} \textsf{return}$_{c_q}$.
 
-A \textit{control-flow graph} is a directed graph in which nodes correspond to instructions and edges represent transfer of control between the instructions during an execution of the program. 
-A control-flow graph has a unique start node, $\startmain$, which is the node corresponding to the program entrypoint.
+%A control-flow supergraph allows us to model the control flow in inter-procedural paths.
+ %The flow from the caller to the callee is represented using an edge \[(\textsf{call}_{c_q},\,\textsf{start}_q)\,.\] The control flow from the callee back to the caller goes through an edge \[(\textsf{end}_q,\,\textsf{return}_{c_q})\,.\]
 
-An \textit{intra-procedural} path is a path in a control-flow graph whose nodes are in the same procedure. By contrast, an \textit{inter-procedural path} is one that contains nodes from different procedures. 
+A call site is \textit{monomorphic} if it always calls the same procedure. In an object-oriented language, 
+a call site $r.m(\ldots)$ can dynamically dispatch to multiple methods depending on the runtime
+type of the object pointed to by the receiver $r$.
+A call site that calls multiple procedures is called
+\textit{polymorphic}.
+We define a function $\textsf{lookup}$ to specify the dynamic dispatch: 
+if $s$ is the signature of $m$ and $t$ is the runtime type of the object
+pointed to by $r$, $\textsf{lookup}(s,t)$ gives the procedure that will
+be invoked by the call $r.m(\ldots)$. We also define a kind of inverse $\tau$
+of $\textsf{lookup}$: given a signature $s$ and a specific invoked procedure
+$f$, $\tau(s,f)$ gives the set of all runtime types of $r$ that cause $r.m(\ldots)$
+to dispatch to $f$: $\tau(s,f) = \{t\mid \textsf{lookup}(s,t)=f\}$.
 
-A \textit{control-flow supergraph} is a control-flow graph
-in which each procedure $p$ is augmented with an additional \textit{start node} \textsf{start}$_p$ and \textit{end node} \textsf{end}$_p$, and for each call $c_q$ to a procedure $q$, there is a \textit{call node} \textsf{call}$_{c_q}$ and subsequent \textit{return node} \textsf{return}$_{c_q}$.
-
-A control-flow supergraph allows us to model the control flow in inter-procedural paths.
- The flow from the caller to the callee is represented using an edge \[(\textsf{call}_{c_q},\,\textsf{start}_q)\,.\] The control flow from the callee back to the caller goes through an edge \[(\textsf{end}_q,\,\textsf{return}_{c_q})\,.\]
-
-We will denote the source and end nodes of an edge $e$ as $\src e$ and $\target e$.
+\otodo{do we ever use $\src$ and $\target$?}
+We denote the source and end nodes of a graph edge $e$ as $\src e$ and $\target e$.
 
 \commentout{
 \begin{example}
@@ -128,13 +146,19 @@ We will denote the source and end nodes of an edge $e$ as $\src e$ and $\target 
 \end{example}
 }
 
-A \textit{flow-sensitive} data-flow analysis is one that takes the order of program instructions into account.
+%A \textit{flow-sensitive} data-flow analysis is one that takes the order of program instructions into account.
 
-Let each call node in a program be labeled with a distinct opening parenthesis and the corresponding return node with the matching closing parenthesis. For a given path $p$, let $s$ be the string that is obtained by concatenating the labels of the nodes in $p$.
-Then $p$ is \textit{valid} if $s$ belongs to the language of substrings of balanced parentheses. The set of all inter-procedurally valid paths from the start node to a node $n$ is denoted as $\ivp(n)$. The set $\ivp(n)$ is a conservative approximation of all concrete execution paths from the start node to $n$.
+A path through the control-flow supergraph is \textit{valid} if every end-to-return edge on the path returns
+to the site of the most recent unmatched call. The set of all valid paths from the program entry point to
+a node $n$ is denoted $\ivp(n)$.
+\otodo{Should we give a formal definition?}
 
-A \textit{context-sensitive} data-flow analysis is an analysis that considers only inter-procedurally valid paths.
+%Let each call node in a program be labeled with a distinct opening parenthesis and the corresponding return node with the matching closing parenthesis. For a given path $p$, let $s$ be the string that is obtained by concatenating the labels of the nodes in $p$.
+%Then $p$ is \textit{valid} if $s$ belongs to the language of substrings of balanced parentheses. The set of all inter-procedurally valid paths from the start node to a node $n$ is denoted as $\ivp(n)$. The set $\ivp(n)$ is a conservative approximation of all concrete execution paths from the start node to $n$.
 
+%A \textit{context-sensitive} data-flow analysis is an analysis that considers only inter-procedurally valid paths.
+
+\commentout{
 \begin{mdelete}
 \begin{example}
   In the supergraph in Figure~\ref{fig:examplesupergraph}, let us assign $\{,\,\}$ parentheses to $\textsf{call}_\texttt{A.f}$ and $\textsf{return}_\texttt{A.f}$, and $\langle,\,\rangle$ parentheses to $\textsf{call}_\texttt{f}$ and $\textsf{return}_\texttt{f}$. 
@@ -165,68 +189,234 @@ However, the graph also contains an inter-procedurally invalid path
   with corresponding string $\langle\}$.
 \end{example}
 \end{mdelete}
+}
 
-A \textit{lattice} is a partially ordered set in which each subset has a least upper bound and a greatest lower bound.
+\otodo{The definitions that Marianna had were for \emph{complete}
+lattices/semilattices. All of the lattices in the context of IFDS/IDE
+are/must be complete. I'll just say that here.}
+A \textit{complete lattice} is a partially ordered set $(S,\sqsubseteq)$ in which every subset has a least upper bound and a greatest lower bound.
+A \textit{complete meet semilattice} is a partially ordered set in which every subset need only have a greatest lower bound.
+The symbols $\bot$ and $\top$ are used to denote the greatest lower bound of $S$ and of the empty set, respectively.
+Since all of the (semi)lattices discussed in this paper are required to be complete, we will henceforth leave out the
+\textit{complete} qualifier.
 
-A \textit{meet semilattice} $L=(S,\,\sqcap)$ is defined by a set $S$ and a meet operation $\sqcap$ that is  associative, commutative, and idempotent.
-  The meet operation induces a partial order $(S,\,\sqsubseteq)$ where every subset contains  a greatest lower bound: For all $x,\,y\in S$, $x\sqsubseteq y$ if $x\sqcap y=x$. The greatest lower bound, or top element, of the semilattice is denoted as $\top$.
-  If $k$ is the length of the longest chains of elements in the semilattice, then the \textit{height} of the semilattice is~$k-1$.
 
-In this work, we will denote a map from a set of keys $K$ to values from set $V$ as
-\begin{equation}
-  \{(k,\,v)\,|\,k\in K,\,v\in V\}.
-\end{equation}
-For an arbitrary map $m$,  $m(x)$ is the value to which $x$ is mapped in $m$. We denote by $m[x\to y]$ a map identical to $m$, except that the element $x$ is mapped to $y$.
-To avoid excessive parentheses, we write $\left(m[x_1\to y_1]\right)[x_2\to y_2]$ as $m[x_1\to y_1][x_2\to y_2]$.
+%A \textit{meet semilattice} $L=(S,\,\sqcap)$ is defined by a set $S$ and a meet operation $\sqcap$ that is  associative, commutative, and idempotent.
+  %The meet operation induces a partial order $(S,\,\sqsubseteq)$ where every subset contains  a greatest lower bound: For all $x,\,y\in S$, $x\sqsubseteq y$ if $x\sqcap y=x$. The greatest lower bound, or top element, of the semilattice is denoted as $\top$.
+  %If $k$ is the length of the longest chains of elements in the semilattice, then the \textit{height} of the semilattice is~$k-1$.
 
-We will denote the identity function $\lambda x\,.x$ by $\textsf{id}$.
-We will use a typed version of this function in various contexts, where the type of $x$ will vary with
-the context.
+In this paper, we denote a map $m$ as a set of pairs of keys and values, in which each key appears at most once.
+For any map $m$,  $m(k)$ is the value paired with the key $k$ in $m$. We denote by $m[x\to y]$ a map that maps $x$ to $y$, and every other key $k$ to $m(k)$.
+%To avoid excessive parentheses, we write $\left(m[x_1\to y_1]\right)[x_2\to y_2]$ as $m[x_1\to y_1][x_2\to y_2]$.
 
-Finally, we introduce the notion of \textit{distributivity}. Given a set $D$, a function $f:2^D\to2^D$ is distributive if $\forall x_1,\,x_2\in 2^D$,
-\begin{equation}
-  f(x_1\cup x_2)=f(x_1)\cup f(x_2).
-\end{equation}
+%We will denote the identity function $\lambda x\,.x$ by $\textsf{id}$.
+%We will use a typed version of this function in various contexts, where the type of $x$ will vary with
+%the context.
+
+%OL: we can just as easily write the identity explicitly as \x.x throughout.
 
 \subsection{IFDS}\label{sec:bgifds}
-The IFDS framework is a precise and efficient algorithm for data-flow analysis. IFDS was developed in 1995 by T.\,Reps, S.\,Horwitz, and M.\,Sagiv at the University of Wisconsin and has been used to solve a variety of data-flow analysis problems~\cite{bodden2013spl,naeem2008typestate,DBLP:conf/birthday/KreikerRRSWY13,tripp2009taj}\mtodo{
-The four references take away space in the References section. Remove some of them?
-}. 
+The IFDS framework~\cite{reps1995precise} is a precise and efficient algorithm for data-flow analysis
+%. IFDS was developed in 1995 by T.\,Reps, S.\,Horwitz, and M.\,Sagiv at the University of Wisconsin and
+that has been used to solve a variety of data-flow analysis problems~\cite{bodden2013spl,naeem2008typestate,DBLP:conf/birthday/KreikerRRSWY13,tripp2009taj}.
+%\mtodo{ The four references take away space in the References section. Remove some of them?  }
+The IFDS framework is an instance of the \textit{functional approach} to data-flow analysis~\cite{pnueli1981two}
+because it constructs summaries of the effects of called procedures.
 \commentout{The IFDS analysis is a version of the classic \textit{functional approach} to data-flow analysis proposed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}.}
 \commentout{In other data-flow algorithms not based on the functional approach, the result of the analysis at the entry of a procedure ``merges'' the incoming data obtained from all callers of the procedure. As a consequence, there is one global data-flow result computed at the end of the procedure. Context-sensitivity, however, allows an analysis to compute the data-flow result for a given procedure as a \textit{function} of the data-flow value at the start of the procedure. 
 In other words, the analysis result for a procedure varies depending on where the procedure was called from. This significantly improves the precision of a data-flow analysis, which is why context-sensitivity is an important advantage of IFDS over classic data-flow algorithms.}
 \mtodo{I'm not saying any more that IFDS is a version of Sharir\&Pnueli's functional approach.}
 \mtodo{I also removed the comparison of IFDS with other algorithms. I'm not pointing out the benefits of IFDS any more, so we might fail to show the importance of the algorithm.}
+The IFDS framework is applicable to \textit{inter-procedural} data flow problems whose domain is \textit{subsets} of a \textit{finite} set $D$,
+and whose data-flow functions are \textit{distributive}.
+A function $f$ is distributive if 
+$f(x_1\sqcap x_2)=f(x_1)\sqcap f(x_2)$.
 
-The IFDS algorithm is applicable to problems which can be expressed with data-flow functions that satisfy certain restrictions. \textit{Inter-procedural} flow functions specify how data flows from the invocation of a procedure to its start, and from the procedure's end back to its call site. \textit{Distributive} flow functions are those that distribute over the confluence operator. In the context of IFDS, the confluence operator is called meet, and it can be either union or intersection. The data-flow facts on which the analysis operates must be a \textit{finite} set $D$. Each flow function operates on a \textit{subset} of $D$ (for example, the set of variables in the program) which makes the domain of the flow functions the power set of $D$.
+%The IFDS algorithm is applicable to problems which can be expressed with data-flow functions that satisfy certain restrictions. \textit{Inter-procedural} flow functions specify how data flows from the invocation of a procedure to its start, and from the procedure's end back to its call site. \textit{Distributive} flow functions are those that distribute over the confluence operator. In the context of IFDS, the confluence operator is called meet, and it can be either union or intersection. The data-flow facts on which the analysis operates must be a \textit{finite} set $D$. Each flow function operates on a \textit{subset} of $D$ (for example, the set of variables in the program) which makes the domain of the flow functions the power set of $D$.
 
 \commentout{The purpose of the IFDS framework is to solve a special subset of inter-procedural, flow-sensitive, context-sensitive data-flow-analysis problems. The main idea of IFDS is to encode the data-flow analysis problem into a graph-reachability problem.}
 
-Given a data-flow problem that satisfies the restrictions of IFDS, the algorithm provides a \textit{context-sensitive} \mtodo{Provide reference explaining context sensitivity?} solution in polynomial time.
-Compared to IFDS, most data-flow analyses are either general but do not run in polynomial time~\cite{knoop1992interprocedural,pnueli1981two} or handle a very specific set of problems~\cite{knoop1993efficient}.
+The IFDS algorithm is notable because it computes a meet over valid paths solution in polynomial time.
+Most other interprocedural analysis algorithms are either imprecise due to invalid paths,
+general but do not run in polynomial time~\cite{knoop1992interprocedural,pnueli1981two}, or handle a very specific set of problems~\cite{knoop1993efficient}.
 
-\subsubsection{Data-Flow Problems Suitable for IFDS}\label{sec:suitableifds}
+%\subsubsection{Data-Flow Problems Suitable for IFDS}\label{sec:suitableifds}
 \commentout{In this section we describe the data-flow problems that can be solved by an IFDS analysis. We will start with an intuitive definition and later on formalize the notion of an IFDS-suitable problem.}
 
-Informally, an IFDS analysis can only solve decision problems. An IFDS analysis answers questions of the following kind: ``is property $X$ true at program point~$Y$?''. For example, a taint-analysis problem asks, for each variable $v$ in the program, ``is $v$ secret at a given program point?''. 
+%Informally, an IFDS analysis can only solve decision problems. An IFDS analysis answers questions of the following kind: ``is property $X$ true at program point~$Y$?''. For example, a taint-analysis problem asks, for each variable $v$ in the program, ``is $v$ secret at a given program point?''. 
 \commentout{An available-expressions problem asks, for each expression $e$, ``does $e$ have to be recomputed at a given program point?''.}
 
-Formally, a data-flow analysis problem is suitable for an IFDS analysis if it can be encoded as an IFDS problem
-\begin{equation}
-  (G^*,\,D,\,F,\,M_F,\,\sqcap)\,,
-\end{equation} where $G^*=(N^*,\,E^*)$ is the supergraph of the input program with nodes $N^*$ and edges $E^*$, $D$ is a finite set of \textit{data-flow facts}, $F$ is a set of distributive dataflow functions of type $2^D\to2^D$, $M_F:\,E^*\to F$ is a function that maps supergraph edges to dataflow functions, and $M_F$ is extended to paths by composition\footnote{%
+The input to the IFDS algorithm is specified as
+%Formally, a data-flow analysis problem is suitable for an IFDS analysis if it can be encoded as an IFDS problem
+  $(G^*,\,D,\,F,\,M_F,\,\sqcap)$,
+where $G^*=(N^*,\,E^*)$ is the supergraph of the input program with nodes $N^*$ and edges $E^*$,
+$D$ is a finite set of \textit{data-flow facts},
+$F$ is a set of distributive dataflow functions of type $2^D\to2^D$,
+$M_F:\,E^*\to F$ assigns a dataflow function to each supergraph edge,
+and $\sqcap$ is the \textit{meet operator} on the powerset $2^D$, either union or intersection.
+In our presentation, the meet will always be union, but all of the results apply dually when the
+meet is intersection.
+
+The output of the IFDS algorithm is, for each node $n$ in the supergraph, the \textit{meet-over-all-valid-paths} solution
+ $\mvp{F}(n)=\bigsqcap_{q\in\ivp(n)}M_F(q)(\top)$, where $M_F$ is extended from edges to paths by composition.
+
+\commentout{
+is a function that maps supergraph edges to dataflow functions, and $M_F$ is extended to paths by composition\footnote{%
   Let $A$ be a set and $f:\,E^*\to(A\to A)$ a function from supergraph edges to functions on $A$.
   We say that $f$ is extended to  paths by composition to denote that for a path $q$ consisting of the edges $e_1,\,\dots,\,e_k$, $f(q)=f(e_k)\circ\ldots\circ f(e_1)\circ\id$.
 }. The \textit{meet operator} $\sqcap$ is either union or intersection.
+}
 
-Without loss of generality, we will take meet to denote union. It can be shown that any problem where meet is defined as intersection can be reformulated into an equivalent one where meet is defined as union~\cite{reps1995precise}.
+%Without loss of generality, we will take meet to denote union. It can be shown that any problem where meet is defined as intersection can be reformulated into an equivalent one where meet is defined as union~\cite{reps1995precise}.
 
 \subsubsection{Overview of the IFDS Algorithm}\label{sec:overviewifds}
-Given an IFDS problem, for each node $n\in N^*$ the IFDS algorithm computes the \textit{meet-over-all-valid-paths} solution
-\begin{equation}
- \mvp{F}(n)=\bigsqcap_{q\in\ivp(n)}M_F(q)(\varnothing)\,.
-\end{equation}
+The key idea behind the IFDS algorithm is that it is possible to represent any distributive
+function $f$ from $2^D$ to $2^D$ by a \textit{representation relation} $R_f \subseteq 
+(D \cup \{0\})
+\times
+(D \cup \{0\})$. The representation relation can be visualized as a bipartite graph
+with edges from one instance of $D \cup \{0\}$ to another instance of $D \cup \{0\}$.
+The IFDS algorithm uses such graphs to efficiently represent both the input dataflow functions
+and the summary functions that it computes for called procedures.
+Specifically, the representation relation $R_f$ of a function $f$ is defined as:
+\[
+R_f=\{(\mathbf0,\,\mathbf0)\}\cup
+      \{(\mathbf0,\,d_j)\,|\,d_j\in f(\varnothing)\}\cup
+      \{(d_i,\,d_j)\,|\,d_j\in f(\{d_i\}) \setminus f(\varnothing)\}.
+\]
+%Each pair $(d_i,\,d_j)\in R_f$ corresponds to an edge $((n_1,\,d_i),\,(n_2,\,d_j))$ in the exploded supergraph.
 
+\commentout{
+Note that $R_f$ constructs pairs of dataflow facts so that
+\begin{itemize}
+  \item there is always an edge $(\mathbf0,\,\mathbf0)$ corresponding to the control-flow-graph edge;
+  \item if there is an edge $(\mathbf0,\,d_j)$, then there is no other edge leading to $d_j$; in particular, there is never an edge $(d_i,\,\mathbf0)$ where $d_i\ne\mathbf0$.
+\end{itemize}
+}
+
+\begin{example}\label{ex:flowfun}
+    Given $D=\{u,\,v,\,w\}$ and $f(S) = S\setminus\{v\} \cup \{u\}$,
+    the representation relation 
+  %The representation relation $R_f$ for a set of data-flow facts 
+  %and dataflow function $f=\lambda S\,.\,S\setminus\{v\}\cup\{u\}$ looks as follows:
+  $
+    R_f=\{(\mathbf0,\,\mathbf0),\,(\mathbf0,\,u),\,(w,\,w)\}
+$, which can be visualized with the following graph:
+   \begin{center}
+    \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
+\begin{tikzpicture}[>=stealth,on grid, auto]
+    \node [n,label=$\mathbf{0}$] (zero){};
+    \node [n,] (zero_) [below=\edge of zero] {};
+    \node [n,label=$u$] (u) [right=\nd of zero] {};
+    \node [n,] (u_) [below=\edge of u] {};
+    \node [n,label=$v$] (v) [right=\nd of u] {};
+    \node [n,] (v_) [below=\edge of v] {};
+    \node [n,label=$w$] (w) [right=\nd of v] {};
+    \node [n,] (w_) [below=\edge of w] {};
+    \path[->](zero) edge (zero_);
+    \path[->](zero) edge (u_);
+    \path[->](w) edge (w_);
+  \end{tikzpicture}
+  \end{center}
+\end{example}
+
+The representation relation decomposes a flow function into functions
+(edges) that operate on each fact individually. This is possible due
+to distributivity: applying the flow function to a set of facts is
+equivalent to applying it on each fact individually and
+taking the union of the results.
+
+The meet of two functions can be computed as simply the union of their representation
+functions: $R_{f\sqcap f'} = R_f \cup R_{f'}$. The composition of two functions can be
+computed by combining their representation graphs, merging the range nodes of the
+first function with the corresponding domain nodes of the second function, and finding
+paths in the resulting graph.
+
+\commentout{
+The representation relation allows us to compactly represent the composition and meet operations which are required for the IFDS algorithm.
+
+For two representation relations $R_{f_1},\,R_{f_2}$, the composition and meet operations are defined as follows:
+\begin{align}
+  R_{f_1}\circ R_{f_2}&=\{(d_1,\,d_3)\ |\ \exists d_2:\ (d_1,\,d_2)\in R_{f_1},\,(d_2,\,d_3)\in R_{f_2}\}\,.
+\intertext{and}
+  R_{f_1}\sqcap R_{f_2}&=R_{f_1}\cup R_{f_2}\,.
+\end{align}
+
+The representation relation distributes over composition and meet:
+\begin{align}
+  R_{f_1}\circ R_{f_2}=R_{f_1\circ f_2}\,,\qquad
+\text{and}\qquad
+  R_{f_1}\sqcap R_{f_2}=R_{f_1\sqcap f_2}\,.
+\end{align}
+}
+
+%On the exploded graph, the composition of two functions is represented by the paths that are formed when the exploded-graph edges are combined.
+\otodo{The example used to say $R_f \circ R_g$, but I believe it showed $R_g \circ R_f$. I fixed it, but please check that this is correct.}
+
+\begin{example}
+    If $g(S)=S\setminus\{w\}$ and $f(S) = S\setminus\{v\} \cup \{u\}$, then
+    $
+    R_g\circ R_f=\{(\mathbf0,\,\mathbf0),\,(\mathbf0,\,u)\},
+    $
+  as illustrated in the following graph:
+    \begin{center}
+    \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
+\begin{tikzpicture}[>=stealth,on grid, auto]
+    \node [n,label=$\mathbf{0}$] (zero){};
+    \node [n] (zero_) [below=\edge of zero] {};
+    \node [n,label=$u$] (u) [right=\nd of zero] {};
+    \node [n] (u_) [below=\edge of u] {};
+    \node [n,label=$v$] (v) [right=\nd of u] {};
+    \node [n] (v_) [below=\edge of v] {};
+    \node [n,label=$w$] (w) [right=\nd of v] {};
+    \node [n] (w_) [below=\edge of w] {};
+    \node [n] (zero__) [below=\edge of zero_] {};
+    \node [n] (u__) [below=\edge of u_] {};
+    \node [n] (v__) [below=\edge of v_] {};
+    \node [n] (w__) [below=\edge of w_] {};
+
+    \path[->](zero) edge node[left] {$R_f$} (zero_);
+    \path[->](zero) edge (u_);
+    \path[->](w) edge (w_);
+    \path[->](zero_) edge node[left] {$R_g$} (zero__);
+    \path[->](u_) edge (u__);
+    \path[->](v_) edge (v__);
+    
+    \node [n,label=$\mathbf{0}$] (zeroC) [below right= .5\edge and 3.5\dist of w] {};
+    \node [n] (zeroC_) [below=\edge of zeroC] {};
+    \node [n,label=$u$] (uC) [right=\nd of zeroC] {};
+    \node [n] (uC_) [below=\edge of uC] {};
+    \node [n,label=$v$] (vC) [right=\nd of uC] {};
+    \node [n] (vC_) [below=\edge of vC] {};
+    \node [n,label=$w$] (wC) [right=\nd of vC] {};
+    \node [n] (wC_) [below=\edge of wC] {};
+
+    \path[->](zeroC) edge node[left] {$R_g\circ R_f$} (zeroC_);
+    \path[->](zeroC) edge (uC_);
+  \end{tikzpicture}
+  \end{center}
+\end{example}
+
+Composition of two distributive
+functions $f$ and $f'$ corresponds to finding reachable nodes in a graph composed from their representation
+relations $R_f$ and $R_{f'}$. Therefore, evaluating the composed dataflow function for a control
+flow path corresponds to finding reachable nodes in a graph composed from the representation relations
+of the dataflow functions for individual instructions.
+
+It is this graph of representation relations that the IFDS algorithm operates on.
+In this graph, called the \textit{exploded supergraph}, each node is a pair $(n,d)$, where
+$n\in N^*$ is a node of the control-flow supergraph and $d$ is an element of $D\cup\{0\}$.
+For each edge $(n \to n') \in E^*$, the exploded supergraph contains a set of edges
+$(n,d_i) \to (n',d_j)$, which form the representation relation of the dataflow function
+$M_F(n \to n')$. The IFDS algorithm finds all exploded supergraph edges that are reachable by
+\textit{realizable} paths in the exploded supergraph. A path
+is \textit{realizable} if its projection to the (non-exploded) supergraph is a valid
+path (i.e. if it is of the form $(n_0, d_0) \to (n_1,d_1) \to \cdots \to (n_m,d_m)$
+and $n_0 \to n_1 \to \cdots \to n_m$ is a valid path).
+
+
+
+\commentout{
 To compute the meet-over-all-valid-paths solution, each node in the control-flow supergraph is paired with a \textit{fact} $d\in D\cup\{\mathbf0\},\,\mathbf0\notin D$, yielding the nodes $N^\#$ of the \textit{exploded supergraph} $G^\#=(N^\#,\,E^\#)$.
 Roughly, for each node in the program, a fact denotes a binary property whose value (true or false) we want to find out.
 The start node of the exploded supergraph is the node $(\startmain,\,\mathbf0)$.
@@ -243,6 +433,7 @@ In this way, the IFDS algorithm reduces the input data-flow problem to a graph-r
 \commentout{\begin{example} 
   In an available-expressions analysis, $D$ is the set of all expressions in the program. If an expression $d\in D$ is reachable at a certain node, it means that it does not need to be recomputed at that node. 
 \end{example}}
+}
 \begin{example}
   The exploded supergraph for Listing~\ref{list:ccexample} is shown in Figure~\ref{fig:cc_edgefn_example}.\mtodo{Tell the reader here to ignore the labels on the edges of the graph?}
   We can see that there is a realizable path
@@ -414,111 +605,6 @@ In this way, the IFDS algorithm reduces the input data-flow problem to a graph-r
 \end{example}
 
 
-%\subsubsection{Flow Functions}\label{sec:flowfunifds}
-The flow functions $F\subseteq 2^D\to2^D$ allow us to establish the edges in the exploded supergraph.
-
-Given a control-flow-graph edge $e=(n_1,\,n_2)\in E^*$ and a distributive dataflow function $f=M(e)$, the \textit{representation relation} $R_f:\,(D\cup\{\mathbf0\})\times (D\cup\{\mathbf0\})$ of $f$ is defined as
-\[
-  R_f=\{(\mathbf0,\,\mathbf0)\}\cup
-      \{(\mathbf0,\,d_j)\,|\,d_j\in f(\varnothing)\}\cup
-      \{(d_i,\,d_j)\,|\,d_j\in f(\{d_i\}),\,d_j\notin f(\varnothing)\}.
-\]
-Each pair $(d_i,\,d_j)\in R_f$ corresponds to an edge $((n_1,\,d_i),\,(n_2,\,d_j))$ in the exploded supergraph.
-
-Note that $R_f$ constructs pairs of dataflow facts so that
-\begin{itemize}
-  \item there is always an edge $(\mathbf0,\,\mathbf0)$ corresponding to the control-flow-graph edge;
-  \item if there is an edge $(\mathbf0,\,d_j)$, then there is no other edge leading to $d_j$; in particular, there is never an edge $(d_i,\,\mathbf0)$ where $d_i\ne\mathbf0$.
-\end{itemize}
-
-\begin{example}\label{ex:flowfun}
-  The representation relation $R_f$ for a set of data-flow facts $D=\{u,\,v,\,w\}$ and dataflow function $f=\lambda S\,.\,S\setminus\{v\}\cup\{u\}$ looks as follows:
-  \[
-    R_f=\{(\mathbf0,\,\mathbf0),\,(\mathbf0,\,u),\,(w,\,w)\}.
-  \]  
-  
-The corresponding exploded-graph edges are shown below.
-   \begin{center}
-    \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
-\begin{tikzpicture}[>=stealth,on grid, auto]
-    \node [n,label=$\mathbf{0}$] (zero){};
-    \node [n,] (zero_) [below=\edge of zero] {};
-    \node [n,label=$u$] (u) [right=\nd of zero] {};
-    \node [n,] (u_) [below=\edge of u] {};
-    \node [n,label=$v$] (v) [right=\nd of u] {};
-    \node [n,] (v_) [below=\edge of v] {};
-    \node [n,label=$w$] (w) [right=\nd of v] {};
-    \node [n,] (w_) [below=\edge of w] {};
-    \path[->](zero) edge (zero_);
-    \path[->](zero) edge (u_);
-    \path[->](w) edge (w_);
-  \end{tikzpicture}
-  \end{center}
-\end{example}
-
-The representation relation lets us decompose a flow function into functions that operate on each fact individually. This is possible due to distributivity: we can apply the flow function on each single fact and take the union of the results, rather than applying the function to the union of the facts.
-
-The representation relation allows us to compactly represent the composition and meet operations which are required for the IFDS algorithm.
-
-For two representation relations $R_{f_1},\,R_{f_2}$, the composition and meet operations are defined as follows:
-\begin{align}
-  R_{f_1}\circ R_{f_2}&=\{(d_1,\,d_3)\ |\ \exists d_2:\ (d_1,\,d_2)\in R_{f_1},\,(d_2,\,d_3)\in R_{f_2}\}\,.
-\intertext{and}
-  R_{f_1}\sqcap R_{f_2}&=R_{f_1}\cup R_{f_2}\,.
-\end{align}
-
-The representation relation distributes over composition and meet:
-\begin{align}
-  R_{f_1}\circ R_{f_2}=R_{f_1\circ f_2}\,,\qquad
-\text{and}\qquad
-  R_{f_1}\sqcap R_{f_2}=R_{f_1\sqcap f_2}\,.
-\end{align}
-
-On the exploded graph, the composition of two functions is represented by the paths that are formed when the exploded-graph edges are combined.
-
-\begin{example}
-  If $g=\lambda S\,.\,S\setminus\{w\}$ and $f$ is defined as in example~\ref{ex:flowfun}, then
-  \[
-    R_f\circ R_g=\{(\mathbf0,\,\mathbf0),\,(\mathbf0,\,u)\},
-  \]
-  as illustrated by the corresponding exploded graph edges:
-    \begin{center}
-    \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
-\begin{tikzpicture}[>=stealth,on grid, auto]
-    \node [n,label=$\mathbf{0}$] (zero){};
-    \node [n] (zero_) [below=\edge of zero] {};
-    \node [n,label=$u$] (u) [right=\nd of zero] {};
-    \node [n] (u_) [below=\edge of u] {};
-    \node [n,label=$v$] (v) [right=\nd of u] {};
-    \node [n] (v_) [below=\edge of v] {};
-    \node [n,label=$w$] (w) [right=\nd of v] {};
-    \node [n] (w_) [below=\edge of w] {};
-    \node [n] (zero__) [below=\edge of zero_] {};
-    \node [n] (u__) [below=\edge of u_] {};
-    \node [n] (v__) [below=\edge of v_] {};
-    \node [n] (w__) [below=\edge of w_] {};
-
-    \path[->](zero) edge node[left] {$R_f$} (zero_);
-    \path[->](zero) edge (u_);
-    \path[->](w) edge (w_);
-    \path[->](zero_) edge node[left] {$R_g$} (zero__);
-    \path[->](u_) edge (u__);
-    \path[->](v_) edge (v__);
-    
-    \node [n,label=$\mathbf{0}$] (zeroC) [below right= .5\edge and 3.5\dist of w] {};
-    \node [n] (zeroC_) [below=\edge of zeroC] {};
-    \node [n,label=$u$] (uC) [right=\nd of zeroC] {};
-    \node [n] (uC_) [below=\edge of uC] {};
-    \node [n,label=$v$] (vC) [right=\nd of uC] {};
-    \node [n] (vC_) [below=\edge of vC] {};
-    \node [n,label=$w$] (wC) [right=\nd of vC] {};
-    \node [n] (wC_) [below=\edge of wC] {};
-
-    \path[->](zeroC) edge node[left] {$R_f\circ R_g$} (zeroC_);
-    \path[->](zeroC) edge (uC_);
-  \end{tikzpicture}
-  \end{center}
-\end{example}
 
 \mtodo{We never use the interpretation function, so I deleted it, too}
 \commentout{
@@ -530,7 +616,16 @@ To convert a representation relation $R_f$ back into the original flow function 
 \end{align}
 }
 
-We presented an overview of the IFDS analysis. IFDS problems are transformed into IDE problems by the correlated-calls analysis. The IDE framework is described in the next section.
+A practical implementation of the IFDS algorithm generally takes as input a representation of the
+exploded supergraph edges $E^\sharp$ instead of explicit dataflow functions $M_F$. This is convenient because
+the two are equivalent in expressiveness, and because the IFDS algorithm works internally with the exploded
+supergraph. More specifically, the input generally provides a function with signature
+$f: N^* \times D \times N^* \to 2^D$. Given a (non-exploded) supergraph edge $n \to n'$ and a dataflow fact $d$,
+$f(n,d,n')$ returns the set of all $d'$ such that the exploded supergraph contains the edge $(n,d) \to (n',d')$.
+For convenience, the function $f$ can be split up into separate functions that handle the cases when
+the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.
+
+%We presented an overview of the IFDS analysis. IFDS problems are transformed into IDE problems by the correlated-calls analysis. The IDE framework is described in the next section.
 
 \subsection{IDE}\label{sec:bgide}
 There exists an entire class of data-flow problems that cannot be formulated as IFDS problems. Informally, the problems cannot be formulated as decision problems. For instance, a constant-propagation problem asks, for each variable $v$ in the program, ``if $v$ is a constant at a given program point, what is $v$'s value?''.
