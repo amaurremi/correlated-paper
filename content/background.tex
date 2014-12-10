@@ -225,8 +225,6 @@ because it constructs summaries of the effects of called procedures.
 \commentout{The IFDS analysis is a version of the classic \textit{functional approach} to data-flow analysis proposed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}.}
 \commentout{In other data-flow algorithms not based on the functional approach, the result of the analysis at the entry of a procedure ``merges'' the incoming data obtained from all callers of the procedure. As a consequence, there is one global data-flow result computed at the end of the procedure. Context-sensitivity, however, allows an analysis to compute the data-flow result for a given procedure as a \textit{function} of the data-flow value at the start of the procedure. 
 In other words, the analysis result for a procedure varies depending on where the procedure was called from. This significantly improves the precision of a data-flow analysis, which is why context-sensitivity is an important advantage of IFDS over classic data-flow algorithms.}
-\mtodo{I'm not saying any more that IFDS is a version of Sharir\&Pnueli's functional approach.}
-\mtodo{I also removed the comparison of IFDS with other algorithms. I'm not pointing out the benefits of IFDS any more, so we might fail to show the importance of the algorithm.}
 The IFDS framework is applicable to \textit{inter-procedural} data flow problems whose domain is \textit{subsets} of a \textit{finite} set $D$,
 and whose data-flow functions are \textit{distributive}.
 A function $f$ is distributive if 
@@ -604,9 +602,6 @@ In this way, the IFDS algorithm reduces the input data-flow problem to a graph-r
 }
 \end{example}
 
-
-
-\mtodo{We never use the interpretation function, so I deleted it, too}
 \commentout{
 To convert a representation relation $R_f$ back into the original flow function $f$, we can use the \textit{interpretation} function $\denote {R_f}$:
 \begin{align}
