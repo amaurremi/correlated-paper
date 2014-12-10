@@ -619,7 +619,7 @@ To convert a representation relation $R_f$ back into the original flow function 
 A practical implementation of the IFDS algorithm generally takes as input a representation of the
 exploded supergraph edges $E^\sharp$ instead of explicit dataflow functions $M_F$. This is convenient because
 the two are equivalent in expressiveness, and because the IFDS algorithm works internally with the exploded
-supergraph. More specifically, the input generally provides a function with signature
+supergraph. More specifically, the input generally provides a function
 $f: N^* \times D \times N^* \to 2^D$. Given a (non-exploded) supergraph edge $n \to n'$ and a dataflow fact $d$,
 $f(n,d,n')$ returns the set of all $d'$ such that the exploded supergraph contains the edge $(n,d) \to (n',d')$.
 For convenience, the function $f$ can be split up into separate functions that handle the cases when
@@ -628,6 +628,7 @@ the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-ret
 %We presented an overview of the IFDS analysis. IFDS problems are transformed into IDE problems by the correlated-calls analysis. The IDE framework is described in the next section.
 
 \subsection{IDE}\label{sec:bgide}
+\commentout{
 There exists an entire class of data-flow problems that cannot be formulated as IFDS problems. Informally, the problems cannot be formulated as decision problems. For instance, a constant-propagation problem asks, for each variable $v$ in the program, ``if $v$ is a constant at a given program point, what is $v$'s value?''.
 The questions asked by constant propagation are of the form ``if property $X$ \textit{($v$ being a constant)} is true at program point~$Y$, what is the value of some property~$Z$ \textit{(the value of the constant)} corresponding to~$X$?''. It turns out that problems with such questions can often be solved by the IDE algorithm.
 
@@ -638,35 +639,50 @@ As an example, in a constant propagation problem, an IDE environment would map e
 Instead of just telling us whether a fact holds or not, the IDE analysis can provide us with additional information about facts. 
 
 Just as in the IFDS analysis, the IDE algorithm reduces a data-flow problem to a graph-reachability problem. Additionally, for each program point, the algorithm computes an \textit{environment} $\textsf{Env}(D,\,L)$, where data-flow facts are mapped to values of a lattice $L$.
+}
 
+The IDE algorithm~\cite{sagiv1996precise} extends IFDS to
+\textit{inter-procedural} \textit{distributive} \textit{environment}
+problems. An \textit{environment} problem is an analysis whose dataflow
+lattice is the lattice $\textsf{Env}(D,L)$ of maps from a finite set $D$ to a meet semilattice
+$L$ of finite height, ordered pointwise. Like IFDS, IDE requires the dataflow functions to be distributive.
+
+
+\commentout{
 \begin{mdelete}
 For example, using the IDE analysis, we can encode a restricted version of a constant-propagation analysis\footnote{%
   In the general case, constant propagation cannot be encoded with distributive flow functions and is therefore not suitable for an IDE analysis~\cite{muller2001complexity}.
 }. The data-flow facts  correspond to program variables, and the lattice incorporates all possible values for constants. 
 If a fact $d$ in the exploded supergraph is reachable at node $n$, and $\textsf{Env}(d)\notin\{\bot,\,\top\}$, it means that the variable associated with $d$ is a constant. Furthermore, the value of the constant can be inferred from the environment for the corresponding node and is equal to $\textsf{Env}(d)$.
 \end{mdelete}
+}
 
-Formally, an IDE problem is defined as a four-tuple
-\begin{equation}
-  (G^*,\,D,\,L,\,M_\textsf{Env})\,,
-\end{equation}
-where $G^*$ is a control-flow supergraph, $D$ is a set of data-flow facts, and $L$ is a meet semilattice
-with finite height. 
-Finally, $M_\textsf{Env}:\,E^*\to(\textsf{Env}(D,\,L)\to \textsf{Env}(D,\,L))$ is a function from the edges of the control-flow supergraph to distributive \textit{environment transformers}. $M_\textsf{Env}$ is extended to paths by composition.
+The input to the IDE algorithm is
+  $(G^*,\,D,\,L,\,M_\textsf{Env})$
+where $G^*$ is a control-flow supergraph,
+$D$ is a set of data-flow facts,
+$L$ is a meet semilattice of finite height,
+and $M_\textsf{Env}:\,E^*\to(\textsf{Env}(D,\,L)\to \textsf{Env}(D,\,L))$ assigns a dataflow function
+to each supergraph edge.
 
-Given an IDE problem, for each node $n\in N^*$ and fact $d\in D$, the IDE algorithm computes the meet-over-all-valid-paths solution
-\begin{equation}\label{eq:mvpdef}
-  \mvp{\textsf{Env}}(n,\,d)=\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\Omega)(d)\,,
-\end{equation}
-where $M_\textsf{Env}$ is extended to paths by composition and
+The output of the IDE algorithm is, for each node $n$ in the supergraph,
+the \textit{meet-over-all-valid-paths} solution
+  $\mvp{\textsf{Env}}(n)=\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\top)$,
+where $M_\textsf{Env}$ is extended from edges to paths by composition.
+
+\commentout{
+and
 \begin{equation}
   \Omega=\lambda d\,.\,\top
 \end{equation}
 is the top element in the environment lattice~$\mathsf{Env}(D,\,L)$.
+}
+
 \commentout{
 The IDE analysis is a generalization of the IFDS analysis: every IFDS problem can be converted into an equivalent IDE problem~\cite{reps1995precise}. The equivalent problem can be solved by the IDE algorithm, and the result converted into an IFDS result. In~an~IFDS-equivalent IDE problem, the~graph~$G^*$ and the~set~$D$ of~data-flow facts remain the~same. The $L$ lattice is a two-point lattice: if a fact is mapped to the top (bottom) element, then it is reachable (unreachable). The conversion between IFDS and IDE problems is discussed in detail in Section~\ref{seq:transIfdsIde}.
 }
 
+\commentout{
 \subsubsection{Environment Transformers}
 For each node in the control-flow graph, the result of an IDE analysis computes an environment $\textsf{Env}(D,\,L)$, which is a map from data-flow facts to lattice elements.
 
@@ -683,8 +699,9 @@ We extend the meet operator to work on micro functions by defining
   (f_1\sqcap f_2)(l)=f_1(l)\sqcap f_2(l)
 \end{equation}
 for all $l\in L$.
+}
 
-In IDE problems, the auxiliary fact analogous to $\mathbf0$ in IFDS is denoted as $\Lambda$.
+%In IDE problems, the auxiliary fact analogous to $\mathbf0$ in IFDS is denoted as $\Lambda$.
 
 \commentout{
 \begin{mdelete}
@@ -798,9 +815,87 @@ In IDE problems, the auxiliary fact analogous to $\mathbf0$ in IFDS is denoted a
 \end{mdelete}
 }
   
+\commentout{
 In this way, each edge in the exploded graph is labeled with a micro function. The mapping from exploded-graph edges to the corresponding micro functions is stored in \textit{edge functions},  denoted as \textsf{EdgeFn}$:\,E^\#\to(L\to L)$.
+}
 
 \subsubsection{Overview of the IDE Algorithm}\label{sec:ideoverview}
+Just as any distributive function from $2^D$ to $2^D$ can be represented with a
+representation relation, it is also possible to represent any distributive functions from
+$\textsf{Env}(D,L)$
+to
+$\textsf{Env}(D,L)$
+with a \textit{pointwise representation}. A pointwise representation is a bipartite graph
+with the same nodes~\footnote{The IDE literature uses the symbol $\Lambda$ for the node that
+    is denoted $\mathbf0$ in the IFDS literature.}
+and edges as a representation relation, except that each edge is labelled
+with a \textit{micro-function}, which is a function from $L$ to $L$. 
+\commentout{
+The pointwise representation of an environment transformer 
+$t : \textsf{Env}(D,L) \to \textsf{Env}(D,L)$
+is defined as
+\newcommand{\microedge}[3]{#1\xrightarrow{#3}#2}
+\begin{align*}
+    R_t =& \{ \microedge{\Lambda}{\Lambda}{\lambda l.l} \} \cup
+    \{\microedge{\Lambda}{d_j}{\lambda l.t(\Omega)(d_j)} \mid d_j \in D\}\\
+    &\cup
+    \{\microedge{d_i}{d_j}{\lambda l.t(\Omega[d_i\to l])(d_j)} \mid d_i, d_j \in D\}.
+\end{align*}
+}
+Let $\Omega = \lambda d.\top$ be the environment that maps every element of $D$ to $\top$.
+Thanks to distributivity, every environment transformer 
+$t : \textsf{Env}(D,L) \to \textsf{Env}(D,L)$
+can be decomposed into its effect on $\Omega$ and on a set of environments $\Omega[d_i\to l]$
+that map every element except one ($d_i$) to $\top$:
+\[
+    t(m)(d_j) = \lambda l. t(\Omega)(d_j) \sqcap \bigsqcap_{d_i\in D} \lambda l. t(\Omega[d_i\to l])(d_j).
+\]
+The functions $\lambda l. \cdots$ in this decomposition are the micro-functions that
+appear on the edges of the pointwise representation edges from $\Lambda$ to each $d_j$ and from
+each $d_i$ to each $d_j$.%
+\footnote{The IDE paper defines a more complicated but equivalent set of micro-functions
+that eliminate some duplication of computation.}
+The absence of an edge in the pointwise representation from some $d_i$ to some $d_j$ is
+equivalent to an edge with micro-function $\lambda l.\top$.
+
+\otodo{Discuss the micro-functions in the example exploded supergraph in Figure 3.}
+
+The meet of two environment transformers $t_1, t_2$ can be computed by taking the union of the edges
+in their pointwise representations. When the same edge appears in the pointwise representations of
+both $t_1$ and $t_2$, the micro-function for that edge in $t_1 \sqcap t_2$ is the meet of the
+micro-functions for that same edge in $t_1$ and in $t_2$.
+
+The composition of two environment transformers can be computed by combining their pointwise
+representation graphs in the same way as IFDS representation relations, and 
+computing the composition of the micro-functions appearing along each path in the resulting graph.
+
+The IDE algorithm operates on the same exploded supergraph as the IFDS algorithm
+(except that the edges are labelled with micro-functions). For each pair $(n,d)$ of
+node and fact, the algorithm computes a micro-function equal to the meet of the micro-functions
+of all the realizable paths from the program entry point to the pair.
+
+In order to do this efficiently, the IDE algorithm requires a representation of micro-functions
+that is general enough to express the basic micro-functions of the dataflow functions for individual
+instructions, and that supports computing the meet and composition of micro-functions.
+
+
+Similar to the IFDS algorithm, a practical implementation of the IDE algorithm requires
+the input dataflow functions to be provided in their pointwise representation
+as exploded supergraph edges labelled with micro-functions. Specifically,
+the input is generally provided as a function $f: N^* \times D \times N^* \to (D \to F)$,
+where $F$ is the set of representations of micro-functions from $L$ to $L$.
+Given a (non-exploded) supergraph edge $n \to n'$ and a dataflow fact $d$,
+$f(n,d,n')$ returns a map that gives for each fact $d'$ the micro-function $f$
+that appears on the exploded supergraph edge $(n,d) \to (n',d')$.
+Like in the IFDS algorithm, the function $f$ can be split up into separate functions that handle the cases when
+the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.
+
+
+\otodo{In the next section, we talk about \textsf{EdgeFn}, which is inconsistent with how
+    we define the functions to be implemented here. We need to make the two sections consistent,
+    one way or the other.}
+
+\commentout{
 Given a labeled exploded supergraph, the IDE algorithm computes the environments for all nodes in the control-flow graph.
 
 The algorithm first computes the lattice elements $l_{n,\,d}$ that correspond to each reachable node $(n,\,d)$ in the exploded supergraph. The union of the exploded nodes $(n,\,d)$ for a given control-flow node $n$, mapped to the corresponding lattice elements $l_{n,\,d}$, form the environment $\textsf{Env}_n$  for that node:
@@ -832,3 +927,4 @@ The lattice element $l_{n,\,d}$ is the meet of the lattice elements correspondin
 
 This is a general outline of the IDE analysis. We use the IDE framework to improve the precision of IFDS problems in the presence of correlated calls.
 The next section describes how this is done.
+}

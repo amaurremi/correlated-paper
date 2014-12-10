@@ -183,11 +183,11 @@ If there is a supergraph path from a method call with signature $s_\mathcal F$ t
   If the call site is polymorphic, then $\tau(s_\mathcal F,\,f)\subset T'$, since some types $t\in T'$ cause dispatch to a method other than $f$.
   }
 
+\commentout{
 \otodo{incorporate into previous section}
 \subsection{Defining IFDS and IDE Problems}
 %In Section~\ref{sec:bg}, we defined what IFDS and IDE problems are, their applications, and their constraints. In this section, we describe how to create instances of IFDS and IDE problems.
 
-\commentout{
 \subsubsection{Defining an IFDS Problem}\label{sec:ifdsdef}
 Recall that an IFDS problem instance is defined as a five-tuple
 \[
@@ -200,7 +200,6 @@ $G^\#=(N^\#,\,E^\#)$. Each node of $G^\#$ is a pair $(n,\ d)$, where $n\in N^*$ 
 
 The meaning of an edge in the exploded supergraph is the following.
 Let $(n_1,\,d_1)$ and $(n_2,\,d_2)$ be two nodes in the exploded supergraph $G^\#$. Furthermore, assume that if fact $d_1$ at node~$n_1$ holds, then the fact~$d_2$ at node~$n_2$ also holds. Then there is an edge $(n_1,\,d_1),\,(n_2,\,d_2)\in E^\#$.
-}
 
 \subsubsection{Defining an IDE Problem}\label{sec:defide}
 An IDE problem instance is a four-tuple
@@ -241,6 +240,7 @@ where $n\in N^*$, $d\in D$, $p\in\ivp(n)$, and $\mathsf{RP}$ is the set of all i
 To summarize, an IDE problem can be defined by a labeled exploded supergraph 
 \begin{equation}(G^\#,\,L,\,\mathsf{EdgeFn})\,,\end{equation}
 where each edge of the exploded supergraph corresponds to a micro function.
+}
 
 
 \section{Correlated Calls Analysis}\label{chapter:cca}
