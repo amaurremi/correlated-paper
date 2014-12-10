@@ -881,7 +881,9 @@ instructions, and that supports computing the meet and composition of micro-func
 
 Similar to the IFDS algorithm, a practical implementation of the IDE algorithm requires
 the input dataflow functions to be provided in their pointwise representation
-as exploded supergraph edges labelled with micro-functions. Specifically,
+as exploded supergraph edges labelled with micro-functions.
+\mtodo{Should we cite the ``Practical extensions'' paper here that talks about the on-demand IFDS algorithm?}
+Specifically,
 the input is generally provided as a function $f: N^* \times D \times N^* \to (D \to F)$,
 where $F$ is the set of representations of micro-functions from $L$ to $L$.
 Given a (non-exploded) supergraph edge $n \to n'$ and a dataflow fact $d$,

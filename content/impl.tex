@@ -285,10 +285,10 @@ The edge functions $\edgefn^\equiv$ are defined as
     \end{cases}
 \end{equation}
 where $d_1(e)$ is the source fact of an edge $e$ and $d_2(e)$ is its target fact. 
-At a ``diagonal'' edge from a $\Lambda$-fact to a non-$\Lambda$-fact
+At a~``diagonal'' edge from a $\Lambda$-fact to a non-$\Lambda$-fact
 $d$, the micro function returns $\bot$
 to make
-the fact $d$ reachable. All other micro-functions are the identity.
+the fact $d$ reachable. All other micro-functions are the identity\mtodo{``the identity function'' or is it okay ot just say ``the identity''?}.
 The equivalence transformation is thus defined as:
   $\transEq((G^\#))=(G^\#,\,L^\equiv,\,\mathsf{EdgeFn}^\equiv)$.
 
@@ -305,7 +305,7 @@ In the correlated-calls transformation, the
 lattice elements are maps from receivers to sets of types:
     $\lcc=\left\{\,m:\ R\to2^T\right\}$,
 where $R$ is the set of receivers and $T$ is the set of all types.
-For each receiver $r$, the map gives an overapproximation of the possible
+For each receiver~$r$, the map gives an overapproximation of the possible
 runtime types of $r$.
 Sets of types are ordered by the superset relation, and this is lifted to maps from receivers
 to sets of types, so the bottom element $\botcc$ maps every receiver to the set of all types,
@@ -456,7 +456,7 @@ Finally, the correlated-calls transformation is defined as
 
 For each program point $n$, the result of an IFDS analysis gives
 a set of facts $d$ that may be reached at $n$. The result of an IDE analysis
-pairs each such fact $d$ with a lattice element $\ell$. Formally,
+pairs each such fact~$d$ with a lattice element $\ell$. Formally,
 for an IFDS problem $P$, the result $\result_{\text{IFDS}}$ has type
 $N \to D$. Similarly, for an IFDS problem $Q$, the result $\result_{\text{IDE}}$
 has type $N \to D \times L$.
@@ -627,7 +627,7 @@ of the denoted functions:
         = 
         \denote{\setpair{I}{U}} \circ \denote{\setpair{I'}{U'}}
     \]
-\end{lemma}
+\end{lemma}\mtodo{Should one of the sides of the equation be $\denote{\dots\circ\dots}$? Same for next lemma.}
 \otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
 
 The meet of two micro-function representations is defined as follows:
