@@ -3,7 +3,7 @@
     \tikzset{
   ashadow/.style={opacity=.25, shadow xshift=0.07, shadow yshift=-0.07},
 }
-  \tikzstyle{problem}=[fill=greyblue,text width=2cm,rounded corners,font=\scriptsize,text=charcoal,drop shadow={ashadow, color=greyblue}]
+  \tikzstyle{problem}=[fill=greyblue,text width=1.6cm,rounded corners,font=\scriptsize,text=charcoal,drop shadow={ashadow, color=greyblue}]
   \tikzstyle{result}=[fill=bisque,text width=1.5cm,rounded corners,font=\scriptsize,text=charcoal,drop shadow={ashadow, color=greyblue}]
 \begin{tikzpicture}
     \node [problem]
@@ -15,15 +15,15 @@
     \node [result]
       (equivres) [right=\dist of equiv.east] {Equivalence-IDE result};
     \node [result]
-      (ccres) [below=2cm of equivres.west,anchor=west] {Correlated-calls result};
+      (ccres) [below=2cm of equivres.west,anchor=west] {Correlated-calls IDE result};
     \node [result,text height=1.5cm,text width=2cm]
       (ifdsres) [below right=0cm and \dist of equivres.east] {};
     \node [below,font=\scriptsize] at (ifdsres.north) {IFDS result};
     \node [rounded corners,font=\scriptsize,text width=1.5cm,fill=lightsalmonpink,text=charcoal]
       (improved) [above right=.6cm and (\dist+.3cm) of ccres.east] {Improved IFDS result};
     
-    \path[->] (equivres) edge node[above,font=\scriptsize]{$\backEq$} (ifdsres);
-    \path[->] (ccres) edge[out=0,in=240] node[above,font=\scriptsize] {$\backCC$} (improved);
+    \path[->] (equivres) edge[out=0,in=150] node[above,font=\scriptsize]{$\backEq$} (ifdsres);
+    \path[->] (ccres) edge[out=0,in=230] node[above,font=\scriptsize] {$\backCC$} (improved);
     %\path[->] (ccres) edge[out=25,in=210] node[above,font=\scriptsize] {$\backEq$} (ifdsres);
     \path[->] (ifds) edge[out=43,in=183] node[above,font=\scriptsize] {$\transEq$} (equiv);
     \path[->] (ifds) edge[out=-45,in=173] node[below,font=\scriptsize] {$\transCC$} (ccide);
