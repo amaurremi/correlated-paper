@@ -23,7 +23,7 @@
       (improved) [above right=.6cm and (\dist+.3cm) of ccres.east] {Improved IFDS result};
     
     \path[->] (equivres) edge node[above,font=\scriptsize]{$\backEq$} (ifdsres);
-    \path[->] (ccres) edge node[above,font=\scriptsize] {$\backCC$} (improved);
+    \path[->] (ccres) edge[out=0,in=240] node[above,font=\scriptsize] {$\backCC$} (improved);
     %\path[->] (ccres) edge[out=25,in=210] node[above,font=\scriptsize] {$\backEq$} (ifdsres);
     \path[->] (ifds) edge[out=43,in=183] node[above,font=\scriptsize] {$\transEq$} (equiv);
     \path[->] (ifds) edge[out=-45,in=173] node[below,font=\scriptsize] {$\transCC$} (ccide);
