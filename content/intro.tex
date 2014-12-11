@@ -4,16 +4,14 @@ Data-flow analysis computes an approximation of how values may flow
 through a program, and has applications in compiler optimization, 
 programming tools, and computer security, and many other areas.
 Data-flow analyses operate on \textit{control-flow graphs} (CFGs)
-\mtodo{If we introduce this abbreviation, should we replace the uses of
-``control-flow graph'' with ``CFG'' in the paper?}
 that model 
 the order in which the instructions of a program are executed. This is
 typically done by associating \textit{flow functions} that represent how 
-data is propagated with the edges of the control-flow graph.  A 
+data is propagated with the edges of the CFG.  A 
 \textit{confluence operator} specifies how the data facts that have been 
 computed along different paths should be merged when the paths join.
 
-Since a control-flow graph is an over-approximation of the possible flows 
+Since a CFG is an over-approximation of the possible flows 
 of control in concrete executions of a program, it may contain \textit{infeasible} 
 paths that cannot occur at runtime. The precision of a data-flow analysis algorithm
 depends critically on its ability to detect and disregard such infeasible paths.
@@ -21,8 +19,6 @@ The popular \textit{Interprocedural Finite Distributive Subset} (IFDS) algorithm
 by  Reps, Horwitz, and Sagiv \cite{reps1995precise} is a general data-flow analysis
 algorithm for computing solutions to standard finite distributive data-flow problems such 
 as reaching definitions, available expressions, and taint analysis.
-\mtodo{We should define somewhere what taint analysis is, since it's currently
-commented out.}
 A distinguishing 
 characteristic of IFDS is that it avoids infeasible interprocedural paths in which calls 
 and returns to/from functions are not properly matched. Sagiv, Reps, and Horwitz
@@ -50,30 +46,24 @@ The results of this IDE problem can be mapped back to the dataflow domain of the
 original IFDS problem.
 
 We present a formalization of the transformation and prove its correctness
-as follows. First, we derive an ``Equivalence IDE problem''
-\mtodo{The IDE paper already states that each IFDS problem can be solved with IDE.
-I wonder if this sounds like the equivalence transformation was our contribution.
-We just use the equivalence transformation to explain the CC transformation, and for the
-proofs.
-}
-from the original 
-IFDS problem by associating the identity environment functions with all edges,
-and show that the solution to this Equivalence IDE problem can be mapped back
-to the solution of the original IFDS problem. Then, we derive a ``Correlated Calls 
-IDE Problem'' from the original IFDS problem and show how a solution to this problem 
-can be mapped to the solution to the original IFDS problem, but also how a
-more precise IFDS result can be derived from it. 
-\otodo{Do we need to mention the imprecise map from the CC-IDE result to the IFDS result? It
-doesn't really seem relevant, and could be confusing.}
+as follows. 
+First, we derive an IDE problem that is equivalent to the original IFDS problem,
+as described by Reps et al.~\cite{sagiv1996precise}.
+Solving this ``Equivalence-IDE Problem'' with the IDE algorithm yields a result that
+is equivalent to the one obtained by applying the IFDS algorithm to the original IFDS problem.
+Then, we derive a ``Correlated Calls 
+IDE Problem'' from the original IFDS problem and show 
+that the solution to this problem, when converted to an IFDS result, is more precise
+than the original IFDS result.
 We also show that the correlated-calls analysis is sound, i.e., that it never considers concrete execution paths as infeasible.
 This is illustrated schematically
 in Figure~\ref{fig:transformations}%
 \footnote{ 
-  The labels $\result$, $\backEq$, $\backCC$, $\transEq$, and $\transCC$ on edges in 
+  The labels $\resultIDE$, $\resultIFDS$, $\backEq$, $\backCC$, $\transEq$, and $\transCC$
+  on edges in 
   Figure~\ref{fig:transformations} reflect a number of mappings and projections 
   that will be defined in Section~\TODO{ref} and that can be ignored here.
-}.  
-\ftodo{would it make sense to add an edge in Figure~\ref{fig:transformations} from the IFDS problem to the IFDS result?}
+}.\mtodo{In the footnote, should we just say "the labels" since there are so many?}
 
 We implemented the correlated-calls transformation and the IDE algorithm in Scala,
 on top of the WALA framework for static analysis of JVM bytecode~\cite{fink2012wala}.

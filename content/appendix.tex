@@ -8,10 +8,10 @@ We start by proving the Lemmas of Soundness and Precision of the correlated-call
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:subsetifds}}]
   The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
   \begin{align*}
-    \backCC\left(\result(\transCC_R(P))\right)(n)&=\{(n',\,D_n'^\Subset(\result(\transCC_R(P))))\ |\ n\in N^*\}(n)\\
-      &=D_n^\Subset(\result(\transCC_R(P)))\\
+    \backCC\left(\resultIDE(\transCC_R(P))\right)(n)&=\{(n',\,D_n'^\Subset(\resultIDE(\transCC_R(P))))\ |\ n\in N^*\}(n)\\
+      &=D_n^\Subset(\resultIDE(\transCC_R(P)))\\
       &\subseteq\mvp F(n)\\
-      &=\result_\text{IFDS}(P)(n)\,.\qedhere
+      &=\resultIFDS(P)(n)\,.\qedhere
   \end{align*}
 \end{proof}
 
@@ -217,7 +217,7 @@ We will now show that on a node of a concrete execution path, the correlated-cal
 
 Finally, we can prove the Soundness Lemma.
 
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:sound}}] Let $\rho=\result(\transCC_R(P))$. Then
+\begin{proof}[\textbf{Proof of Lemma~\ref{lem:sound}}] Let $\rho=\resultIDE(\transCC_R(P))$. Then
   \begin{align*}
     \backCC(\rho)(n)
     &=D_n^\Subset(\rho)\\
@@ -343,14 +343,14 @@ The following Lemma shows that the correlated-calls analysis computes the result
 \begin{lemma}\label{lem:recindep} Let $P$ be an IFDS problem. Let $N^*$ be the supergraph for $P$, $D$ the set of data-flow facts, and $S\subseteq R$ a set of receivers.
   Then for any $n\in N^*$, $d\in D$, and receiver $r\in S$,
   \begin{equation}
-    \result\left(\transCC_S(P)\right)(n,\,d)(r)=
-    \result(\transCC_{\{r\}}(P))(n,\,d)(r)\,.
+    \resultIDE\left(\transCC_S(P)\right)(n,\,d)(r)=
+    \resultIDE(\transCC_{\{r\}}(P))(n,\,d)(r)\,.
   \end{equation}
 \end{lemma}
 \begin{proof}
   According to~\eqref{eq:ideresult}, \eqref{eq:mvpdef}, and~\eqref{eq:envTransToEdgefn},
   \begin{align}
-    \result\left(\transCC_S(P)\right)(n,\,d)(r)
+    \resultIDE\left(\transCC_S(P)\right)(n,\,d)(r)
     &=\mvp{\textsf{Env}}(n,\,d)(r)\notag\\
     &=\left(\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\Omega)(d)\right)(r)\notag\\
     &=\left(\bigsqcap_{q\in\ivp(n)}\bigsqcap_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn S(q')(\topcc)\right)(r)\notag\\
@@ -358,9 +358,9 @@ The following Lemma shows that the correlated-calls analysis computes the result
   \end{align}
   Then from Lemma~\ref{lem:recindepedgefn},
   \begin{align*}
-    \result\left(\transCC_S(P)\right)(n,\,d)(r)
+    \resultIDE\left(\transCC_S(P)\right)(n,\,d)(r)
     &=\bigcup_{q\in\ivp(n)}\bigcup_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn{\{r\}}(q')(\topcc)(r)\\
-    &=\result\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)\,.\qedhere
+    &=\resultIDE\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)\,.\qedhere
   \end{align*}
 \end{proof}
 
@@ -515,14 +515,14 @@ We will now show that if a receiver ever gets mapped to top, then it is a correl
    For an IFDS problem $P$, let $n\in N^*$ be a node, and $d\in D$ a dataflow fact such there exists a realizable path $p\in\textsf{RP}(n,\,d)$.
    Then, if there exists a receiver $r\in R$, such that
   \[
-    \result\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)=\top_T\,,
+    \resultIDE\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)=\top_T\,,
   \]
   then $r\in \rcc$.
 \end{lemma}
 \begin{proof}
   As shown in~\eqref{eq:resultThroughEdgefn},
   \[
-    \result\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)=\bigcup_{q\in\ivp(n)}\bigcup_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn{\{r\}}(q')(\topcc)(r)\,.
+    \resultIDE\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)=\bigcup_{q\in\ivp(n)}\bigcup_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn{\{r\}}(q')(\topcc)(r)\,.
   \]
   Since the latter is equal to $\top_T$, it follows that for each realizable path $p'$ to node $n$, $\ccedgefn{\{r\}}(p')(\top)(r)=\top_T$. According to~Lemma~\ref{lem:ccrectop}, this is only possible if $r\in\rcc$.
 \end{proof}
@@ -532,28 +532,28 @@ Finally, we present the proof for Lemma~\ref{lem:onlycorrec} which states that a
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:onlycorrrec}}]
   From~\eqref{eq:ucc} we know that
   \begin{align*}
-    \backCC(\result\left(\transCC_R(P)\right))
-    &=\left\{(n,\,D_n^\Subset(\result(\transCC_R(P))))\ |\ n\in N^*\right\}.
+    \backCC(\resultIDE\left(\transCC_R(P)\right))
+    &=\left\{(n,\,D_n^\Subset(\resultIDE(\transCC_R(P))))\ |\ n\in N^*\right\}.
   \end{align*}
   According to~\eqref{eq:dnq} and~Lemma~\ref{lem:recindep}, for a given $n\in N^*$,
   \begin{align*}
-    D_n^\Subset&(\result(\transCC_R(P))))\\
-    &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall r\in R:\ \left\{(r,\,\result(\transCC_{\{r\}}(P))(n,\,d)(r))\ |\ r\in R\right\}(r)\ne\top_T\right\}\\
-    &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall\bm{r\in R}:\ \result(\transCC_{\{r\}}(P))(n,\,d)(r)\ne\top_T\right\}.
+    D_n^\Subset&(\resultIDE(\transCC_R(P))))\\
+    &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall r\in R:\ \left\{(r,\,\resultIDE(\transCC_{\{r\}}(P))(n,\,d)(r))\ |\ r\in R\right\}(r)\ne\top_T\right\}\\
+    &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall\bm{r\in R}:\ \resultIDE(\transCC_{\{r\}}(P))(n,\,d)(r)\ne\top_T\right\}.
   \end{align*}
 
-Since, according to Lemma~\ref{lem:ccrectop}, $\result(\transCC_{\{r\}}(P))(n,\,d)(r)$ can only be equal to $\top_T$ when $r\in\rcc$, we can conclude that
+Since, according to Lemma~\ref{lem:ccrectop}, $\resultIDE(\transCC_{\{r\}}(P))(n,\,d)(r)$ can only be equal to $\top_T$ when $r\in\rcc$, we can conclude that
   \begin{align*}
-    D_n^\Subset&(\result(\transCC_R(P))))\\
-    &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall\bm{r\in\rcc}:\ \result(\transCC_{\{r\}}(P))(n,\,d)(r)\ne\top_T\right\}\\
-    &=D_n^\Subset(\result(\transCC_\rcc(P)))).
+    D_n^\Subset&(\resultIDE(\transCC_R(P))))\\
+    &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall\bm{r\in\rcc}:\ \resultIDE(\transCC_{\{r\}}(P))(n,\,d)(r)\ne\top_T\right\}\\
+    &=D_n^\Subset(\resultIDE(\transCC_\rcc(P)))).
   \end{align*}
   
   Therefore,
   \begin{align*}
-    \backCC(\result\left(\transCC_R(P)\right))
-    &=\left\{(n,\,D_n^\Subset(\result(\transCC_\rcc(P))))\ |\ n\in N^*\right\}\\
-    &=\backCC(\result\left(\transCC_\rcc(P)\right))\,.\qedhere
+    \backCC(\resultIDE\left(\transCC_R(P)\right))
+    &=\left\{(n,\,D_n^\Subset(\resultIDE(\transCC_\rcc(P))))\ |\ n\in N^*\right\}\\
+    &=\backCC(\resultIDE\left(\transCC_\rcc(P)\right))\,.\qedhere
   \end{align*}
 \end{proof}
 

@@ -313,8 +313,8 @@ Finally, the correlated-calls transformation is defined as
 For each program point $n$, the result of an IFDS analysis gives
 a set of facts $d$ that may be reached at $n$. The result of an IDE analysis
 pairs each such fact~$d$ with a lattice element $\ell$. Formally,
-for an IFDS problem $P$, the result $\result_{\text{IFDS}}$ has type
-$N \to D$. Similarly, for an IFDS problem $Q$, the result $\result_{\text{IDE}}$
+for an IFDS problem $P$, the result $\resultIFDS$ has type
+$N \to D$. Similarly, for an IFDS problem $Q$, the result $\resultIDE$
 has type $N \to D \times L$.
 
 Recall that in the equivalence transformation lattice $L^\equiv$, $\bot$ means reachable
@@ -330,16 +330,16 @@ $\backCC(\rho) = \lambda n.\{d\mid\rho(n) = (d,\ell), \forall r\,.\, \ell(r) \ne
 
 \commentout{
 
-The output of an IFDS analysis states whether a node is reachable in the exploded supergraph. This means that for an IFDS problem $P$, the IFDS-analysis result $\result_{\text{IFDS}}(P):\ N^*\to 2^D$ is a map from nodes of the control-flow supergraph to sets of facts:
+The output of an IFDS analysis states whether a node is reachable in the exploded supergraph. This means that for an IFDS problem $P$, the IFDS-analysis result $\resultIFDS(P):\ N^*\to 2^D$ is a map from nodes of the control-flow supergraph to sets of facts:
 \begin{equation}
-  \result_{\text{IFDS}}(P)=\{(n,\,\mvp F(n))\,|\,n\in N^*\}\,.
+  \resultIFDS(P)=\{(n,\,\mvp F(n))\,|\,n\in N^*\}\,.
 \end{equation}
 
 \begin{mdelete}
 \begin{example}\label{ex:ifdsresult}
   The solution to the taint-analysis IFDS problem $\mathcal P$ in Listing~\ref{list:examplejava} whose exploded supergraph is presented in Figure~\ref{fig:exampleexploded} looks as follows:
   \small\begin{align*}
-    \result_\text{IFDS}(\mathcal P)=\{&(\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\{\texttt a\}),
+    \resultIFDS(\mathcal P)=\{&(\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\{\texttt a\}),
       &(\highlight{\textsf{start}_\texttt f}{lightsalmonpink},\,\{\texttt s\}),
       &\qquad\qquad(\highlight{\textsf{return}_\texttt f}{lightsalmonpink},\,\{\texttt r,\,\texttt s\}),\\
 %      
@@ -357,17 +357,17 @@ The output of an IFDS analysis states whether a node is reachable in the explode
 \end{example}
 \end{mdelete}
 
- The IDE analysis associates a lattice element with each node in the exploded supergraph. For an IDE problem $Q$, the result $\result(Q):\ N^\#\to L$ maps nodes of the exploded supergraph to lattice elements (see~\eqref{eq:mvpdef}):
+ The IDE analysis associates a lattice element with each node in the exploded supergraph. For an IDE problem $Q$, the result $\resultIDE(Q):\ N^\#\to L$ maps nodes of the exploded supergraph to lattice elements (see~\eqref{eq:mvpdef}):
 \begin{equation}\label{eq:ideresult}
-  \result(Q)=\{((n,\,d),\,\mvp{\textsf{Env}}(n,\,d))\ |\ n\in N^*,\,d\in D\}\,.
+  \resultIDE(Q)=\{((n,\,d),\,\mvp{\textsf{Env}}(n,\,d))\ |\ n\in N^*,\,d\in D\}\,.
 \end{equation}
-In other words, for each fact $d\in D$ at a given node $n\in N^*$, $\result(Q)(n,\,d)$ returns a lattice element. If a fact $d\in D$ is unreachable, $\result(Q)(n,\,d)=\top$.
+In other words, for each fact $d\in D$ at a given node $n\in N^*$, $\resultIDE(Q)(n,\,d)$ returns a lattice element. If a fact $d\in D$ is unreachable, $\resultIDE(Q)(n,\,d)=\top$.
 
 In the case of an equivalence transformation from IFDS to IDE, if a node in the IFDS result is reachable, it will be also reachable in the IDE result, and it will be mapped to the bottom lattice element. For an exploded node in the IDE result, being mapped to the top element means being not reachable.
 
 The~domain of an equivalence-IDE result 
 \begin{equation}
-  \resultEq=\result(\transEq(P))
+  \resultEq=\resultIDE(\transEq(P))
 \end{equation}
 consists of pairs of control-flow-supergraph nodes and data-flow facts. The range of the result is the set of lattice elements. To transform an IDE result to an IFDS result, we need to map each control-flow-supergraph node to the set of facts with which it is paired, provided that the pair is mapped to the bottom lattice element.
 
@@ -375,19 +375,19 @@ consists of pairs of control-flow-supergraph nodes and data-flow facts. The rang
 \begin{example}\label{ex:ideresult}
   Converting the IFDS problem $\mathcal P$ from Example~\ref{ex:ifdsresult} into an equivalent IDE problem and solving it will yield the following result:
     \small\begin{align*}
-    \result(\transEq(\mathcal P))=\{&((\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\texttt a),\,\bot),\\
+    \resultIDE(\transEq(\mathcal P))=\{&((\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\texttt a),\,\bot),\\
       &((\highlight{\textsf{call}_\texttt{A.f}}{greyblue},\,\texttt a),\,\bot),\\
       &((\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\texttt a),\,\bot),\\
       &((\highlight{\textsf{return}_\texttt{A.f}}{greyblue},\,\texttt b),\,\bot),\\
       &\dots\}.\\
     \end{align*}\normalsize
-  Suppose that for a pair $(n,\,d)$, where $n\in N^*$ and $d\in D$, there is no corresponding result in ~$\result_\text{IFDS}(\mathcal P)$ (see Example~\ref{ex:ifdsresult}). Then $(n,\,d)$ appears in $\result(\transEq(\mathcal P))$ as $((n,\,d),\,\top)$.
+  Suppose that for a pair $(n,\,d)$, where $n\in N^*$ and $d\in D$, there is no corresponding result in ~$\resultIFDS(\mathcal P)$ (see Example~\ref{ex:ifdsresult}). Then $(n,\,d)$ appears in $\resultIDE(\transEq(\mathcal P))$ as $((n,\,d),\,\top)$.
 \end{example}
 \end{mdelete}
 
 Let $\rho$ be the result of an equivalence-IDE analysis for an IFDS problem $P$:
 \[
-  \rho=\result(\transEq(P)).
+  \rho=\resultIDE(\transEq(P)).
 \]
 For a node $n\in N^*$, let $D_n^\equiv(\rho)$ be a set of data-flow facts such that
 \begin{equation}
@@ -403,7 +403,7 @@ from an IDE result to~an~IFDS result looks as follows:
 
 Obviously, if applied to the result of an equivalence-IDE problem, $\backEq$ returns a result equivalent to the original IFDS problem result. In other words, for any IFDS problem $P$ with supergraph $N^*$, and any node $n\in N^*$,
 \begin{equation}
-  \backEq\left(\result(\transEq(P))\right)(n)=\result_{\text{IFDS}}(P)(n)\,.
+  \backEq\left(\resultIDE(\transEq(P))\right)(n)=\resultIFDS(P)(n)\,.
 \end{equation}
 
 \begin{example}
@@ -413,11 +413,11 @@ Obviously, if applied to the result of an equivalence-IDE problem, $\backEq$ ret
 
 
 Let $P$ be an IFDS problem. 
-Let $E:\,N\times D$ be the domain of the IDE result $\result(Q)$.
-To convert $\result(\transCC_R(P))$ to an IFDS result, we need to map the control-flow-supergraph nodes $n\in N^*$ to the corresponding facts $d\in D$. 
-Unlike in~$\backEq$, we will only map each~$n$ to the facts~$d$ for~which~$\result(\transCC_R(P))(n,\,d)$ does not contain an~empty mapping for~any~receiver. 
+Let $E:\,N\times D$ be the domain of the IDE result $\resultIDE(Q)$.
+To convert $\resultIDE(\transCC_R(P))$ to an IFDS result, we need to map the control-flow-supergraph nodes $n\in N^*$ to the corresponding facts $d\in D$. 
+Unlike in~$\backEq$, we will only map each~$n$ to the facts~$d$ for~which~$\resultIDE(\transCC_R(P))(n,\,d)$ does not contain an~empty mapping for~any~receiver. 
 
-For a node $n\in N^*$ and a correlated-calls IDE problem result $\rho=\result(\transCC_S(P))$, let $D_n^\Subset(\rho)$ be a set of data-flow facts defined as
+For a node $n\in N^*$ and a correlated-calls IDE problem result $\rho=\resultIDE(\transCC_S(P))$, let $D_n^\Subset(\rho)$ be a set of data-flow facts defined as
 \begin{equation}\label{eq:dnq}
   D_n^\Subset(\rho)=\left\{d\ |\ 
     d\in\mvp F(n)\,\wedge\,\forall r\in R:\ \rho(n,\ d)(r)\ne\top_T\right\}.
@@ -513,13 +513,11 @@ of the denoted functions:
 In the following lemma we show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.
 
 \begin{lemma}[Precision]\label{lem:subsetifds}
-    \otodo{Should we say $\result_{\text{IDE}}$ instead of $\result$ everywhere, to
-        be consistent with $\result_{\text{IFDS}}$?}
     For an IFDS problem $P$ and all ${n\in N^*}$,
     \begin{equation}\label{eq:correct}
-      \backCC\left(\result(\transCC_R(P))\right)(n)
+      \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
       \subseteq
-      \result_{\text{IFDS}}(P)(n)\,.
+      \resultIFDS(P)(n)\,.
     \end{equation}
 \end{lemma}
 
@@ -530,7 +528,7 @@ We will next show that our analysis is sound, i.e. that the result of an IDE pro
   If $d\in M_F(p)(\varnothing),$
   then
   \begin{equation}
-    d\in \backCC\left(\result(\transCC_R(P))\right)(n)\,.
+    d\in \backCC\left(\resultIDE(\transCC_R(P))\right)(n)\,.
   \end{equation}
 \end{lemma}
 
@@ -551,12 +549,12 @@ In other words, we show that if a correlated calls analysis considers only corre
 \begin{lemma}\label{lem:onlycorrrec}
   Let $P$ be an IFDS problem. Then
   \begin{equation}
-    \backCC\left(\result\left(\transCC_\rcc(P)\right)\right)=\backCC(\result\left(\transCC_R(P)\right))\,.
+    \backCC\left(\resultIDE\left(\transCC_\rcc(P)\right)\right)=\backCC(\resultIDE\left(\transCC_R(P)\right))\,.
   \end{equation}
 \end{lemma}
 
 To summarize, Lemma~\ref{lem:sound} shows that the result $\resultCC$ of a correlated-calls analysis is sound since it overapproximates the data flow of all possible concrete execution paths.
-We have also shown in Lemma~\ref{lem:subsetifds} that the correlated-calls analysis improves the precision of the original IFDS result $\result_\text{IFDS}$, because the correlated-calls result $\resultCC$ underapproximates an equivalence-IDE result $\resultEq=\result_\text{IFDS}$.
+We have also shown in Lemma~\ref{lem:subsetifds} that the correlated-calls analysis improves the precision of the original IFDS result $\resultIFDS$, because the correlated-calls result $\resultCC$ underapproximates an equivalence-IDE result $\resultEq$.
 Finally, we showed in Lemma~\ref{lem:onlycorrrec} that a correlated-call transformation to IDE that considers only correlated-call receivers $\rcc$ achieves the same result $\resultCC$ that is obtained when considering all receivers $R$.
 
 %This is the general idea of the correlated-calls analysis. The analysis involves a transformation from IFDS to IDE problems. To implement an IDE problem, it is necessary to define a representation of lattice elements and micro functions. An efficient representation of those data structures for the correlated-calls analysis is presented in the next section.

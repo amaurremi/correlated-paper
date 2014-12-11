@@ -9,7 +9,7 @@
     \node [problem]
       (ifds) {IFDS problem};
     \node [problem]
-      (equiv) [above right=0.5cm and .7\dist of ifds.east] {Equivalent IDE problem};
+      (equiv) [above right=0.5cm and .7\dist of ifds.east] {Equivalence-IDE problem};
     \node [problem]
       (ccide)[below=2cm of equiv.west, anchor=west] {Correlated-calls IDE problem};
     \node [result]
@@ -27,9 +27,9 @@
     %\path[->] (ccres) edge[out=25,in=210] node[above,font=\scriptsize] {$\backEq$} (ifdsres);
     \path[->] (ifds) edge[out=43,in=183] node[above,font=\scriptsize] {$\transEq$} (equiv);
     \path[->] (ifds) edge[out=-45,in=173] node[below,font=\scriptsize] {$\transCC$} (ccide);
-    \path[->] (equiv) edge node[above,font=\scriptsize]{$\result$} (equivres);
-    \path[->] (ccide) edge node[above,font=\scriptsize]{$\result$} (ccres);
-    \path[->,dashed] (ifds) edge[out=-3,in=183] node[above,font=\scriptsize]{$\result_{\text{IFDS}}$} (ifdsres);
+    \path[->] (equiv) edge node[above,font=\scriptsize]{$\resultIDE$} (equivres);
+    \path[->] (ccide) edge node[above,font=\scriptsize]{$\resultIDE$} (ccres);
+    \path[->,dashed] (ifds) edge[out=-3,in=183] node[above,font=\scriptsize]{$\resultIFDS$} (ifdsres);
 \end{tikzpicture}
   \caption{Transformations between IFDS and IDE problems and their results}%
   \label{fig:transformations}%

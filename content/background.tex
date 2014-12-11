@@ -4,12 +4,14 @@ This section defines basic terminology and presents the IFDS and IDE algorithms.
 
 \subsection{Terminology and Notation}
 %We will start by introducing several concepts used by the IFDS and IDE analyses.
+\begin{mdelete}\mtodo{We already say (but less precisely) what a CFG is in the introduction.}
 The \textit{control-flow graph} of a procedure is a directed graph whose nodes are instructions, and which contains an edge from $n_1$ to $n_2$ whenever
-$n_2$ may execute immediately after $n_1$. A control-flow graph has a distinguished \textit{start node} \textsf{start}$_p$ and \textit{end node} \textsf{end}$_p$.
+$n_2$ may execute immediately after $n_1$. A CFG has a distinguished \textit{start node} \textsf{start}$_p$ and \textit{end node} \textsf{end}$_p$.
+\end{mdelete}
 %and edges represent transfer of control between the instructions during an execution of the program. 
 %A control-flow graph has a unique start node, $\startmain$, which is the node corresponding to the program entrypoint.
 %An \textit{intra-procedural} path is a path in a control-flow graph whose nodes are in the same procedure. By contrast, an \textit{inter-procedural path} is one that contains nodes from different procedures. 
-The \textit{control-flow supergraph} of a program contains the control-flow graphs of all of the procedures as
+The \textit{control-flow supergraph} of a program contains the CFGs of all of the procedures as
 subgraphs. In addition, for each call instruction $c$, the supergraph contains a \textit{call-to-start} edge to the start node of every procedure that
 may be called from $c$, and an \textit{end-to-return} edge from the end node of the procedure back to the call instruction.
 \otodo{do we really need to extra "return nodes" that the IFDS/IDE papers add?}
@@ -287,7 +289,7 @@ R_f=\{(\mathbf0,\,\mathbf0)\}\cup
 \commentout{
 Note that $R_f$ constructs pairs of dataflow facts so that
 \begin{itemize}
-  \item there is always an edge $(\mathbf0,\,\mathbf0)$ corresponding to the control-flow-graph edge;
+  \item there is always an edge $(\mathbf0,\,\mathbf0)$ corresponding to the CFG edge;
   \item if there is an edge $(\mathbf0,\,d_j)$, then there is no other edge leading to $d_j$; in particular, there is never an edge $(d_i,\,\mathbf0)$ where $d_i\ne\mathbf0$.
 \end{itemize}
 }
@@ -679,7 +681,7 @@ The IDE analysis is a generalization of the IFDS analysis: every IFDS problem ca
 
 \commentout{
 \subsubsection{Environment Transformers}
-For each node in the control-flow graph, the result of an IDE analysis computes an environment $\textsf{Env}(D,\,L)$, which is a map from data-flow facts to lattice elements.
+For each node in the CFG, the result of an IDE analysis computes an environment $\textsf{Env}(D,\,L)$, which is a map from data-flow facts to lattice elements.
 
 Instead of flow functions that show how to propagate facts, the IDE framework uses distributive environment transformers to propagate environments. For each edge $(n_1,\,n_2)$ in the control-flow supergraph, an environment transformer indicates how the environment at node $n_1$ is modified at node $n_2$.
 
@@ -893,7 +895,7 @@ the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-ret
     one way or the other.}
 
 \commentout{
-Given a labeled exploded supergraph, the IDE algorithm computes the environments for all nodes in the control-flow graph.
+Given a labeled exploded supergraph, the IDE algorithm computes the environments for all nodes in the CFG.
 
 The algorithm first computes the lattice elements $l_{n,\,d}$ that correspond to each reachable node $(n,\,d)$ in the exploded supergraph. The union of the exploded nodes $(n,\,d)$ for a given control-flow node $n$, mapped to the corresponding lattice elements $l_{n,\,d}$, form the environment $\textsf{Env}_n$  for that node:
 \begin{equation}
