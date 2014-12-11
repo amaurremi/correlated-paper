@@ -1,6 +1,9 @@
 \section{Background}\label{sec:bg}
 %The purpose of the correlated-calls analysis is to solve IFDS problems more precisely than using the standard IFDS algorithm by ruling out some infeasible paths. The correlated-calls analysis works by transforming an IFDS problem to an IDE problem, solving the IDE problem, and transforming the IDE result to a solution to the original IFDS problem. 
 This section defines basic terminology and presents the IFDS and IDE algorithms.
+\ftodo{
+  Shall we add a sentence saying that readers familiar with these algorithms may skip this section?
+}
 
 \subsection{Terminology and Notation}
 %We will start by introducing several concepts used by the IFDS and IDE analyses.
@@ -29,7 +32,8 @@ A call site that calls multiple procedures is called
 We define a function $\textsf{lookup}$ to specify the dynamic dispatch: 
 if $s$ is the signature of $m$ and $t$ is the runtime type of the object
 pointed to by $r$, $\textsf{lookup}(s,t)$ gives the procedure that will
-be invoked by the call $r.m(\ldots)$. We also define a kind of inverse $\tau$
+be invoked by the call $r.m(\ldots)$. We also define a function $\tau$
+that may be viewed as the inverse
 of $\textsf{lookup}$: given a signature $s$ and a specific invoked procedure
 $f$, $\tau(s,f)$ gives the set of all runtime types of $r$ that cause $r.m(\ldots)$
 to dispatch to $f$: $\tau(s,f) = \{t\mid \textsf{lookup}(s,t)=f\}$.
@@ -151,7 +155,9 @@ We denote the source and end nodes of a graph edge $e$ as $\src e$ and $\target 
 %A \textit{flow-sensitive} data-flow analysis is one that takes the order of program instructions into account.
 
 A path through the control-flow supergraph is \textit{valid} if every end-to-return edge on the path returns
-to the site of the most recent unmatched call. The set of all valid paths from the program entry point to
+to the site of the most recent unmatched call. 
+\ftodo{Can we explain/define the notion of the ``most recent unmatched call'' more precisely?}
+The set of all valid paths from the program entry point to
 a node $n$ is denoted $\ivp(n)$.
 \otodo{Should we give a formal definition?}
 
@@ -196,6 +202,10 @@ However, the graph also contains an inter-procedurally invalid path
 \otodo{The definitions that Marianna had were for \emph{complete}
 lattices/semilattices. All of the lattices in the context of IFDS/IDE
 are/must be complete. I'll just say that here.}
+\ftodo{Would it make sense to first the define the notion of a lattice without referring to its completeness?
+       This could be followed by defining what it means for a (semi)lattice to be complete, and then we
+       could say that all lattices considered in this paper are complete, etc.}
+\ftodo{Can we define the symbols $\sqcup$ and $\sqcap$ for join and meet here?}
 A \textit{complete lattice} is a partially ordered set $(S,\sqsubseteq)$ in which every subset has a least upper bound and a greatest lower bound.
 A \textit{complete meet semilattice} is a partially ordered set in which every subset need only have a greatest lower bound.
 The symbols $\bot$ and $\top$ are used to denote the greatest lower bound of $S$ and of the empty set, respectively.
@@ -236,9 +246,11 @@ $f(x_1\sqcap x_2)=f(x_1)\sqcap f(x_2)$.
 
 \commentout{The purpose of the IFDS framework is to solve a special subset of inter-procedural, flow-sensitive, context-sensitive data-flow-analysis problems. The main idea of IFDS is to encode the data-flow analysis problem into a graph-reachability problem.}
 
-The IFDS algorithm is notable because it computes a meet over valid paths solution in polynomial time.
-Most other interprocedural analysis algorithms are either imprecise due to invalid paths,
-general but do not run in polynomial time~\cite{knoop1992interprocedural,pnueli1981two}, or handle a very specific set of problems~\cite{knoop1993efficient}.
+The IFDS algorithm is notable because it computes a meet-over-valid paths solution in polynomial time.
+Most other interprocedural analysis algorithms are either: 
+  (i) imprecise due to invalid paths,
+  (ii) general but do not run in polynomial time~\cite{knoop1992interprocedural,pnueli1981two}, or 
+  (iii) handle a very specific set of problems~\cite{knoop1993efficient}.
 
 %\subsubsection{Data-Flow Problems Suitable for IFDS}\label{sec:suitableifds}
 \commentout{In this section we describe the data-flow problems that can be solved by an IFDS analysis. We will start with an intuitive definition and later on formalize the notion of an IFDS-suitable problem.}
@@ -254,7 +266,7 @@ $D$ is a finite set of \textit{data-flow facts},
 $F$ is a set of distributive dataflow functions of type $2^D\to2^D$,
 $M_F:\,E^*\to F$ assigns a dataflow function to each supergraph edge,
 and $\sqcap$ is the \textit{meet operator} on the powerset $2^D$, either union or intersection.
-In our presentation, the meet will always be union, but all of the results apply dually when the
+In our presentation, the meet operator will always be union, but all of the results apply dually when the
 meet is intersection.
 
 The output of the IFDS algorithm is, for each node $n$ in the supergraph, the \textit{meet-over-all-valid-paths} solution
@@ -323,7 +335,7 @@ $, which can be visualized with the following graph:
 The representation relation decomposes a flow function into functions
 (edges) that operate on each fact individually. This is possible due
 to distributivity: applying the flow function to a set of facts is
-equivalent to applying it on each fact individually and
+equivalent to applying it on each fact individually and then
 taking the union of the results.
 
 The meet of two functions can be computed as simply the union of their representation
@@ -411,8 +423,8 @@ $(n,d_i) \to (n',d_j)$, which form the representation relation of the dataflow f
 $M_F(n \to n')$. The IFDS algorithm finds all exploded supergraph edges that are reachable by
 \textit{realizable} paths in the exploded supergraph. A path
 is \textit{realizable} if its projection to the (non-exploded) supergraph is a valid
-path (i.e. if it is of the form $(n_0, d_0) \to (n_1,d_1) \to \cdots \to (n_m,d_m)$
-and $n_0 \to n_1 \to \cdots \to n_m$ is a valid path).
+path (i.e., if it is of the form $(n_0, d_0) \to (n_1,d_1) \to \cdots \to (n_m,d_m)$
+and where $n_0 \to n_1 \to \cdots \to n_m$ is a valid path).
 
 
 
@@ -840,6 +852,9 @@ is defined as
 \end{align*}
 }
 Let $\Omega = \lambda d.\top$ be the environment that maps every element of $D$ to $\top$.
+\ftodo{
+   What is the relationship between $\Omega$ and $\Delta$?
+}
 Thanks to distributivity, every environment transformer 
 $t : \textsf{Env}(D,L) \to \textsf{Env}(D,L)$
 can be decomposed into its effect on $\Omega$ and on a set of environments $\Omega[d_i\to l]$
@@ -884,7 +899,7 @@ Specifically,
 the input is generally provided as a function $f: N^* \times D \times N^* \to (D \to F)$,
 where $F$ is the set of representations of micro-functions from $L$ to $L$.
 Given a (non-exploded) supergraph edge $n \to n'$ and a dataflow fact $d$,
-$f(n,d,n')$ returns a map that gives for each fact $d'$ the micro-function $f$
+$f(n,d,n')$ returns a map that gives, for each fact $d'$, the micro-function $f$
 that appears on the exploded supergraph edge $(n,d) \to (n',d')$.
 Like in the IFDS algorithm, the function $f$ can be split up into separate functions that handle the cases when
 the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.
@@ -927,3 +942,6 @@ The lattice element $l_{n,\,d}$ is the meet of the lattice elements correspondin
 This is a general outline of the IDE analysis. We use the IDE framework to improve the precision of IFDS problems in the presence of correlated calls.
 The next section describes how this is done.
 }
+
+\ftodo{Would it make sense to discuss an example of an IDE problem here?  Perhaps we can do this
+  without using much space by referring to an existing figure elsewhere in the paper?}
