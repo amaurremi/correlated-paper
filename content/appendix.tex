@@ -74,7 +74,12 @@ Let $p=[\startmain,\,\dots,\,n]$ be some concrete execution trace of the program
     &=\menv(e_k)\left(\menv(p)(\Omega)\right)(d)\,.
   \end{align*}
   
-  According to~\eqref{eq:envTransToEdgeFnEdge},
+As shown in~Sagiv et al.~\cite{sagiv1996precise}, the relationship between environment transformers and edge functions can be described with the following equation. For an edge $(n_1,\,n_2)\in E^*$ an environment $\textsf{env}$ that maps $D$ to $L$, and a fact $d\in D$,
+\begin{align}\label{eq:envTransToEdgeFnEdge}
+  \menv&((n_1,\,n_2))(\textsf{env})(d)\notag\\
+  &=\edgefn((n_1,\,\Lambda),\,(n_2,\,d))(\top)\sqcap\bigsqcap_{d'\in D}\edgefn((n_1,\,d'),\,(n_2,\,d))(\textsf{env}(d'))\,.
+\end{align}  
+Then, according to~\eqref{eq:envTransToEdgeFnEdge},\mtodo{Is it okay that in~\eqref{eq:envTransToEdgeFnEdge}, we use $\edgefn$, and below we use $\ccedgefn R$?}
   \begin{align*}
     &\menv(e_k)\left(\menv(p)(\Omega)\right)(d)(r)\\
       =&\bigg(\ccedgefn R((n_{k-1},\,\Lambda),\,(n_k,\,d))(\topcc)\sqcap\\
@@ -245,9 +250,11 @@ Finally, we can prove the Soundness Lemma.
 \end{proof}
 
 \subsection*{Correlated Call Receivers}
-This appendix contains the proof for Lemma~\ref{} which shows that in a correlated-calls analysis, it is enough to consider only correlated-call receivers~$\rcc$.
+We will now present the proof for Lemma~\ref{lem:onlycorrrec} which shows that in a correlated-calls analysis, it is enough to consider only correlated-call receivers~$\rcc$.
 
-The following Lemma shows that the types to which a given receiver is mapped in the result of the algorithm is not affected by other receivers and the types to which they are mapped.
+In this section, we will denote the set of realizable paths corresponding to a valid path $p$ and a fact $d$ as $\textsf{RP}(p,\,d)$.
+
+First, we introduce a Lemma showing that the types to which a given receiver is mapped in the result of the algorithm is not affected by other receivers and the types to which they are mapped.
 
 \begin{lemma}\label{lem:recindepedgefn}
   Let $P$ be an IFDS problem. Let $N^*$ be the supergraph for $P$, $D$ the set of data-flow facts, $n\in N^*$ a node, and $p=[\startmain,\,\dots,\,n]$ a path in the supergraph. Let $d\in D\cup\{\Lambda\}$.
@@ -348,7 +355,16 @@ The following Lemma shows that the correlated-calls analysis computes the result
   \end{equation}
 \end{lemma}
 \begin{proof}
-  According to~\eqref{eq:ideresult}, \eqref{eq:mvpdef}, and~\eqref{eq:envTransToEdgefn},
+ Recall from Section~\ref{sec:ideToIfds} that the result of an IDE analysis maps a lattice element to each node in the exploded supergraph. Specifically, for an IDE problem $Q$, the result $\resultIDE(Q):\ N^\#\to L$ maps nodes of the exploded supergraph to lattice elements:
+\begin{equation}\label{eq:ideresult}
+  \resultIDE(Q)=\{((n,\,d),\,\mvp{\textsf{Env}}(n,\,d))\ |\ n\in N^*,\,d\in D\}\,.
+\end{equation}
+Furthermore, recall from Section~\ref{sec:bgide} that
+\begin{equation}\label{eq:mvpdef}
+  \mvp{\textsf{Env}}(n)=\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\top)
+\end{equation}
+
+  According to~\eqref{eq:ideresult}, \eqref{eq:mvpdef}, and~\eqref{eq:envTransToEdgeFnEdge},
   \begin{align}
     \resultIDE\left(\transCC_S(P)\right)(n,\,d)(r)
     &=\mvp{\textsf{Env}}(n,\,d)(r)\notag\\

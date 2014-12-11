@@ -308,13 +308,13 @@ Finally, the correlated-calls transformation is defined as
 
 %Then, for an edge $e$, the correlated-call micro functions can be defined as $\ccedgefn R$ and a correlated-calls transformation is defined as $\transCC_R$.
 
-\subsection{Converting IDE Results to IFDS Results}
+\subsection{Converting IDE Results to IFDS Results}\label{sec:ideToIfds}
 
 For each program point $n$, the result of an IFDS analysis gives
 a set of facts $d$ that may be reached at $n$. The result of an IDE analysis
 pairs each such fact~$d$ with a lattice element $\ell$. Formally,
 for an IFDS problem $P$, the result $\resultIFDS$ has type
-$N \to D$. Similarly, for an IFDS problem $Q$, the result $\resultIDE$
+$N \to D$.\mtodo{Should it be $N^*$?} Similarly, for an IFDS problem $Q$, the result $\resultIDE$
 has type $N \to D \times L$.
 
 Recall that in the equivalence transformation lattice $L^\equiv$, $\bot$ means reachable
