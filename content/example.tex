@@ -1,9 +1,253 @@
 \section{Motivating Example}
   \label{sec:MotivatingExample}
   
-\ftodo{This section is current under revision. Please do not edit..}
+\newcommand{\code}[1]{\textsf{#1}}  
+\definecolor{sh_comment}{rgb}{0.12, 0.38, 0.18}
+\definecolor{sh_keyword}{rgb}{0.37, 0.08, 0.25}  % #5F1441
+\definecolor{sh_string}{rgb}{0.06, 0.10, 0.98} % #101AF9
+\definecolor{KWColor}{rgb}{0.5,0,0.67}
+\definecolor{CommentColor}{rgb}{0.15,0.5,0.15}
+\lstdefinelanguage{scala}[]{Java}{
+   morekeywords={trait,def,object,with,override,val,type,var} 
+}
 
-\input{figures/fig-examplesupergraph}
+\lstdefinestyle{Eclipse}{
+  xleftmargin=0pt,
+  language = scala,
+  basicstyle=\sffamily\small,
+  stringstyle=\color{sh_string},
+  keywordstyle = \color{sh_keyword}\bfseries,  %}
+  lineskip=-0.0em,
+  commentstyle=\color{sh_comment}\itshape,  
+  escapeinside={/*@}{@*/},
+  numbersep=5pt,
+  captionpos=b,
+  xleftmargin=0.4cm, xrightmargin=0.5cm,
+   morekeywords={invokestatic,invokeinterface,invokevirtual,invokespecial},
+}
+
+
+\lstset{
+  showspaces=false,showtabs=false,tabsize=2,columns=flexible,
+  morekeywords={trait,def,object,with},
+  language={scala},
+  style=Eclipse,
+  numbers=left,
+  numberstyle=\scriptsize\color{CommentColor},
+  firstnumber=last,
+  showstringspaces=true
+}  
+  
+In this section, we illustrate our approach using a small motivating example that
+shows how our technique can be used to improve the precision of taint analysis.
+A taint analysis is a specialized dataflow analysis for computing how string values
+may flow from ``sources'', which are typically statements that read untrusted input, 
+to ``sinks'', which are typically securitive-sensitive operations such as calls to 
+a database. In previous research \TODO{cite}, taint analysis algorithms have been 
+formulated as IFDS problems.     
+  
+\begin{figure}
+  \centering
+  
+  \begin{minipage}{\textwidth}
+    \inputMinted{java}{ccexample.java}
+  \end{minipage}
+    \vspace*{-4mm}
+  \caption{Example program containing correlated calls}
+  \label{list:ccexample}
+   
+   \begin{minipage}{\textwidth}
+    \tikzstyle{supergraph}=[
+      fill=greyblue,
+      rounded corners,
+      font=\footnotesize,
+      align=right,
+      text=charcoal,
+      drop shadow={ashadow, color=greyblue}
+    ]
+    \tikzstyle{supergraph_y}=[
+      fill=bisque,
+      rounded corners,
+      font=\footnotesize,
+      align=left,
+      text=charcoal,
+      drop shadow={ashadow, color=greyblue}
+    ]
+    \tikzstyle{supergraph_f}=[
+      fill=lightsalmonpink,
+      rounded corners,
+      font=\footnotesize,
+      align=left,
+      text=charcoal,
+      drop shadow={ashadow, color=greyblue}
+    ]
+    \tikzstyle{description}=[fill=white]
+    \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
+    \tikzstyle{arrowtext}=[font=\tiny,color=black,above]
+    
+\hspace*{-10pt}
+\begin{tikzpicture}
+\scalebox{.8}{
+% main method nodes
+    \node [supergraph] (st_main) {\textsf{start}$_{\texttt{main}}$};
+    \node [supergraph] (asgn_a) [below = \dist of st_main.south] {\texttt{a = args==null\,?}\\\texttt{new\,A()\,:\,new\,B()}};
+    \node [supergraph] (call_foo) [below = \dist of asgn_a.south] {\textsf{call}$_\texttt{foo}$};
+    \node [supergraph] (return_foo) [below = \dist of call_foo.south] {\textsf{return}$_\texttt{foo}$\\\texttt{v = a.foo()}};
+    \node [supergraph] (call_bar) [below = \dist of return_foo.south] {\textsf{call}$_\texttt{bar}$};
+    \node [supergraph] (return_bar) [below = \dist of call_bar.south] {\textsf{return}$_\texttt{bar}$};
+    \node [supergraph] (end_main) [below = \dist of return_bar.south] {\textsf{end}$_{\texttt{main}}$};
+    
+% main method edges 
+    \path[->,ultra thick] (st_main) edge (asgn_a);
+    \path[->,ultra thick] (asgn_a) edge (call_foo);
+    \path[->] (call_foo) edge (return_foo);
+    \path[->,ultra thick] (return_foo) edge (call_bar);
+    \path[->] (call_bar) edge (return_bar);
+    \path[->,ultra thick] (return_bar) edge (end_main);
+    
+%A.foo method nodes
+    \node [supergraph_y] (st_a_foo) [right = 5*\dist of st_main] {\textsf{start}$_{\texttt{A.foo}}$};
+    \node [supergraph_y] (return_secret) [below = \dist of st_a_foo.south] {\texttt{return secret()}};
+    \node [supergraph_y] (end_a_foo) [below = \dist of return_secret.south] {\textsf{end}$_\texttt{A.foo}$};
+
+%A.foo method edges
+    \path[->] (st_a_foo) edge (return_secret);
+    \path[->] (return_secret) edge (end_a_foo);
+    
+%A.bar method nodes
+    \node [supergraph_y] (st_a_bar) [right = 5*\dist of st_a_foo] {\textsf{start}$_{\texttt{A.bar}}$};
+    \node [supergraph_y] (end_a_bar) [below = \dist of st_a_bar.south] {\textsf{end}$_\texttt{A.bar}$};
+    
+%A.bar method edges
+    \path[->] (st_a_bar) edge (end_a_bar);
+
+%B.foo method nodes
+    \node [supergraph_f] (st_b_foo) [right = 5*\dist of call_bar] {\textsf{start}$_{\texttt{B.foo}}$};
+    \node [supergraph_f] (return_not_secret) [below = \dist of st_b_foo.south] {\texttt{return "not secret"}};
+    \node [supergraph_f] (end_b_foo) [below = \dist of return_not_secret.south] {\textsf{end}$_\texttt{B.foo}$};
+    
+%B.foo method edges
+  \path[->] (st_b_foo) edge (return_not_secret);
+  \path[->] (return_not_secret) edge (end_b_foo);
+    
+%B.bar method nodes
+    \node [supergraph_f] (st_b_bar) [right = 5*\dist of st_b_foo] {\textsf{start}$_{\texttt{B.bar}}$};
+    \node [supergraph_f] (print) [below = \dist of st_b_bar.south] {\texttt{print(s)}};
+    \node [supergraph_f] (end_b_bar) [below = \dist of print.south] {\textsf{end}$_\texttt{B.bar}$};
+    
+%B.bar method edges
+  \path[->] (st_b_bar) edge (print);
+  \path[->] (print) edge (end_b_bar);
+  
+%inter-procedural edges
+  \path[->,dashed,ultra thick] (call_foo) edge[out=20,in=190] (st_a_foo);
+  \path[->,dashed] (call_foo) edge[color=lightsalmonpink,out=-20,in=135] (st_b_foo);
+  \path[->,dashed] (call_bar) edge[out=25,in=220] (st_a_bar);
+  \path[->,dashed,ultra thick] (call_bar) edge[color=lightsalmonpink,out=18,in=160] (st_b_bar);
+  \path[->,dashed,ultra thick] (end_a_foo) edge[out=220,in=15] (return_foo);
+  \path[->,dashed] (end_b_foo) edge[color=lightsalmonpink,out=160,in=-60] (return_foo);
+  \path[->,dashed] (end_a_bar) edge[out=210,in=40] (return_bar);
+  \path[->,dashed,ultra thick] (end_b_bar) edge[color=lightsalmonpink,out=200,in=-40] (return_bar);
+    
+%arrow description
+    \node [description] (intra_arrow_left) [above left = 2*\dist and 3.5*\dist of st_a_bar] {};
+    \node [description] (intra_arrow_right) [right = \dist of intra_arrow_left] {};
+    \node [description] (inter_arrow_left) [below = .5*\dist of intra_arrow_left] {};
+    \node [description] (inter_arrow_right) [below = .5*\dist of intra_arrow_right] {};
+    \path[->](intra_arrow_left) edge node[right = .5*\dist]{intra-procedural edge} (intra_arrow_right);
+    \path[dashed,->](inter_arrow_left) edge node[right = .5*\dist]{inter-procedural edge} (inter_arrow_right); 
+}
+\end{tikzpicture}
+   \end{minipage}
+   \vspace*{-25mm}
+  \caption{
+    Control flow supergraph for the example program of Figure~\ref{list:ccexample}.
+    An infeasible path is shown in bold. 
+  }%
+  \label{fig:examplesupergraph}%
+\end{figure} 
+  
+Figure~\ref{list:ccexample} shows a small Java program that we will use to illustrate
+how our technique can improve the precision of a simple taint analysis. The program
+declares a class \code{A} with a subclass \code{B},  where \code{A} defines methods 
+\code{foo()} and \code{bar()} that are overridden in \code{B}.  In order to keep the 
+example small and self-contained, it is assumed  that secret values are created by 
+an unspecified function \code{secret()}, which is called in method \code{A.foo()} on 
+line~\ref{line:Afoo}. Furthermore, it is assumed that any write to the standard output 
+stream via calls \code{System.out.println()} such as the one in method \code{B.bar()} 
+on line~\ref{line:Bbar} is a security-sensitive operation. Depending on the number of 
+arguments passed to the program, the \code{main()} method of the example program creates 
+either an \code{A}-object or a \code{B}-object on line~\ref{line:createObject}. The 
+program then calls \code{foo()} on this object on line~\ref{line:callfoo}, which is 
+followed by a call to \code{bar()} on the same object on line~\ref{line:callbar}.  
+ 
+The specific question that we would like to answer for the example program of
+Figure~\ref{list:ccexample} is the following: Is it possible for the untrusted value 
+that is read on line~\ref{line:Afoo} to flow to the print statement on line~\ref{line:Bbar}? 
+%
+To determine whether such a flow of tainted data is possible, consider the control-flow
+supergraph for the example program that is shown in Figure~\ref{fig:examplesupergraph}.
+ The nodes in this graph correspond to statements, method entry points (start nodes) and 
+method exit points (end nodes). Note that for each method call, the graph contains a 
+distinct call-node and a return-node. Edges in the graph reflect intraprocedural control flow, 
+flow of control from a caller to a callee (edges from call-nodes to start-nodes), or
+flow of control from a callee back to a caller (edges from end-nodes to return-nodes). 
+
+In the case of our example, the control flow within each of the methods is straightforward and
+all interesting issues arise from interprocedural control flow. In particular,
+note that, since the variable \code{a} may point to either an \code{A}-object or a \code{B}-object, 
+the call on line~\ref{line:callfoo} may dispatch to either \code{A.foo()} or to \code{B.foo()},
+and this is reflected by edges  
+  from the node labeled $\code{call}_\code{foo}$ to the nodes labeled
+  $\code{Start}_\code{A.foo()}$ and $\code{Start}_\code{B.foo()}$
+and by edges
+  from the nodes labeled $\code{End}_\code{A.foo}$ and $\code{End}_\code{B.foo}$ 
+  to the node labeled  $\code{return}_\code{foo}$.  
+Similarly, there are edges from the node labeled $\code{call}_\code{bar}$ to the nodes 
+$\code{Start}_\code{A.bar()}$ and $\code{Start}_\code{B.bar()}$, and 
+edges
+  from the nodes labeled $\code{End}_\code{A.bar}$ and $\code{End}_\code{B.bar}$ 
+  to the node labeled  $\code{return}_\code{bar}$. 
+ 
+Informally speaking, an IFDS-based dataflow analysis propagates dataflow facts along the edges
+of a control flow supergraph such as the one in Figure~\ref{fig:examplesupergraph}. The
+IFDS algorithm was carefully designed to avoid infeasible paths that may arise in the
+presence of multiple calls to the same method. However, in this example all methods are
+called in exactly one place, so IFDS is unable to eliminate dataflow along any of the
+paths shown in the figure. As a result, an IFDS-based taint analysis such as the
+one of \TODO{cite} would report that the secret value read on line~\ref{line:Afoo}
+might flow to the print statement on line~\ref{line:Bbar}. 
+
+As we discussed previously, the calls to \code{foo()} and \code{bar()} may dispatch
+to different implementations of these methods in classes \code{A} and \code{B}, 
+because the variable \code{a} that serves as the receiver for the call may be bound to
+ objects of type \code{A} or type \code{B} at run time. 
+However, consider the fact that the methods \code{foo()} and \code{bar()} are invoked
+on \textit{the same object}. This means that the behaviors of the two method calls
+are \textit{correlated}: if the call to \code{foo()} dispatches to \code{A.foo()},
+then the call to \code{bar()} must dispatch to \code{A.bar()}, and if the call
+to \code{foo()} dispatches to \code{B.foo()}, then the call to \code{bar()} must 
+dispatch to \code{B.bar()}.  Consequently, paths such as the one highlighted in
+Figure~\ref{fig:examplesupergraph} where the call to \code{foo()} dispatches 
+to \code{A.foo()} and where the call to \code{bar()} dispatches to \code{B.bar()}
+are infeasible.  
+
+The main contribution of this paper is an algorithm for transforming an IFDS problem 
+into an IDE problem in which the feasibility of paths in the presence of 
+correlated is encoded into the environment functions. 
+Informally speaking, our approach associates with each edge in an (exploded) 
+interprocedural control flow graph a function that records the types of 
+variables that are used as the receiver of correlated method calls. Paths that 
+are composed of edges in which the same receiver expression has different types
+are infeasible, and the propagation of dataflow facts along such paths is
+prevented. Applying our technique to an IFDS-based taint analysis would enable
+the resulting IDE-based taint analysis to determine that no secret value can flow from
+line~\ref{line:Afoo} to the print statement on line~\ref{line:Bbar}. 
+ 
+
+
+  
+\commentout{
 
 Consider a call site~$r.m()$ in an object-oriented programming language, where the variable~$r$ is the \textit{receiver} variable of the call site and $m$ is the name of the invoked method\footnote{We assume an internal representation of the program in which for each call site $e_r.m()$, the expression~$e_r$ has been evaluated to the variable~$r$.}. In the rest of the paper, we use the general term \textit{receiver} to mean a receiver variable.
 At runtime, the actual method that will be invoked by the call site depends on the runtime type of the object referenced by $r$. If the call site $r.m()$ can be associated with more than one method at compile time, we will say that the call site is \textit{polymorphic}.
@@ -13,14 +257,7 @@ The call \verb'a.foo()' can be dispatched to either \verb'A.foo' or \verb'B.foo'
 A concrete execution path for the main method might therefore go through \verb'A.foo' and \verb'A.bar', or through \verb'B.foo' and \verb'B.bar'.
 However, there cannot be an execution path through \verb'A.foo' and \verb'B.bar' or through \verb'B.foo' and \verb'A.bar'.
 
-\begin{figure}
-  \centering
-  \begin{minipage}{\textwidth}
-    \inputMinted{java}{ccexample.java}
-  \end{minipage}
-  \caption{Example program containing correlated calls}
-  \label{list:ccexample}
-\end{figure}
+
 
 We call the invocations to methods \verb'foo' and \verb'bar' \textit{correlated}.
 More generally, correlated calls occur when more than one polymorphic call is invoked on the same receiver variable.
@@ -51,4 +288,5 @@ The contributions of this work are:
 
 The remainder of this paper is organized as follows. In the next section, we describe the IFDS and IDE analyses in detail. In Section~\ref{chapter:cca} we present the correlated-calls analysis as a transformation of IFDS problems into a special kind of IDE problem. Section~\ref{sec:ccdatastr} describes an efficient representation of the data structures that are required to define a correlated-calls IDE transformation.
 In Section~\ref{chapter:eval} we address some implementation aspects of the correlated-calls analysis and present an evaluation of its results. Section~\ref{chapter:concl} contains concluding remarks. The proofs for the lemmas in the paper are provided in the Appendix.\mtodo{Reference appendix like this?}
+}
 }
