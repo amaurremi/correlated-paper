@@ -14,7 +14,8 @@
 
 \mainmatter  % start of an individual contribution
 
-\title{Data Flow Analysis\\in the Presence of Correlated Calls}
+\title{Precise Data Flow Analysis\\in the Presence of Correlated Method Calls}
+\titlerunning{Data Flow Analysis in the Presence of Correlated Calls}
 
 \author{
  Marianna Rapoport\inst{1} \and
@@ -33,7 +34,7 @@
 
 \toctitle{Data Flow Analysis in the Presence of Correlated Calls}
 %\tocauthor{Authors' Instructions} % TODO
-\maketitle\mtodo{Frank wanted to discuss the title}
+\maketitle
 
 \begin{abstract}
 We present a technique to improve the precision of data-flow analyses on object-oriented programs in the presence of 	\textit{correlated calls}. Two method calls are correlated if they are polymorphic and are invoked on the same object. Correlated calls are problematic because they can make  existing data-flow analyses consider certain infeasible data-flow paths as valid. This leads to loss in precision of the analysis solution.

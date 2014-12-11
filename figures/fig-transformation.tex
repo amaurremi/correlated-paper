@@ -7,19 +7,20 @@
   \tikzstyle{result}=[fill=bisque,text width=1.8cm,rounded corners,font=\small,text=charcoal,drop shadow={ashadow, color=greyblue}]
 \begin{tikzpicture}
     \node [problem] (ifds) {IFDS problem};
-    \node [problem] (equiv) [above right=0.3cm and .7\dist of ifds.east] {Equivalent IDE problem};
-    \node [problem] (ccide)[below=1.6cm of equiv.west, anchor=west] {Correlated-calls IDE problem};
+    \node [problem] (equiv) [above right=0.5cm and .7\dist of ifds.east] {Equivalent IDE problem};
+    \node [problem] (ccide)[below=2cm of equiv.west, anchor=west] {Correlated-calls IDE problem};
     \node [result] (equivres) [right=\dist of equiv.east] {Equivalence-IDE result};
-    \node [result] (ccres) [below=1.6cm of equivres.west,anchor=west] {Correlated-calls result};
+    \node [result] (ccres) [below=2cm of equivres.west,anchor=west] {Correlated-calls result};
     \node [result] (ifdsres) [right=\dist of equivres.east] {IFDS result};
     \node [result] (improved) [right=\dist of ccres.east] {Improved IFDS result};
     \path[->] (equivres) edge node[above]{$\backEq$} (ifdsres);
     \path[->] (ccres) edge node[above] {$\backCC$} (improved);
-    \path[->] (ccres) edge[out=25,in=210] node[above] {$\backEq$} (ifdsres);
-    \path[->] (ifds) edge[out=40,in=179] node[above] {$\transEq$} (equiv);
+    %\path[->] (ccres) edge[out=25,in=210] node[above] {$\backEq$} (ifdsres);
+    \path[->] (ifds) edge[out=42,in=179] node[above] {$\transEq$} (equiv);
     \path[->] (ifds) edge[out=-40,in=173] node[below] {$\transCC$} (ccide);
     \path[->] (equiv) edge node[above]{$\result$} (equivres);
     \path[->] (ccide) edge node[above]{$\result$} (ccres);
+    \path[->,dashed] (ifds) edge[out=-3,in=205] node[above]{$\result_{\text{IFDS}}$} (ifdsres);
 \end{tikzpicture}
   \caption{Transformations between IFDS and IDE problems and their results}%
   \label{fig:transformations}%
