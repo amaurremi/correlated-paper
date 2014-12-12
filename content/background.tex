@@ -205,8 +205,8 @@ are/must be complete. I'll just say that here.}
 \ftodo{Would it make sense to first the define the notion of a lattice without referring to its completeness?
        This could be followed by defining what it means for a (semi)lattice to be complete, and then we
        could say that all lattices considered in this paper are complete, etc.}
-\ftodo{Can we define the symbols $\sqcup$ and $\sqcap$ for join and meet here?}
-A \textit{complete lattice} is a partially ordered set $(S,\sqsubseteq)$ in which every subset has a least upper bound and a greatest lower bound.
+%\ftodo{Can we define the symbols $\sqcup$ and $\sqcap$ for join and meet here?}
+A \textit{complete lattice} is a partially ordered set $(S,\sqsubseteq)$ in which every subset has a least upper bound, called \textit{join} or $\sqcup$, and a greatest lower bound, called \textit{meet} or $\sqcap$.
 A \textit{complete meet semilattice} is a partially ordered set in which every subset need only have a greatest lower bound.
 The symbols $\bot$ and $\top$ are used to denote the greatest lower bound of $S$ and of the empty set, respectively.
 Since all of the (semi)lattices discussed in this paper are required to be complete, we will henceforth leave out the
@@ -858,6 +858,7 @@ Let $\Omega = \lambda d.\top$ be the environment that maps every element of $D$ 
 \ftodo{
    What is the relationship between $\Omega$ and $\Delta$?
 }
+\otodo{What do you mean by $\Delta$?}
 Thanks to distributivity, every environment transformer 
 $t : \textsf{Env}(D,L) \to \textsf{Env}(D,L)$
 can be decomposed into its effect on $\Omega$ and on a set of environments $\Omega[d_i\to l]$
@@ -948,3 +949,4 @@ The next section describes how this is done.
 
 \ftodo{Would it make sense to discuss an example of an IDE problem here?  Perhaps we can do this
   without using much space by referring to an existing figure elsewhere in the paper?}
+\otodo{I have the todo on the previous page to add text referring to the example in Figure 3.}
