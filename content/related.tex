@@ -1,6 +1,6 @@
 \section{Related Work}
 \otodo{Should we remove first initials in this section?}
-The IFDS algorithm is an instance of the functional approach to data-flow analysis developed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}.
+The IFDS algorithm is an instance of the functional approach to data-flow analysis developed by Sharir and Pnueli~\cite{pnueli1981two}.
 \commentout{
 Their algorithm is based on computing \textit{summary functions} that return the data-flow value at the end of a procedure, given the data-flow value at the start of the procedure. IFDS problems form a more restricted set of data-flow problems: unlike in the functional approach, IFDS flow functions have to be distributive, and the set of data-flow facts $D$ has to be finite. However, the IFDS algorithm is more general than Sharir's and Pnueli's algorithm in that it can handle programs containing local variables and parameters in recursive methods.
 }
@@ -9,7 +9,7 @@ IFDS has been used to encode a variety of data-flow problems such as typestate a
 \commentout{(detecting errors and validating properties of programs at compile time)}%
 ~\cite{DBLP:conf/birthday/KreikerRRSWY13}. IFDS has been broadly used~\cite{DBLP:conf/pldi/ArztRFBBKTOM14,tripp2009taj} and extended~\cite{DBLP:conf/sigsoft/LerchHBM14} to solve taint-analysis problems.
 
-The IFDS algorithm is implemented in two popular static-analysis frameworks for Java bytecode, the T.~J.~Watson Libraries for~Analysis (WALA)~\cite{fink2012wala} and Heros~\cite{bodden2012inter}.
+The IFDS algorithm is implemented in two popular static-analysis frameworks for Java bytecode, the T.J.~Watson Libraries for~Analysis (WALA)~\cite{fink2012wala} and Heros~\cite{bodden2012inter}.
 
 \commentout{
 WALA is a framework for static analysis on Java bytecode developed by the IBM T.J.~Watson Research Center.
@@ -21,7 +21,7 @@ Whereas one advantage of Soot's IFDS implementation (and other static analysis t
 }
 
 Several extensions of the IFDS algorithm have been proposed to improve its precision,
-efficiency, and expressiveness. N.~Naeem and O.~Lhot\'ak~\cite{naeem2010pei} propose
+efficiency, and expressiveness. Naeem and Lhot\'ak~\cite{naeem2010pei} propose
 four extensions: two to improve efficiency on certain kinds of IFDS problems,
 one to improve expressiveness to a wider range of IFDS problems, and one
 to improve precision when applying the IFDS algorithm to programs in SSA form.
@@ -39,21 +39,21 @@ The fourth extension is targeted towards programs that are represented in SSA fo
 The extension makes the IFDS analysis on programs in SSA form as precise as on programs that are not represented in SSA form. In contrast, the correlated-calls analysis is applicable to programs in both SSA and non-SSA forms. Even if applied to a program in SSA form, our analysis and the extension improve the precision of IFDS in unrelated situations: the first analysis handles correlated calls, and the latter handles control-flow constructs. Thus, an IFDS analysis could benefit from both precision improvements independently.
 }
 
-Two other extensions target efficiency. E.\,Bodden et~al.~\cite{bodden2013spl} presents a framework
+Two other extensions target efficiency. Bodden et~al.~\cite{bodden2013spl} presents a framework
 for applying IFDS analyses to software product lines. Their approach enables the analysis of
 all possible products derived from a product line in a single analysis pass. Like our approach,
 their approach transforms IFDS problems to IDE problems. The micro-functions keep track
 of the possible program variations specified by the product line.
-J.\,Rodriguez and O.\,Lhot\'ak evaluate a parallelized implementation of the IFDS algorithm using actors~\cite{rodriguez2010concurrent} that can take advantage of multiple processors.
+Rodriguez and Lhot\'ak evaluate a parallelized implementation of the IFDS algorithm using actors~\cite{rodriguez2010concurrent} that can take advantage of multiple processors.
 %However, neither of those works is concerned with improving the precision of IFDS results.
 
 \commentout{
 The correlated-calls analysis improves the precision of a data-flow analysis by eliminating a special type of infeasible paths. This is similar to the idea of context-sensitive analysis: just as a context-sensitive analysis eliminates infeasible paths from the end of a procedure to the call sites that do not match the given procedure call, the correlated-calls analysis eliminates infeasible paths caused by correlated method calls.
 }
 
-The idea of using correlated calls to remove infeasible paths in data-flow analyses of object-oriented programs was introduced by F.\,Tip~\cite{DBLP:journals/scp/Tip15}. The possibility of using IDE to achieve this is mentioned, but not elaborated upon. Our work presents a concrete solution to the problem and an implementation of that solution.
+The idea of using correlated calls to remove infeasible paths in data-flow analyses of object-oriented programs was introduced by Tip~\cite{DBLP:journals/scp/Tip15}. The possibility of using IDE to achieve this is mentioned, but not elaborated upon. Our work presents a concrete solution to the problem and an implementation of that solution.
 
-M.~Sridharan et~al.'s improvements to the precision of pointer analysis
+Sridharan et~al.'s improvements to the precision of pointer analysis
 for JavaScript programs~\cite{DBLP:conf/ecoop/SridharanDCST12} also
 eliminate infeasible paths. However, instead of infeasible paths
 between dynamically dispatched method calls, their approach eliminates

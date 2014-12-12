@@ -9,15 +9,15 @@ We start by proving the Lemmas of Soundness and Precision of the correlated-call
   Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
   nodes $n\in N^*$ to sets of data-flow facts $\delta\in2^D$. Specifically,
   \begin{equation}
-    \resultIFDS(P)=\lambda n\,.\,\mvp F(n).
+    \resultIFDS(P)=\lambda n\,.\,\mvp F(n)\,.
   \end{equation}
   The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
   \begin{align*}
     \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
-    &=\left(\lambda n'\,.\,\left\{d\,|\,\resultIDE(\transCC_R(P))(n')=(d,\,\ell),\,\forall r\,.\,\ell(r)\ne\top_T\right\}\right)(n)\\
-    &=\left\{d\,|\,\resultIDE(\transCC_R(P))(n)=(d,\,\ell),\,\forall r\,.\,\ell(r)\ne\top_T\right\}\\
-    &\subseteq\left\{d\,|\,\resultIDE(\transCC_R(P))(n)=(d,\,\ell),\,\ell\ne\topcc\right\}\\
-    &=\backEq\left(\resultIDE(\transCC_R(P))(n)\right)\,.\qedhere
+    &=\left(\lambda n'\,.\,\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n')(d)(r)\ne\top_T\right\}\right)(n)\\
+    &=\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n')(d)(r)\ne\top_T\right\}\\
+    &\subseteq\left\{d\,|\,\resultIDE(\transCC_R(P))(n)(d)\ne\topcc\right\}\\
+    &=\backEq\left(\resultIDE(\transCC_R(P))(n)\right).\qedhere
   \end{align*}
 \end{proof}
 
@@ -144,22 +144,22 @@ Then, according to~\eqref{eq:envTransToEdgeFnEdge},\mtodo{Is it okay that in~\eq
         \item if $r=r'$, then $\efek=\bot_T$, which contains $t'$.
         \item\label{item:defaultmap} If $r\ne r'$, then $r$ has not been reassigned a value, and still maps to the same object of type $t$. The receiver $r$ is mapped to $\Delta(r)$, which, according to~\eqref{eq:deltaContainsT}, contains $t$. Since $t=t'$, $\Delta(r)$ contains $t'$.
       \end{enumerate}
-    \item\label{item:callstart} $e_k$ is a call-start edge with signature $s_\mathcal F$, and $f\in\mathcal F$ is the called procedure.
+    \item\label{item:callstart} $e_k$ is a call-start edge with signature $s$, and $f$ is the called procedure.
       Then
         \begin{align*}
           \efek
-          &=(\lambda m\,.\,m[r'\to m(r')\cap\tau(s_\mathcal F,\,f)])(\Delta)(r)\\
-          &=\Delta[r'\to\Delta(r')\cap\tau(s_\mathcal F,\,f)]\,,
+          &=(\lambda m\,.\,m[r'\to m(r')\cap\tau(s,\,f)])(\Delta)(r)\\
+          &=\Delta[r'\to\Delta(r')\cap\tau(s,\,f)]\,,
         \end{align*}
       where $r'$ is the receiver of the call.
       \begin{itemize}
-        \item If $r'=r$, then $\Delta(r')=\Delta(r)$ which contains $t$. Since $t\in\tau(s_\mathcal F,\,f)$, it follows that $t\in\Delta(r)\cap\tau(s_\mathcal F,\,f)$, and $t\in\efek$.
+        \item If $r'=r$, then $\Delta(r')=\Delta(r)$ which contains $t$. Since $t\in\tau(s,\,f)$, it follows that $t\in\Delta(r)\cap\tau(s,\,f)$, and $t\in\efek$.
          \item If $r'\ne r$, see~(\ref{item:defaultmap}).
        \end{itemize}
-    \item $e_k$ is an end-return edge, $r_1,\,\dots,\,r_k\in R$ are the local variables in the callee method, $r'$ is the receiver of the call site corresponding to the return node $n_k$, and $f\in\mathcal F$ is the called method with signature~$s_\mathcal F$.
+    \item $e_k$ is an end-return edge, $r_1,\,\dots,\,r_k\in R$ are the local variables in the callee method, $r'$ is the receiver of the call site corresponding to the return node $n_k$, and $f$ is the called method with signature~$s$.
       Then 
       \[
-        \varepsilon_R(e_k)=\lambda m\,.\,m[r'\to m(r')\cap\tau(s_\mathcal F,\,f)][r_1\to\bot_T]\dots[r_k\to\bot_T].
+        \varepsilon_R(e_k)=\lambda m\,.\,m[r'\to m(r')\cap\tau(s,\,f)][r_1\to\bot_T]\dots[r_k\to\bot_T].
       \]
       If $r\in\{r_1,\,\dots,\,r_k\}$, see~Case~\ref{item:asgn}. Otherwise, the case is analogous to Case~\ref{item:callstart}.
     \item\label{item:idcase} The node contains any other instruction.
@@ -208,27 +208,39 @@ We will now show that on a node of a concrete execution path, the correlated-cal
     \]
      The edge function corresponding to the call-start and end-return edges is the only place in which the set of types that a receiver maps to can be reduced.
     
-    Assume that $e_k$ is a end-return edge with a call on the receiver $r'\in R$ with a signature $s_\mathcal F$ to a function $f\in\mathcal F$.
+    Assume that $e_k$ is a end-return edge with a call on the receiver $r'\in R$ with a signature $s$ to a function $f$.
     \begin{align*}
       \ccedgefn R&(e_k)(\mpdkm)(r)\\
-      &=\left(\lambda m\,.\,m[r'\to m(r)\cap\tau(s_\mathcal F,\,f)][r_1\to\bot_T]\dots[r_l\to\bot_T]\right)(\mpdkm)(r)\\
-      &=\left(\mpdkm[r'\to \uptau\cap\tau(s_\mathcal F,\,f)][r_1\to\bot_T]\dots[r_l\to\bot_T]\right)(r)\,,
+      &=\left(\lambda m\,.\,m[r'\to m(r)\cap\tau(s,\,f)][r_1\to\bot_T]\dots[r_l\to\bot_T]\right)(\mpdkm)(r)\\
+      &=\left(\mpdkm[r'\to \uptau\cap\tau(s,\,f)][r_1\to\bot_T]\dots[r_l\to\bot_T]\right)(r)\,,
     \end{align*}
   where $r_1,\,\dots,r_l\in R$ are the local variables in the called method.
     
     If $r\in\{r_1,\,\dots,\,r_l\}$, then $\efek=\bot_T\ni t$\footnote{In the case of a recursive call, it is possible that both $r\in\{r_1,\,\dots,\,r_l\}$ and $r=r'$.
     In that case, the set to which $r$ will be mapped would be still ``overwritten'' by $\bot_T$.}.
     
-    Otherwise, if $r=r'$, then $\efek=\uptau\cap\tau(s_\mathcal F,\,f)$.
+    Otherwise, if $r=r'$, then $\efek=\uptau\cap\tau(s,\,f)$.
 
-    According to Lemma~\ref{lem:sound1} and by the induction hypothesis, the runtime type $t$ of $r$ must be contained in $\mpdkm(r)=\uptau$. At the same time, by definition, $t$ is part of $\tau(s_\mathcal F,\,f)$. Therefore, $t\in\uptau\cap\tau(s_\mathcal F,\,f)\subseteq\efek$, which means that $\efek\ne\top_T$.
+    According to Lemma~\ref{lem:sound1} and by the induction hypothesis, the runtime type $t$ of $r$ must be contained in $\mpdkm(r)=\uptau$. At the same time, by definition, $t$ is part of $\tau(s,\,f)$. Therefore, $t\in\uptau\cap\tau(s,\,f)\subseteq\efek$, which means that $\efek\ne\top_T$.
     
     The same reasoning applies to the case where $e_k$ is a call-start edge.
 \end{proof}
 
+For the following proofs, recall from Section~\ref{sec:ideToIfds} that the result of an IDE analysis maps a lattice element to each node in the exploded supergraph. Specifically, for an IDE problem $Q$, the result $\resultIDE(Q):\ N^*\to D\times L$ maps nodes of the supergraph to pairs of data-flow facts and lattice elements~\cite{sagiv1996precise}:
+\begin{equation}\label{eq:ideresult}
+  \resultIDE(Q)=\lambda n\,.\,\lambda d\,.\,\mvp{\textsf{Env}}(n,\,d))\,.
+\end{equation}
+
 Finally, we can prove the Soundness Lemma.
 
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:sound}}] Let $\rho=\resultIDE(\transCC_R(P))$. Then
+\begin{proof}[\textbf{Proof of Lemma~\ref{lem:sound}}] 
+According to~\eqref{eq:ideresult}, we can rewrite~\eqref{eq:transCcDef} as
+\begin{equation}\label{eq:transCcResultCc}
+  \backCC(\resultIDE(\transCC_R(P)))(n)
+  =\{d\,|\,\forall r\in R\,.\,\mvp{\textsf{Env}}(n,\,d))(r)\ne\top_T\}.
+\end{equation}
+\mtodo{TODO rest of proof!}
+Let $\rho=\resultIDE(\transCC_R(P))$. Then
   \begin{align*}
     \backCC(\rho)(n)
     &=D_n^\Subset(\rho)\\
@@ -300,18 +312,18 @@ First, we introduce a Lemma showing that the types to which a given receiver is 
   
   Otherwise, there are four sub-cases.
   \begin{enumerate}
-    \item $e_k$ is a call-start edge, $r'.c()$ is the call site at $n_{k-1}$ with signature $s_\mathcal F$, $f\in\mathcal F$ is the called procedure, and $r'\in U$.
+    \item $e_k$ is a call-start edge, $r'.c()$ is the call site at $n_{k-1}$ with signature $s$, $f$ is the called procedure, and $r'\in U$.
     Then
     \[
-      \ccedgefn U(e_k)=\lambda m\,.\,\delta(m)[r'\to\delta(m)(r)\cap\tau(s_\mathcal F,\,f)]\,.
+      \ccedgefn U(e_k)=\lambda m\,.\,\delta(m)[r'\to\delta(m)(r)\cap\tau(s,\,f)]\,.
     \]
     There are two sub-cases.
     \begin{enumerate}
       \item\label{item:callstartreceq} If $r=r'$, then, according to~\eqref{eq:edgefnU}, the resulting set of types 
         \[
-          \ccedgefn U(q')(\topcc)(r)=\delta(\ccedgefn U(q)(\topcc))(r)\cap\tau(s_\mathcal F,\,f).
+          \ccedgefn U(q')(\topcc)(r)=\delta(\ccedgefn U(q)(\topcc))(r)\cap\tau(s,\,f).
         \]
-        If $d_{k-1}=\Lambda$, then $\delta(\ccedgefn U(q)(\topcc))(r)=\botcc(r)=\bot_T$. If $d_{k-1}\ne\Lambda$, then $\delta(\ccedgefn U(q)(\topcc))(r)=\ccedgefn U(q)(\topcc)(r)=\uptau$. The set $\tau(s_\mathcal F,\,f)$ is the same for either case.
+        If $d_{k-1}=\Lambda$, then $\delta(\ccedgefn U(q)(\topcc))(r)=\botcc(r)=\bot_T$. If $d_{k-1}\ne\Lambda$, then $\delta(\ccedgefn U(q)(\topcc))(r)=\ccedgefn U(q)(\topcc)(r)=\uptau$. The set $\tau(s,\,f)$ is the same for either case.
     
         Therefore, the value of $\ccedgefn U(q')(\topcc)(r)$ has the same result regardless of $U$,
         which means that $\ccedgefn S(q')(\topcc)(r)=\ccedgefn{\{r\}}(q')(\topcc)(r)$, and the Lemma holds.
@@ -321,11 +333,11 @@ First, we introduce a Lemma showing that the types to which a given receiver is 
         \end{equation}
         which, as we have seen in~Case~\eqref{item:callstartreceq}, does not depend on~$U$, and the Lemma holds.
     \end{enumerate}
-    \item $e_k$ is an end-return edge, $r_1,\,\dots,\,r_l\in U$ are the local variables in the callee method, $r'.c()$ is the call corresponding to the return node at $n_k$, $f\in\mathcal F$ is the called method with signature $s_\mathcal F$, and $r'\in U$.
+    \item $e_k$ is an end-return edge, $r_1,\,\dots,\,r_l\in U$ are the local variables in the callee method, $r'.c()$ is the call corresponding to the return node at $n_k$, $f$ is the called method with signature $s$, and $r'\in U$.
     Then
     \[
       \ccedgefn U(e_k)=\lambda m\,.\,\delta(m)
-      [r'\to\delta(m)(r)\cap\tau(s_\mathcal F,\,f)]
+      [r'\to\delta(m)(r)\cap\tau(s,\,f)]
       [r_1\to\bot_T]\ldots[r_l\to\bot_T]\,.
     \]
     There are three sub-cases.
@@ -356,23 +368,18 @@ The following Lemma shows that the correlated-calls analysis computes the result
 \begin{lemma}\label{lem:recindep} Let $P$ be an IFDS problem. Let $N^*$ be the supergraph for $P$, $D$ the set of data-flow facts, and $S\subseteq R$ a set of receivers.
   Then for any $n\in N^*$, $d\in D$, and receiver $r\in S$,
   \begin{equation}
-    \resultIDE\left(\transCC_S(P)\right)(n,\,d)(r)=
-    \resultIDE(\transCC_{\{r\}}(P))(n,\,d)(r)\,.
+    \resultIDE\left(\transCC_S(P)\right)(n)(d)(r)=
+    \resultIDE(\transCC_{\{r\}}(P))(n)(d)(r)\,.
   \end{equation}
 \end{lemma}
-\begin{proof}
- Recall from Section~\ref{sec:ideToIfds} that the result of an IDE analysis maps a lattice element to each node in the exploded supergraph. Specifically, for an IDE problem $Q$, the result $\resultIDE(Q):\ N^\#\to L$ maps nodes of the exploded supergraph to lattice elements:
-\begin{equation}\label{eq:ideresult}
-  \resultIDE(Q)=\{((n,\,d),\,\mvp{\textsf{Env}}(n,\,d))\ |\ n\in N^*,\,d\in D\}\,.
-\end{equation}
-Furthermore, recall from Section~\ref{sec:bgide} that
+\begin{proof} Recall from Section~\ref{sec:bgide} that
 \begin{equation}\label{eq:mvpdef}
   \mvp{\textsf{Env}}(n)=\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\top)
 \end{equation}
 
   According to~\eqref{eq:ideresult}, \eqref{eq:mvpdef}, and~\eqref{eq:envTransToEdgeFnEdge},
   \begin{align}
-    \resultIDE\left(\transCC_S(P)\right)(n,\,d)(r)
+    \resultIDE\left(\transCC_S(P)\right)(n)(d)(r)
     &=\mvp{\textsf{Env}}(n,\,d)(r)\notag\\
     &=\left(\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\Omega)(d)\right)(r)\notag\\
     &=\left(\bigsqcap_{q\in\ivp(n)}\bigsqcap_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn S(q')(\topcc)\right)(r)\notag\\
@@ -380,18 +387,18 @@ Furthermore, recall from Section~\ref{sec:bgide} that
   \end{align}
   Then from Lemma~\ref{lem:recindepedgefn},
   \begin{align*}
-    \resultIDE\left(\transCC_S(P)\right)(n,\,d)(r)
+    \resultIDE\left(\transCC_S(P)\right)(n)(d)(r)
     &=\bigcup_{q\in\ivp(n)}\bigcup_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn{\{r\}}(q')(\topcc)(r)\\
-    &=\resultIDE\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)\,.\qedhere
+    &=\resultIDE\left(\transCC_{\{r\}}(P)\right)(n)(d)(r)\,.\qedhere
   \end{align*}
 \end{proof}
 
-The next lemma shows that the set of types to which a receiver is mapped in a correlated-calls lattice element can be represented as an intersection of static-type function applications $\tau(s_{\mathcal F_i},\,f_i)$.
+The next lemma shows that the set of types to which a receiver is mapped in a correlated-calls lattice element can be represented as an intersection of static-type function applications $\tau(s_i,\,f_i)$.
 \begin{lemma}\label{lem:edgefnThroughTaus}
-  For an IFDS problem $P$, a node $n\in N^*$, and fact $d\in D$, let $p\in\mathsf{RP}(n,\,d)$ be a realizable path and $r\in R$ a receiver. Then there exists a non-negative number $\gamma$ of calls on the receiver $r$ with signatures $s_{\mathcal F_\gamma}$ to the functions $f_\gamma\in\mathcal F_\gamma$, for which
+  For an IFDS problem $P$, a node $n\in N^*$, and fact $d\in D$, let $p\in\mathsf{RP}(n,\,d)$ be a realizable path and $r\in R$ a receiver. Then there exists a non-negative number $\gamma$ of calls on the receiver $r$ with signatures $s_\gamma$ to the functions~$f_\gamma$, for which
   \[
     \ccedgefn{\{r\}}(p)(\topcc)(r)=
-      \bigcap_{\gamma\ge0}\tau(s_{\mathcal F_\gamma},\,f_\gamma)\,.
+      \bigcap_{\gamma\ge0}\tau(s_\gamma,\,f_\gamma)\,.
   \]
 \end{lemma}
 \begin{proof}
@@ -419,8 +426,8 @@ The next lemma shows that the set of types to which a receiver is mapped in a co
   \[
     \beta=
     \begin{cases}
-      \botcc[r\to\tau(s_\mathcal F,\,f)]&\text{if $(n_k,\,n_{k+1})$ is a call-start or end-return edge, and}\\&\text{the call site $r.c()$ with signature $s_\mathcal F$ to the function}\\
-      &\text{$f\in\mathcal F$ corresponds to the call-start or end-return edge,}\\
+      \botcc[r\to\tau(s,\,f)]&\text{if $(n_k,\,n_{k+1})$ is a call-start or end-return edge, and}\\&\text{the call site $r.c()$ with signature $s$ to the function}\\
+      &\text{$f$ corresponds to the call-start or end-return edge,}\\
       \botcc&\text{otherwise\footnotemark.}
     \end{cases}
   \]
@@ -446,9 +453,9 @@ If $\beta=\botcc$, then
   \ccedgefn{\{r\}}(p)(\topcc)(r)&=\beta(r)\\&=\bot_T\,,
 \end{align*} and $\gamma=0$.
 
-If $\beta=\botcc[r\to\tau(s_\mathcal F,\,f)]$, then 
+If $\beta=\botcc[r\to\tau(s,\,f)]$, then 
 \[
-  \ccedgefn{\{r\}}(p)(\topcc)(r)=\tau(s_\mathcal F,\,f)\,,
+  \ccedgefn{\{r\}}(p)(\topcc)(r)=\tau(s,\,f)\,,
 \]
 and $\gamma=1$.
 
@@ -471,20 +478,20 @@ If $\ccedgefn{\{r\}}(e_{k+l+1})(r)=\bot_T$, then the Lemma holds for $\gamma=0$.
 Otherwise,
 \begin{align*}
   \ccedgefn{\{r\}}(e_{k+l+1})(\topcc)(r)&=\ccedgefn{\{r\}}(p)(\topcc)(r)\\
-  &=\bigcap_{N}\tau(s_{\mathcal F_N},\,f_N)\,,
+  &=\bigcap_{N}\tau(s_N,\,f_N)\,,
 \end{align*}
 and therefore $\gamma=N$.
 
-Suppose that $e_{k+l+1}$ is a call-start edge with a call on the receiver $r$ with signature $s_\mathcal G$ to a function $g\in\mathcal G$. Then, according to~\eqref{eq:varepsilon}, 
+Suppose that $e_{k+l+1}$ is a call-start edge with a call on the receiver $r$ with signature $s$ to a function $g$. Then, according to~\eqref{eq:varepsilon}, 
 \[
-  \ccedgefn{\{r\}}(e_{k+l+1})=\lambda m\,.\,m[r\to m(r)\cap\tau(s_\mathcal G,\,g)]\,.
+  \ccedgefn{\{r\}}(e_{k+l+1})=\lambda m\,.\,m[r\to m(r)\cap\tau(s,\,g)]\,.
 \]
 Therefore,
 \begin{align*}
   \ccedgefn{\{r\}}&(p')(\topcc)(r)\\
-  &=\lambda m\,.\,m[r\to m(r)\cap\tau(s_\mathcal G,\,g)]\left(\ccedgefn{\{r\}}(p)(\topcc)\right)(r)\\
-  &=\ccedgefn{\{r\}}(p)(\topcc)(r)\cap\tau(s_\mathcal G,\,g)\\
-  &=\left(\bigcap_{N}\tau(s_{\mathcal F_N},\,f_N)\right)\cap\tau(s_\mathcal G,\,g)\,,
+  &=\lambda m\,.\,m[r\to m(r)\cap\tau(s,\,g)]\left(\ccedgefn{\{r\}}(p)(\topcc)\right)(r)\\
+  &=\ccedgefn{\{r\}}(p)(\topcc)(r)\cap\tau(s,\,g)\\
+  &=\left(\bigcap_{N}\tau(s_N,\,f_N)\right)\cap\tau(s,\,g)\,,
 \end{align*}
 and the Lemma holds for $\gamma=N+1$.
 
@@ -501,21 +508,25 @@ We now show that a receiver will be only mapped to $\topcc$ if it is the receive
   \]
   then $r\in \rcc$.
 \end{lemma}
-\begin{proof}
+\begin{proof} 
+Observe that if there is a supergraph path from a method call with signature $s$ to the start of $f$, then the set $\tau(s,\,f)$ is always non-empty.
+  Let $r.c()$ be a call on a receiver $r\in R$ with a method signature $s$ to a function $f$.
+  If the call site is monomorphic, then $\tau(s,\,f)$ contains all types $T'\subseteq T$ that are compatible with the static type of $r$.
+  If the call site is polymorphic, then $\tau(s,\,f)\subset T'$, since some types $t\in T'$ cause dispatch to a method other than~$f$.
+ 
  According to Lemma~\ref{lem:edgefnThroughTaus},
  \[
    \ccedgefn{\{r\}}(p)(\topcc)(r)=
-      \bigcap_{\gamma\ge0}\tau(s_{\mathcal F_\gamma},\,f_\gamma).
+      \bigcap_{\gamma\ge0}\tau(s_\gamma,\,f_\gamma).
  \]
  
- Let $\tau_i=\tau(s_{\mathcal F_i},\,f_i)$. 
- For a given $k$, let $r.m_k()$ be the call site corresponding to $\tau_k$, and $T'$ the set of types compatible with the static type of $r$.
- Recall from Section~\ref{sec:ef} that 
+Let $\tau_i=\tau(s_i,\,f_i)$. 
+ For a given $k$, let $r.m_k()$ be the call site corresponding to $\tau_k$, and $T'$ the set of types compatible with the static type of $r$. Then the following is true:
  \begin{itemize}
    \item $\tau_k\ne\top_T$;
    \item if $\tau_k=T'$ then the corresponding call site is monomorphic;
    \item if $\tau_k\subset T'$ then the call site is polymorphic.
- \end{itemize}
+ \end{itemize}  
  
  From the conditions of the Lemma, 
  \begin{equation}
@@ -537,14 +548,14 @@ We will now show that if a receiver ever gets mapped to top, then it is a correl
    For an IFDS problem $P$, let $n\in N^*$ be a node, and $d\in D$ a dataflow fact such there exists a realizable path $p\in\textsf{RP}(n,\,d)$.
    Then, if there exists a receiver $r\in R$, such that
   \[
-    \resultIDE\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)=\top_T\,,
+    \resultIDE\left(\transCC_{\{r\}}(P)\right)(n)(d)(r)=\top_T\,,
   \]
   then $r\in \rcc$.
 \end{lemma}
 \begin{proof}
   As shown in~\eqref{eq:resultThroughEdgefn},
   \[
-    \resultIDE\left(\transCC_{\{r\}}(P)\right)(n,\,d)(r)=\bigcup_{q\in\ivp(n)}\bigcup_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn{\{r\}}(q')(\topcc)(r)\,.
+    \resultIDE\left(\transCC_{\{r\}}(P)\right)(n)(d)(r)=\bigcup_{q\in\ivp(n)}\bigcup_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn{\{r\}}(q')(\topcc)(r)\,.
   \]
   Since the latter is equal to $\top_T$, it follows that for each realizable path $p'$ to node $n$, $\ccedgefn{\{r\}}(p')(\top)(r)=\top_T$. According to~Lemma~\ref{lem:ccrectop}, this is only possible if $r\in\rcc$.
 \end{proof}
@@ -552,17 +563,14 @@ We will now show that if a receiver ever gets mapped to top, then it is a correl
 Finally, we present the proof for Lemma~\ref{lem:onlycorrrec} which states that a correlated-calls analysis that considers all receivers computes the same result as an analysis that considers only correlated-call receivers.
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:onlycorrrec}}]
-  From Section~\ref{sec:ideToIfds} we know that
-  \[
+  By definition of $\backCC$,
+  \begin{align*}
     \backCC(\resultIDE\left(\transCC_R(P)\right))
-    =\lambda n.\{d\,|\,\resultIDE(\transCC_R(P))(n)=(d,\,\ell),\,\forall r\,.\,\ell(r)\ne\topcc\}\,.
-  \]
-  We can rewrite this equation as follows:
-  \[
-    \backCC(\resultIDE\left(\transCC_R(P)\right))
-    =\lambda n.\{d\,|\,\forall r,\,\resultIDE(\transCC_R(P))(n)=(d,\,\ell),\,\forall r\,.\,\ell(r)\ne\topcc\}\,.
-  \]
+    &=\{d\,|\,\resultIDE(\transCC_R(P))(n)(d)=\ell,\,\forall r\,.\,\ell(r)\ne\top_T\}\\
+    &=\{d\,|\,\forall r\in R,\,\resultIDE(\transCC_R(P))(n)(d)(r)\ne\top_T\}.
+  \end{align*}
   
+  \commentout{
   \begin{align*}
     \backCC(\resultIDE\left(\transCC_R(P)\right))
     &=\left\{(n,\,D_n^\Subset(\resultIDE(\transCC_R(P))))\ |\ n\in N^*\right\}.
@@ -573,19 +581,13 @@ Finally, we present the proof for Lemma~\ref{lem:onlycorrrec} which states that 
     &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall r\in R:\ \left\{(r,\,\resultIDE(\transCC_{\{r\}}(P))(n,\,d)(r))\ |\ r\in R\right\}(r)\ne\top_T\right\}\\
     &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall\bm{r\in R}:\ \resultIDE(\transCC_{\{r\}}(P))(n,\,d)(r)\ne\top_T\right\}.
   \end{align*}
-
-Since, according to Lemma~\ref{lem:ccrectop}, $\resultIDE(\transCC_{\{r\}}(P))(n,\,d)(r)$ can only be equal to $\top_T$ when $r\in\rcc$, we can conclude that
-  \begin{align*}
-    D_n^\Subset&(\resultIDE(\transCC_R(P))))\\
-    &=\left\{d\ |\ d\in\mvp F(n)\,\wedge\,\forall\bm{r\in\rcc}:\ \resultIDE(\transCC_{\{r\}}(P))(n,\,d)(r)\ne\top_T\right\}\\
-    &=D_n^\Subset(\resultIDE(\transCC_\rcc(P)))).
-  \end{align*}
-  
-  Therefore,
+  }
+Since, according to Lemma~\ref{lem:ccrectop}, $\resultIDE(\transCC_{\{r\}}(P))(n)(d)(r)$ can only be equal to $\top_T$ when $r\in\rcc$, we can conclude that
   \begin{align*}
     \backCC(\resultIDE\left(\transCC_R(P)\right))
-    &=\left\{(n,\,D_n^\Subset(\resultIDE(\transCC_\rcc(P))))\ |\ n\in N^*\right\}\\
-    &=\backCC(\resultIDE\left(\transCC_\rcc(P)\right))\,.\qedhere
+    &=\{d\,|\,\bm{\forall r\in\rcc},\,\resultIDE(\transCC_{\bm\rcc}(P))(n)(d)(r)\ne\top_T\}\\
+    &=\backCC(\resultIDE\left(\transCC_\rcc(P)\right)).
+    \qedhere
   \end{align*}
 \end{proof}
 

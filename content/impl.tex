@@ -213,14 +213,14 @@ of a supergraph edge $e$ is defined as:
   \begin{align}\label{eq:varepsilon}
       &\varepsilon_S(e)= \lambda m\,.\,\\
         &\begin{cases}
-            m[r\to m(r)\cap \tau(s_\mathcal F,\,f)],
+            m[r\to m(r)\cap \tau(s,\,f)],
             &\text{\parbox{75mm}{
                 if $e$ is a call-start edge, $r.c()$ is
                 the call site at $\src e$, $f$ is the called
-                procedure with signature $s_\mathcal F$,
+                procedure with signature $s$,
                 and $r\in S$;}}\\[3ex]
         \parbox{30mm}{\[\begin{array}{l}
-                m[r\to m(r)\cap \tau(s_\mathcal F,\,f)]\\
+                m[r\to m(r)\cap \tau(s,\,f)]\\
             [v_1\to\bot_T] \ldots [v_k\to\bot_T],
         \end{array}
         \]
@@ -232,7 +232,7 @@ of a supergraph edge $e$ is defined as:
                 corresponding to the return node
                 at $\target e$,
                 $f$ is the called method with
-                signature $s_\mathcal F$,
+                signature $s$,
                 $v_1,\,\dots,\,v_k\in S$ are the local variables
                 in $f$,
                 and $r\in S$;}}\\
@@ -308,31 +308,31 @@ Finally, the correlated-calls transformation is defined as
 
 %Then, for an edge $e$, the correlated-call micro functions can be defined as $\ccedgefn R$ and a correlated-calls transformation is defined as $\transCC_R$.
 
-\subsection{Converting IDE Results to IFDS Results}\label{sec:ideToIfds}
+\subsection{Converting IDE Results to IFDS Results}\label{sec:ideToIfds}\mtodo{I changed the formalisms in this section. Please see if you agree to these changes.}
 
 For each program point $n$, the result of an IFDS analysis gives
 a set of facts $d$ that may be reached at $n$. The result of an IDE analysis
 pairs each such fact~$d$ with a lattice element $\ell$. Formally,
 for an IFDS problem $P$, the result $\resultIFDS$ has type
-$N \to D$.
-\mtodo{Should it be $N^*$ and $\resultIDE(Q)$?}
-Similarly, for an IFDS problem $Q$, the result $\resultIDE$
-has type $N \to D \times L$.
+$N^* \to D$.
+Similarly, for an IDE problem $Q$, the result $\resultIDE(Q)$
+has type $N \to (D \to L)$.
 
 Recall that in the equivalence transformation lattice $L^\equiv$, $\bot$ means reachable
 and $\top$ means unreachable.
-Therefore, a result $\rho$ of the equivalence IDE analysis
+Therefore, a result $\rho=\resultIDE(\transEq(P))$ of the equivalence IDE analysis
 is converted to an IFDS result as follows:
-$\backEq(\rho) = \lambda n.\{d\mid\rho(n) = (d,\top)\}$.
-\mtodo{For the proofs, instead of talking about the transformation for an equivalence-IDE problem,
-we should talk about the equivalence transformation for any IDE problem. So we should define
-$\backEq(\rho) = \lambda n.\{d\mid\rho(n) = (d,\ell),\,\ell\ne\topcc\}$.}
+\begin{equation}\label{eq:transEqDef}
+  \backEq(\rho) = \lambda n.\{d\mid\rho(n)(d)\ne\top\}.
+\end{equation}
 
 In the correlated-calls transformation lattice $\lcc$, a map that maps any receiver
 to the empty set of possible types means that the corresponding data flow path is
-infeasible. Therefore, a result $\rho$ of the correlated-calls IDE analysis is
+infeasible. Therefore, a result $\rho=\resultIDE(\transCC S(P))$ of the correlated-calls IDE analysis is
 converted to an IFDS result as follows:
-$\backCC(\rho) = \lambda n.\{d\mid\rho(n) = (d,\ell), \forall r\,.\, \ell(r) \neq \top\}$.\mtodo{Should it be $\ell(r)\ne\top_T$?}
+\begin{equation}\label{eq:transCcDef}
+  \backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)\neq\top_T\}.
+\end{equation}
 
 \commentout{
 
