@@ -286,18 +286,18 @@ For each edge $e = (n_1,d_1) \to (n_2,d_2)$, $\ccedgefn S(e)$ is defined as foll
 \begin{example}
   Consider the program from Listing~\ref{list:ccexample}, whose exploded supergraph appeared in Figure~\ref{fig:cc_edgefn_example}.
 
-  Returning a secret value in method \verb'A.foo' creates a ``diagonal'' edge from the $\Lambda$-fact to the secret fact $\psi$. 
+  Returning a secret value in method \code{A.foo} creates a ``diagonal'' edge from the $\Lambda$-fact to the secret fact $\psi$. 
   The diagonal edge is labeled with the micro function $\lambda m\,.\,\botcc$. Thus, at the end node of the method, every receiver is mapped to the set of all types~$\bot_T$.
   
-On the end-return edge from \verb'A.foo' to \verb'main', the set of types for the receiver \verb'a' is restricted by the micro function $\lambda m\,.\,m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$ on the edge corresponding to the assignment of the return value $\psi$ to \verb'v'.
+On the end-return edge from \code{A.foo} to \code{main}, the set of types for the receiver \code{a} is restricted by the micro function $\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code A\}]$ on the edge corresponding to the assignment of the return value $\psi$ to \code v.
 
-Similarly, on the call-start edge from \verb'main' to \verb'B.bar', the possible types
-of the receiver \verb'a' are further restricted by the micro-function
-$\lambda m\,.\,m[\texttt a\to m(\texttt a)\cap\{\texttt B\}]$.
-on the edge that passes the argument \verb'v' to the parameter \verb's'.
+Similarly, on the call-start edge from \code{main} to \code{B.bar}, the possible types
+of the receiver \code{a} are further restricted by the micro-function
+$\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code B\}]$.
+on the edge that passes the argument \code{v} to the parameter \code{s}.
 
 The composition of these micro functions results in the empty set as the possible
-types of the receiver \verb'a', indicating that this data flow path that would
+types of the receiver \code{a}, indicating that this data flow path that would
 result in an information leak is actually infeasible.
 \end{example}
 

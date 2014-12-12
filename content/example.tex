@@ -42,16 +42,16 @@ all interesting issues arise from interprocedural control flow. In particular,
 note that, since the variable \code{a} may point to either an \code{A}-object or a \code{B}-object, 
 the call on line~\ref{line:callfoo} may dispatch to either \code{A.foo()} or to \code{B.foo()},
 and this is reflected by edges  
-  from the node labeled $\code{call}_\code{foo}$ to the nodes labeled
-  $\code{Start}_\code{A.foo()}$ and $\code{Start}_\code{B.foo()}$
+  from the node labeled $\highlight{\code{call}_\code{foo}}{greyblue}$ to the nodes labeled
+  $\highlight{\code{start}_\code{A.foo()}}{bisque}$ and $\highlight{\code{start}_\code{B.foo()}}{lightsalmonpink}$
 and by edges
-  from the nodes labeled $\code{End}_\code{A.foo}$ and $\code{End}_\code{B.foo}$ 
-  to the node labeled  $\code{return}_\code{foo}$.  
-Similarly, there are edges from the node labeled $\code{call}_\code{bar}$ to the nodes 
-$\code{Start}_\code{A.bar()}$ and $\code{Start}_\code{B.bar()}$, and 
+  from the nodes labeled $\highlight{\code{end}_\code{A.foo}}{bisque}$ and $\highlight{\code{end}_\code{B.foo}}{lightsalmonpink}$ 
+  to the node labeled  $\highlight{\code{return}_\code{foo}}{greyblue}$.  
+Similarly, there are edges from the node labeled $\highlight{\code{call}_\code{bar}}{greyblue}$ to the nodes 
+$\highlight{\code{start}_\code{A.bar()}}{bisque}$ and $\highlight{\code{start}_\code{B.bar()}}{lightsalmonpink}$, and 
 edges
-  from the nodes labeled $\code{End}_\code{A.bar}$ and $\code{End}_\code{B.bar}$ 
-  to the node labeled  $\code{return}_\code{bar}$. 
+  from the nodes labeled $\highlight{\code{end}_\code{A.bar}}{bisque}$ and $\highlight{\code{end}_\code{B.bar}}{lightsalmonpink}$ 
+  to the node labeled  $\highlight{\code{return}_\code{bar}}{greyblue}$. 
  
 Informally speaking, an IFDS-based dataflow analysis propagates dataflow facts along the edges
 of a control flow supergraph such as the one in Figure~\ref{fig:examplesupergraph}. The
@@ -80,15 +80,15 @@ The main contribution of this paper is an algorithm for transforming an IFDS pro
 into an IDE problem that expresses the feasibility of paths
 in light of correlated calls.
 Informally speaking, our approach associates with each edge in an
-interprocedural control flow graph a function that records the types of 
+interprocedural CFG a function that records the types of 
 variables that are used as the receiver of correlated method calls. Paths that 
 are composed of edges in which the same receiver expression has different types
 are infeasible, and the propagation of dataflow facts along such paths is
 prevented. Applying our technique to an IFDS-based taint analysis would enable
 the resulting IDE-based taint analysis to determine that no secret value can flow from
-line~\ref{line:Afoo} to the print statement on line~\ref{line:Bbar}. 
- 
-
+line~\ref{line:Afoo} to the print statement on line~\ref{line:Bbar}.
+\mtodo{Maybe emphasize that more generally, the program is not
+considered to leak secret information, and not mention the line numbers?}
 
   
 \commentout{
