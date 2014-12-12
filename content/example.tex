@@ -1,43 +1,6 @@
 \section{Motivating Example}
   \label{sec:MotivatingExample}
   
-\newcommand{\code}[1]{\textsf{#1}}  
-\definecolor{sh_comment}{rgb}{0.12, 0.38, 0.18}
-\definecolor{sh_keyword}{rgb}{0.37, 0.08, 0.25}  % #5F1441
-\definecolor{sh_string}{rgb}{0.06, 0.10, 0.98} % #101AF9
-\definecolor{KWColor}{rgb}{0.5,0,0.67}
-\definecolor{CommentColor}{rgb}{0.15,0.5,0.15}
-\lstdefinelanguage{scala}[]{Java}{
-   morekeywords={trait,def,object,with,override,val,type,var} 
-}
-
-\lstdefinestyle{Eclipse}{
-  xleftmargin=0pt,
-  language = scala,
-  basicstyle=\sffamily\small,
-  stringstyle=\color{sh_string},
-  keywordstyle = \color{sh_keyword}\bfseries,  %}
-  lineskip=-0.0em,
-  commentstyle=\color{sh_comment}\itshape,  
-  escapeinside={/*@}{@*/},
-  numbersep=5pt,
-  captionpos=b,
-  xleftmargin=0.4cm, xrightmargin=0.5cm,
-   morekeywords={invokestatic,invokeinterface,invokevirtual,invokespecial},
-}
-
-
-\lstset{
-  showspaces=false,showtabs=false,tabsize=2,columns=flexible,
-  morekeywords={trait,def,object,with},
-  language={scala},
-  style=Eclipse,
-  numbers=left,
-  numberstyle=\scriptsize\color{CommentColor},
-  firstnumber=last,
-  showstringspaces=true
-}  
-  
 In this section, we illustrate our approach using a small motivating example that
 shows how our technique can be used to improve the precision of taint analysis.
 A taint analysis is a specialized dataflow analysis for computing how string values
