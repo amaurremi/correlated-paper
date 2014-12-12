@@ -314,19 +314,25 @@ For each program point $n$, the result of an IFDS analysis gives
 a set of facts $d$ that may be reached at $n$. The result of an IDE analysis
 pairs each such fact~$d$ with a lattice element $\ell$. Formally,
 for an IFDS problem $P$, the result $\resultIFDS$ has type
-$N \to D$.\mtodo{Should it be $N^*$?} Similarly, for an IFDS problem $Q$, the result $\resultIDE$
+$N \to D$.
+\mtodo{Should it be $N^*$ and $\resultIDE(Q)$?}
+Similarly, for an IFDS problem $Q$, the result $\resultIDE$
 has type $N \to D \times L$.
 
 Recall that in the equivalence transformation lattice $L^\equiv$, $\bot$ means reachable
-and $\top$ means unreachable. Therefore, a result $\rho$ of the equivalence IDE analysis
+and $\top$ means unreachable.
+Therefore, a result $\rho$ of the equivalence IDE analysis
 is converted to an IFDS result as follows:
 $\backEq(\rho) = \lambda n.\{d\mid\rho(n) = (d,\top)\}$.
+\mtodo{For the proofs, instead of talking about the transformation for an equivalence-IDE problem,
+we should talk about the equivalence transformation for any IDE problem. So we should define
+$\backEq(\rho) = \lambda n.\{d\mid\rho(n) = (d,\ell),\,\ell\ne\topcc\}$.}
 
 In the correlated-calls transformation lattice $\lcc$, a map that maps any receiver
 to the empty set of possible types means that the corresponding data flow path is
 infeasible. Therefore, a result $\rho$ of the correlated-calls IDE analysis is
 converted to an IFDS result as follows:
-$\backCC(\rho) = \lambda n.\{d\mid\rho(n) = (d,\ell), \forall r\,.\, \ell(r) \neq \top\}$.
+$\backCC(\rho) = \lambda n.\{d\mid\rho(n) = (d,\ell), \forall r\,.\, \ell(r) \neq \top\}$.\mtodo{Should it be $\ell(r)\ne\top_T$?}
 
 \commentout{
 
