@@ -6,12 +6,18 @@ In this appendix we present the proofs to the Lemmas introduced in Section~\ref{
 We start by proving the Lemmas of Soundness and Precision of the correlated-calls analysis.
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:subsetifds}}]
+  Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
+  nodes $n\in N^*$ to sets of data-flow facts $\delta\in2^D$. Specifically,
+  \begin{equation}
+    \resultIFDS(P)=\lambda n\,.\,\mvp F(n).
+  \end{equation}
   The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
   \begin{align*}
-    \backCC\left(\resultIDE(\transCC_R(P))\right)(n)&=\{(n',\,D_n'^\Subset(\resultIDE(\transCC_R(P))))\ |\ n\in N^*\}(n)\\
-      &=D_n^\Subset(\resultIDE(\transCC_R(P)))\\
-      &\subseteq\mvp F(n)\\
-      &=\resultIFDS(P)(n)\,.\qedhere
+    \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
+    &=\left(\lambda n'\,.\,\left\{d\,|\,\resultIDE(\transCC_R(P))(n')=(d,\,\ell),\,\forall r\,.\,\ell(r)\ne\top_T\right\}\right)(n)\\
+    &=\left\{d\,|\,\resultIDE(\transCC_R(P))(n)=(d,\,\ell),\,\forall r\,.\,\ell(r)\ne\top_T\right\}\\
+    &\subseteq\left\{d\,|\,\resultIDE(\transCC_R(P))(n)=(d,\,\ell),\,\ell\ne\topcc\right\}\\
+    &=\backEq\left(\resultIDE(\transCC_R(P))(n)\right)\,.\qedhere
   \end{align*}
 \end{proof}
 
