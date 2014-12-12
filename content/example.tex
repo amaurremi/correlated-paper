@@ -233,9 +233,9 @@ to \code{A.foo()} and where the call to \code{bar()} dispatches to \code{B.bar()
 are infeasible.  
 
 The main contribution of this paper is an algorithm for transforming an IFDS problem 
-into an IDE problem in which the feasibility of paths in the presence of 
-correlated is encoded into the environment functions. 
-Informally speaking, our approach associates with each edge in an (exploded) 
+into an IDE problem that expresses the feasibility of paths
+in light of correlated calls.
+Informally speaking, our approach associates with each edge in an
 interprocedural control flow graph a function that records the types of 
 variables that are used as the receiver of correlated method calls. Paths that 
 are composed of edges in which the same receiver expression has different types
