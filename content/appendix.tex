@@ -543,10 +543,20 @@ We will now show that if a receiver ever gets mapped to top, then it is a correl
   Since the latter is equal to $\top_T$, it follows that for each realizable path $p'$ to node $n$, $\ccedgefn{\{r\}}(p')(\top)(r)=\top_T$. According to~Lemma~\ref{lem:ccrectop}, this is only possible if $r\in\rcc$.
 \end{proof}
 
-Finally, we present the proof for Lemma~\ref{lem:onlycorrec} which states that a correlated-calls analysis that considers all receivers computes the same result as an analysis that considers only correlated-call receivers.
+Finally, we present the proof for Lemma~\ref{lem:onlycorrrec} which states that a correlated-calls analysis that considers all receivers computes the same result as an analysis that considers only correlated-call receivers.
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:onlycorrrec}}]
-  From~\eqref{eq:ucc} we know that
+  From Section~\ref{sec:ideToIfds} we know that
+  \[
+    \backCC(\resultIDE\left(\transCC_R(P)\right))
+    =\lambda n.\{d\,|\,\resultIDE(\transCC_R(P))(n)=(d,\,\ell),\,\forall r\,.\,\ell(r)\ne\topcc\}\,.
+  \]
+  We can rewrite this equation as follows:
+  \[
+    \backCC(\resultIDE\left(\transCC_R(P)\right))
+    =\lambda n.\{d\,|\,\forall r,\,\resultIDE(\transCC_R(P))(n)=(d,\,\ell),\,\forall r\,.\,\ell(r)\ne\topcc\}\,.
+  \]
+  
   \begin{align*}
     \backCC(\resultIDE\left(\transCC_R(P)\right))
     &=\left\{(n,\,D_n^\Subset(\resultIDE(\transCC_R(P))))\ |\ n\in N^*\right\}.
