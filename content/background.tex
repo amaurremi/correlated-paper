@@ -7,10 +7,8 @@ This section defines basic terminology and presents the IFDS and IDE algorithms.
 
 \subsection{Terminology and Notation}
 %We will start by introducing several concepts used by the IFDS and IDE analyses.
-\begin{mdelete}\mtodo{We already say (but less precisely) what a CFG is in the introduction.}
 The \textit{control-flow graph} of a procedure is a directed graph whose nodes are instructions, and which contains an edge from $n_1$ to $n_2$ whenever
 $n_2$ may execute immediately after $n_1$. A CFG has a distinguished \textit{start node} \textsf{start}$_p$ and \textit{end node} \textsf{end}$_p$.
-\end{mdelete}
 %and edges represent transfer of control between the instructions during an execution of the program. 
 %A control-flow graph has a unique start node, $\startmain$, which is the node corresponding to the program entrypoint.
 %An \textit{intra-procedural} path is a path in a control-flow graph whose nodes are in the same procedure. By contrast, an \textit{inter-procedural path} is one that contains nodes from different procedures. 
@@ -677,9 +675,6 @@ to each supergraph edge.
 The output of the IDE algorithm is, for each node $n$ in the supergraph,
 the \textit{meet-over-all-valid-paths} solution
   $\mvp{\textsf{Env}}(n)=\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\top)$,
-  \mtodo{I like that the text is now very compact. But I wonder if some of the formulas should be put
-  on a separate line and enumerated. For example, I need to reference the definition of $\textsf{MVP}_{\textsf{Env}}$ in the
-  proof, but since it's embedded in the text, I'm repeating the formula in the appendix and reference the section. Is that fine?}
 where $M_\textsf{Env}$ is extended from edges to paths by composition.
 
 \commentout{

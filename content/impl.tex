@@ -1,6 +1,5 @@
 \input{figures/fig-cc_edge_fn_example}
 
-\mtodo{In Figure~\ref{fig:cc_edgefn_example}, should we say that $\psi$ corresponds to the function's return value?}
 \otodo{we agreed to move this figure to the initial example section}
   \mtodo{Move Figure~\ref{fig:cc_edgefn_example} up to where it's mentioned first? If yes, the caption won't make sense.}
 
@@ -286,10 +285,10 @@ For each edge $e = (n_1,d_1) \to (n_2,d_2)$, $\ccedgefn S(e)$ is defined as foll
 \begin{example}
   Consider the program from Listing~\ref{list:ccexample}, whose exploded supergraph appeared in Figure~\ref{fig:cc_edgefn_example}.
 
-  Returning a secret value in method \code{A.foo} creates a ``diagonal'' edge from the $\Lambda$-fact to the secret fact $\psi$. 
+  Returning a secret value in method \code{A.foo} creates a ``diagonal'' edge from the $\Lambda$-fact to the method's return value $r$. 
   The diagonal edge is labeled with the micro function $\lambda m\,.\,\botcc$. Thus, at the end node of the method, every receiver is mapped to the set of all types~$\bot_T$.
   
-On the end-return edge from \code{A.foo} to \code{main}, the set of types for the receiver \code{a} is restricted by the micro function $\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code A\}]$ on the edge corresponding to the assignment of the return value $\psi$ to \code v.
+On the end-return edge from \code{A.foo} to \code{main}, the set of types for the receiver \code{a} is restricted by the micro function $\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code A\}]$ on the edge corresponding to the assignment of the return value $r$ to \code v.
 
 Similarly, on the call-start edge from \code{main} to \code{B.bar}, the possible types
 of the receiver \code{a} are further restricted by the micro-function
@@ -308,7 +307,7 @@ Finally, the correlated-calls transformation is defined as
 
 %Then, for an edge $e$, the correlated-call micro functions can be defined as $\ccedgefn R$ and a correlated-calls transformation is defined as $\transCC_R$.
 
-\subsection{Converting IDE Results to IFDS Results}\label{sec:ideToIfds}\mtodo{I changed the formalisms in this section. Please see if you agree to these changes.}
+\subsection{Converting IDE Results to IFDS Results}\label{sec:ideToIfds}
 
 For each program point $n$, the result of an IFDS analysis gives
 a set of facts $d$ that may be reached at $n$. The result of an IDE analysis
