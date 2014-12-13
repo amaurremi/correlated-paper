@@ -59,11 +59,11 @@ We also show that the correlated-calls analysis is sound, i.e., that it never co
 This is illustrated schematically
 in Figure~\ref{fig:transformations}%
 \footnote{ 
-  The labels $\resultIDE$, $\resultIFDS$, $\backEq$, $\backCC$, $\transEq$, and $\transCC$
+  The labels %$\resultIDE$, $\resultIFDS$, $\backEq$, $\backCC$, $\transEq$, and $\transCC$
   on edges in 
   Figure~\ref{fig:transformations} reflect a number of mappings and projections 
-  that will be defined in Section~\TODO{ref} and that can be ignored here.
-}.\mtodo{In the footnote, should we just say "the labels" since there are so many?}
+  that will be defined in Section~\ref{sec:ccdatastr} and that can be ignored here.
+}.
 
 We implemented the correlated-calls transformation and the IDE algorithm in Scala,
 on top of the WALA framework for static analysis of JVM bytecode~\cite{fink2012wala}.
@@ -95,40 +95,8 @@ and a proof of its correctness.
 The implementation of our approach and preliminary experiments are discussed
 in Section~\ref{chapter:eval}.
 %
-Related work is discussed in Section~\TODO{ref}.
+Related work is discussed in Section~\ref{sec:Related}.
 %
-Finally, conclusions and directions for future work are presented in Section~\TODO{ref}.
+Finally, conclusions and directions for future work are presented in Section~\ref{sec:Conclusions}.
  
  
-\commentout{
-Static program analysis aims to discover properties of computer programs without running them.
-Static analysis has applications in compiler optimization, development of programming tools, and computer security, among others.
-As an example, we might want to analyze a program to know which variables are constants. 
-We could then write a compiler optimization that ensures that the values of those variables are computed only once.
-Alternatively, we could use the information about constant variables in an integrated development environment; for instance, to notify the user when an if-expression executes only one of its branches because its test condition has a constant value.
-
-There are demonstrable limits on what information we can obtain about a program without running it.
-Rice's theorem states that verifying any non-trivial property of a program is an undecidable problem~\cite{rice1953classes}. However, it is sometimes possible to design an algorithm that \textit{over}- or \textit{underapproximates} the solution that we are seeking.
-
-\textit{Data-flow analysis} is an area of program analysis whose goal is to compute approximations of certain information (for example, which variables must be constants) for each program point. 
-
-Other examples of data-flow analyses are \textit{reaching definitions} (finding out up to which instruction a given assignment of a variable must be valid) and \textit{available expressions} (retrieving the expressions in the program that do not need to be recomputed at a given program point).
-
-Another example of a data-flow analysis is \textit{taint analysis}~\cite{tripp2009taj}. Taint analysis discovers if ``secret'' values, like passwords or other confidential user information, can leak to an external observer. Methods that generate secret values, e.g. those that read user input, are called \textit{sources}. Methods that can leak information, e.g. those that write data to a file or send data through a network, are called \textit{sinks}. The goal of taint analysis is to find out whether data can propagate from sources to sinks.
-
-An important property of a data-flow analysis is \textit{precision}.
-Precision reflects how closely a data-flow-analysis result over- or underapproximates the information we are interested in. In the case of taint analysis, let $T$ be the number of sinks that the analysis considers to leak secret information, and $R$ the real number of potential information leaks. The smaller the difference between $T$ and $R$, the greater the precision of the taint analysis.
-
-Data-flow analyses operate on \textit{control-flow graphs} that model the order in which the instructions of a program are executed.
-A data-flow-analysis problem defines \textit{flow functions} that represent how data is propagated along the edges of the control-flow graph. The \textit{confluence operator} specifies how the data that has been computed along different paths should be merged when the paths join.
-
-Since a control-flow graph is an overapproximation of the possible flows of control in concrete executions of a program, the graph may contain \textit{infeasible} paths that cannot occur at runtime.
-
-One way to improve the precision of a data-flow analysis is to detect and eliminate infeasible paths.
-
-Our goal is to improve the precision of solutions to problems that can be solved by the \textit{Inter-procedural Finite Distributive Subset} (IFDS) algorithm~\cite{reps1995precise}.
-The IFDS algorithm is a general data-flow algorithm that can compute solutions to various data-flow problems, like reaching definitions, available expressions, and taint analysis.
-
-We improve the precision of IFDS problem solutions by eliminating infeasible paths that occur in object-oriented programs in the presence of \textit{correlated method calls}~--- polymorphic calls that are invoked on the same object~\cite{DBLP:journals/scp/Tip15}.
-}
-
