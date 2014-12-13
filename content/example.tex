@@ -7,8 +7,8 @@ A taint analysis is a specialized dataflow analysis for computing how string val
 may flow from ``sources'', which are typically statements that read untrusted input, 
 to ``sinks'', which are typically security-sensitive
 operations such as calls to 
-a database. In previous research \TODO{cite}, taint analysis algorithms have been 
-formulated as IFDS problems.     
+a database. In previous research \cite{DBLP:conf/issta/GuarnieriPTDTB11,DBLP:conf/pldi/ArztRFBBKTOM14}, 
+taint analysis algorithms have been formulated as IFDS problems.     
   
 \input{figures/fig-examplesupergraph}
   
@@ -59,8 +59,9 @@ of a control flow supergraph such as the one in Figure~\ref{fig:examplesupergrap
 IFDS algorithm was carefully designed to avoid infeasible paths that may arise in the
 presence of multiple calls to the same method. However, in this example all methods are
 called in exactly one place, so IFDS is unable to eliminate dataflow along any of the
-paths shown in the figure. As a result, an IFDS-based taint analysis such as the
-one of \TODO{cite} would report that the secret value read on line~\ref{line:Afoo}
+paths shown in the figure. As a result, IFDS-based taint analysis algorithms such as
+\cite{DBLP:conf/issta/GuarnieriPTDTB11,DBLP:conf/pldi/ArztRFBBKTOM14} would report 
+that the secret value read on line~\ref{line:Afoo}
 might flow to the print statement on line~\ref{line:Bbar}. 
 
 As we discussed previously, the calls to \code{foo()} and \code{bar()} may dispatch
@@ -87,51 +88,18 @@ are composed of edges in which the same receiver expression has different types
 are infeasible, and the propagation of dataflow facts along such paths is
 prevented. Applying our technique to an IFDS-based taint analysis would enable
 the resulting IDE-based taint analysis to determine that no secret value can flow from
-line~\ref{line:Afoo} to the print statement on line~\ref{line:Bbar}.
-\mtodo{Maybe emphasize that more generally, the program is not
-considered to leak secret information, and not mention the line numbers?}
+line~\ref{line:Afoo} to the print statement on line~\ref{line:Bbar}. 
 
+In summary, the example discussed in this section shows how the precision of 
+IFDS-based taint analysis can be improved by taking into account how paths
+become infeasible in the presence of correlated calls. In particular, we have
+shown how a false positive reported by a standard IFDS-based algorithm is eliminated.
+While the discussion in this section has focused on the specific problem of taint analysis,
+we would like to emphasize that our technique generally applies to \textit{any}
+dataflow analysis problem that can be expressed in the IFDS framework. This includes
+many common analysis tasks such as \TODO{please add a few examples + citations} 
+
+
+ 
   
-\commentout{
 
-Consider a call site~$r.m()$ in an object-oriented programming language, where the variable~$r$ is the \textit{receiver} variable of the call site and $m$ is the name of the invoked method\footnote{We assume an internal representation of the program in which for each call site $e_r.m()$, the expression~$e_r$ has been evaluated to the variable~$r$.}. In the rest of the paper, we use the general term \textit{receiver} to mean a receiver variable.
-At runtime, the actual method that will be invoked by the call site depends on the runtime type of the object referenced by $r$. If the call site $r.m()$ can be associated with more than one method at compile time, we will say that the call site is \textit{polymorphic}.
-
-For example, in Listing~\ref{list:ccexample}, it is not possible to infer statically whether the runtime type of the variable \verb'a' in the \texttt{main} method is \verb'A' or \verb'B'.
-The call \verb'a.foo()' can be dispatched to either \verb'A.foo' or \verb'B.foo', and \verb'a.bar(v)' can be dispatched to either \verb'A.bar' or \verb'B.bar'.
-A concrete execution path for the main method might therefore go through \verb'A.foo' and \verb'A.bar', or through \verb'B.foo' and \verb'B.bar'.
-However, there cannot be an execution path through \verb'A.foo' and \verb'B.bar' or through \verb'B.foo' and \verb'A.bar'.
-
-
-
-We call the invocations to methods \verb'foo' and \verb'bar' \textit{correlated}.
-More generally, correlated calls occur when more than one polymorphic call is invoked on the same receiver variable.
-
-Suppose we wanted to perform a taint analysis on the program in Listing~\ref{list:ccexample}.
-Most dataflow-analysis algorithms, including IFDS, would conservatively assume that the call \verb'a.bar' could be dispatched to both \verb'A.bar' and \verb'B.bar', independently of what \verb'a.foo' had been dispatched to in the previous line.
-
-As a result, 
-such an analysis would consider a path through \verb'A.foo' and \verb'B.bar' feasible. This means that the variable \verb'v' would be considered secret. We would conclude that a secret value is passed to \verb'B.bar' and printed to the user. In other words, we would consider the program to leak secret information, which it does not do in any concrete execution.
-
-\commentout{
-Our technique for improving the precision of an IFDS result is based on transforming the original IFDS problem into a more expressive \textit{Inter-procedural Distributive Environment} (IDE) problem. IDE problems can be solved with the IDE algorithm which is a generalization of IFDS~\cite{sagiv1996precise}. The IDE algorithm can, for instance, solve certain versions of the constant propagation problem that IFDS cannot.
-
-To improve the precision of IFDS results, given an IFDS problem $P$, we convert it into an IDE problem $Q$ that accounts for correlated calls. We then use the IDE algorithm to obtain a solution to $Q$. Finally, we convert the IDE result into a IFDS result. In the presence of correlated calls, the obtained IFDS result can be more precise than the solution that the IFDS algorithm would compute for $P$.
-
-The goal of the correlated-calls analysis presented in this work is to modify the output of an IFDS analysis to account for correlated calls. Specifically, the correlated-calls analysis improves the precision of IFDS problem results by eliminating infeasible execution paths caused by correlated calls. This is done by converting the input-IFDS problem to an IDE problem that detects infeasible paths, and converting the IDE result back to a more precise IFDS result.
-
-The contributions of this work are:
-\begin{itemize}
-  \item A transformation from IFDS to IDE problems that considers correlated calls.
-  \item An implementation in Scala of the correlated-calls transformation and the IDE algorithm which is based on the WALA framework for static analysis on Java bytecode~\cite{fink2012wala}.
-\end{itemize}\mtodo{Reference the figure here.}
-
-  We prove that the solution to an IDE problem that considers correlated calls is more precise than the solution to the original IFDS problem.
-  We also show that the correlated-calls analysis is sound, i.e. that it never considers concrete execution paths as infeasible.\mtodo{As discussed on the phone, we want to talk more about the results here.}
-
- Finally, we evaluate the effectiveness of the correlated-calls analysis using an implementation of taint analysis as the source IFDS problem.
-
-The remainder of this paper is organized as follows. In the next section, we describe the IFDS and IDE analyses in detail. In Section~\ref{chapter:cca} we present the correlated-calls analysis as a transformation of IFDS problems into a special kind of IDE problem. Section~\ref{sec:ccdatastr} describes an efficient representation of the data structures that are required to define a correlated-calls IDE transformation.
-In Section~\ref{chapter:eval} we address some implementation aspects of the correlated-calls analysis and present an evaluation of its results. Section~\ref{chapter:concl} contains concluding remarks. The proofs for the lemmas in the paper are provided in the Appendix.\mtodo{Reference appendix like this?}
-}
-}
