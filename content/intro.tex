@@ -62,7 +62,7 @@ in Figure~\ref{fig:transformations}%
   The labels %$\resultIDE$, $\resultIFDS$, $\backEq$, $\backCC$, $\transEq$, and $\transCC$
   on edges in 
   Figure~\ref{fig:transformations} reflect a number of mappings and projections 
-  that will be defined in Section~\ref{sec:ccdatastr} and that can be ignored here.
+  that will be defined in Section~\ref{sec:cca} and that can be ignored here.
 }.
 
 We implemented the correlated-calls transformation and the IDE algorithm in Scala,
@@ -90,7 +90,11 @@ Section~\ref{sec:MotivatingExample} presents a motivating example.
 Section~\ref{sec:bg} reviews the IFDS and IDE algorithms.
 %
 Section~\ref{sec:ccdatastr} presents the correlated-calls transformation
-and a proof of its correctness.
+and sketches a proof of its correctness%
+\footnote{
+  Detailed proofs of our lemmas and theorems can be found in
+  the supplemental materials that are included with this submission.
+}.
 %
 The implementation of our approach and preliminary experiments are discussed
 in Section~\ref{chapter:eval}.
@@ -98,5 +102,6 @@ in Section~\ref{chapter:eval}.
 Related work is discussed in Section~\ref{sec:Related}.
 %
 Finally, conclusions and directions for future work are presented in Section~\ref{sec:Conclusions}.
+
  
  
