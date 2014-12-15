@@ -226,7 +226,7 @@ We will now show that on a node of a concrete execution path, the correlated-cal
     The same reasoning applies to the case where $e_k$ is a call-start edge.
 \end{proof}
 
-For the following proofs, recall from Section~\ref{sec:ideToIfds} that the result of an IDE analysis maps a lattice element to each node in the exploded supergraph. Specifically, for an IDE problem $Q$, the result $\resultIDE(Q):\ N^*\to D\times L$ maps nodes of the supergraph to pairs of data-flow facts and lattice elements~\cite{sagiv1996precise}:
+For the following proofs, recall from Section~\ref{sec:ideToIfds} that the result of an IDE analysis maps a lattice element to each node in the exploded supergraph. Specifically, for an IDE problem $Q$, the result $\resultIDE(Q):\ N^*\to(D\to L)$ maps nodes of the supergraph to pairs of data-flow facts and lattice elements~\cite{sagiv1996precise}:
 \begin{equation}\label{eq:ideresult}
   \resultIDE(Q)=\lambda n\,.\,\lambda d\,.\,\mvp{\textsf{Env}}(n,\,d))\,.
 \end{equation}
@@ -594,50 +594,45 @@ Since, according to Lemma~\ref{lem:ccrectop}, $\resultIDE(\transCC_{\{r\}}(P))(n
 \section*{Representation of Micro Functions}
 In this part of the appendix we present the proofs to the Lemmas related to the representation of micro functions with update maps.
 
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:normeq}}]
-    Let $\updfun f^*=\setpair I U$.
-    For any $\tau\in T,$
-    \[
-        \begin{aligned}
-            \denote{\mathcal N(\updfun f^*)}(\tau)
-            &=\denote{\mathcal N(\langle I,\ U\rangle)}(\tau)\\
-            &=\denote{\setpair{I\cup U}U}(\tau)\\
-            &=\tau\cap(I\cup U)\cup U\\
-            &=(\tau\cap I)\cup(\tau\cap U)\cup U\\
-            &=\tau\cap I\cup U\\
-            &=\denote{\setpair IU}(\tau)\\
-            &=\denote{\updfun f^*}(\tau)\,.
-        \end{aligned}
-    \]
-    Thus, $\denote{\mathcal N(\updfun f^*)}=\denote{\updfun f^*}$.
+\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalEq}}]
+First, we need to show that for all $r\in R$ and ${m\in R\to2^T}$, if $I(r)=I'(r)$ and $U(r)=U'(r)$, then $\denote{\setpair IU}(m)(r)=\denote{\setpair{I'}{U'}}(m)(r)$. Indeed, we can see that
+\begin{align*}
+  \denote{\setpair IU}(m)(r)
+  &=\left(\lambda m'\,.\,\lambda r'\,.\,(m'(r')\cap I(r'))\cup U(r')\right)(m)(r)\\
+  &=(m(r)\cap I(r))\cup U(r)\\
+  &=(m(r)\cap I'(r))\cup U'(r)\\
+  &=\left(\lambda m'\,.\,\lambda r'\,.\,(m'(r')\cap I'(r'))\cup U'(r')\right)(m)(r)\\
+  &=\denote{\setpair{I'}{U'}}(m)(r).
+\end{align*}
+
+For the other direction, we need to show that if for any $r\in R$ and ${m\in R\to2^T}$, $(m(r)\cap I(r))\cup U(r)=(m(r)\cap I'(r))\cup U'(r)$, then for all $r'\in R$, $I(r')=I'(r')$ and $U(r')=U'(r')$.
+
+To prove that $U(r')=U'(r')$, we will pick $m(r)=\varnothing$.
+Then by our assumption, for all $r$, $U(r)=U'(r)$, and hence $U(r')=U'(r')$.
+
+To prove that $I(r')=I'(r')$, let us pick $m=I$. Then the assumption
+is $I(r)\cup U(r)=(I(r)\cap I'(r))\cup U'(r)$. By our definition, $U(r)\subseteq I(r)$, and we just proved that $U(r')=U'(r)$. Theorefore, $I(r)=(I(r)\cap I'(r))\cup U'(r)$.
+Additionally, $U'(r)\subseteq I'(r)$ and $U'(r)\subseteq I(r)$ (because $U'(r)=U(r)\subseteq I(r)$). This means that $U'(r)\subseteq I(r)\cap I'(r)$. Therefore, $I(r)=I(r)\cap I'(r)$,
+and we can conclude that $I(r)=I'(r)$.
 \end{proof}
 
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:normuneq}}]
-    Let us show that there always exists a set $\tau\subseteq T$ such that $\denote{\setpair IU}(\tau)\ne\denote{\setpair{I'}{U'}}(\tau)$. There are two cases:
-    \begin{enumerate}
-        \item $U\ne U'$. Then for the empty set $\tau=\varnothing$,
-            \[
-                \denote{\setpair IU}(\tau)=\denote{\setpair IU}(\varnothing)=(\varnothing\cap I)\cup U=U\,,
-            \]
-            whereas 
-            \[ 
-                \denote{\setpair {I'}{U'}}(\tau)=\denote{\setpair {I'}{U'}}(\varnothing)=(\varnothing\cap I')\cup U'=U'.
-            \]
-            Hence, $\denote{\setpair IU}\ne\denote{\setpair {I'}{U'}}$.
-        \item $I\ne I'$. Then for the set of all types $\tau=T$,
-            \[
-                \denote{\setpair IU}(\tau)=\denote{\setpair IU}(T)=(T\cap I)\cup U=I\cup U\,.
-            \]
-            Since $\setpair IU$ is normalized, $U\subseteq I$, and
-            \[
-                I\cup U= I\,.
-            \]
-            At the same time,
-            \[
-                \denote{\setpair {I'}{U'}}(\tau)=\denote{\setpair {I'}{U'}}(T)=(T\cap I')\cup U'=I'\cup U'=I'\,.
-            \]
-            Since $I\ne I'$, it follows that $\denote{\setpair IU}\ne \denote{\setpair {I'}{U'}}$. \qedhere
-    \end{enumerate}
+\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalComp}}]
+For all $r\in R$ and $m\in R\to2^T$,
+\begin{align*}
+  &\denote{\setpair IU\circ\setpair{I'}{U'}}(m)(r)\\
+  &=\denote{\setpair{\lambda r'\,.\,(I(r')\cap I'(r'))\cup U(r')}
+                    {\lambda r'\,.\,(I(r')\cap U'(r'))\cup U(r')}}(m)(r)\\
+  &=(m(r)\cap(I(r)\cap I'(r))\cup U(r))\cup(I(r)\cap U'(r))\cup U(r)\\
+  &=(m(r)\cap I'(r))\cup I(r)\cup (U'(r)\cap I(r))\cup U(r)\\
+  &=(((m(r)\cap I'(r))\cup U'(r))\cap I(r))\cup U(r)\\
+  &=\left(\lambda r'.(((m(r')\cap I'(r'))\cup U'(r'))\cap I(r'))\cup U(r')\right)(r)\\
+  &=\left(\lambda m'.\lambda r'.(m'(r')\cap I(r'))\cup U(r')\right)
+    \left(\left(\lambda m'.\lambda r'.(m'(r')\cap I'(r'))\cup U'(r')\right)  (m)\right)(r)\\
+  &=\left(\denote{\setpair IU}\circ\denote{\setpair{I'}{U'}}\right)(m)(r).\qedhere
+\end{align*}
+\end{proof}
+
+\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalMeet}}]
 \end{proof}
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:efficient}}]

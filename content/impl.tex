@@ -1,7 +1,6 @@
 \input{figures/fig-cc_edge_fn_example}
 
 \otodo{we agreed to move this figure to the initial example section}
-  \mtodo{Move Figure~\ref{fig:cc_edgefn_example} up to where it's mentioned first? If yes, the caption won't make sense.}
 
   \commentout{
 \otodo{The following definitions are very general, and not related to the transformation.
@@ -459,17 +458,17 @@ All of the basic micro-functions defined in Definition~\ref{def:microfn} can be 
 in this representation.
 
 The implementation of function application follows directly from the definition of
-the representation: $\setpair{I}{U}(m) = \lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.
+the representation: $\setpair{I}{U}(m) = \lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.\mtodo{Should this be the denotation of $\setpair IU$?}
 
 To compare two micro-functions for equality, it suffices to compare the corresponding
 sets $I(r)$ and $U(r)$ for all receivers $r$. The following lemma shows that this
 implementation of comparison corresponds to equality of the represented micro-functions:
-\begin{lemma}\label{lem:equal}
+\begin{lemma}\label{lem:equalEq}
     For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
     \[
         \forall r\,.\,I(r) = I'(r) \land U(r) = U'(r)
         \iff
-        \denote{\setpair{I}{U}} = \denote{\setpair{I'}{U'}}
+        \denote{\setpair{I}{U}} = \denote{\setpair{I'}{U'}}.
     \] 
 \end{lemma}
 \otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
@@ -481,12 +480,12 @@ The composition of two micro-function representations is defined as follows:
 $\setpair{I}{U} \circ \setpair{I'}{U'} = \setpair{\lambda r\,.\,(I(r) \cap I'(r))\cup U(r)}{\lambda r\,.\,(I(r)\cap U'(r))\cup U(r)}$.
 The following lemma shows that this implementation corresponds to the composition
 of the denoted functions:
-\begin{lemma}\label{lem:equal}
+\begin{lemma}\label{lem:equalComp}
     For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
     \[
         \denote{\setpair{I}{U} \circ \setpair{I'}{U'}}
         = 
-        \denote{\setpair{I}{U}} \circ \denote{\setpair{I'}{U'}}
+        \denote{\setpair{I}{U}} \circ \denote{\setpair{I'}{U'}}.
     \]
 \end{lemma}
 \otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
@@ -495,12 +494,12 @@ The meet of two micro-function representations is defined as follows:
 $\setpair{I}{U} \sqcap \setpair{I'}{U'} = \setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}$.
 The following lemma shows that this implementation corresponds to the meet
 of the denoted functions:
-\begin{lemma}\label{lem:equal}
+\begin{lemma}\label{lem:equalMeet}
     For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
     \[
         \denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}
         = 
-        \denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}
+        \denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}.
     \]
 \end{lemma}
 \otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
