@@ -119,10 +119,10 @@ Given an IFDS problem described with IFDS flow functions, an equivalence transfo
   \textsf{end-return}^\equiv(n_1,\,d_1,\,n_2)=&\{(d_2,\,\epsilon(d_1,\,d_2))\,|\,d_2\in\textsf{end-return}(n_1,\,d_1,\,n_2)\}\\
   \textsf{default}^\equiv(n_1,\,d_1,\,n_2)=&\{(d_2,\,\epsilon(d_1,\,d_2))\,|\,d_2\in\textsf{default}(n_1,\,d_1,\,n_2)\}\,,
 \end{align*}
-where $\epsilon$ is the bottom function on an edge from a $\Lambda$-fact to a non-$\Lambda$-fact, and the identity function otherwise:
+where $\epsilon$ is the bottom function on an edge from a $\mathbf0$-fact to a non-$\mathbf0$-fact, and the identity function otherwise:
 \[
   \epsilon(d_1,\,d_2)=\begin{cases}
-    \lambda l\,.\,\bot&\text{if $d_1=\Lambda$ and $d_2\ne\Lambda$;}\\
+    \lambda l\,.\,\bot&\text{if $d_1=\mathbf0$ and $d_2\ne\mathbf0$;}\\
     \id&\text{otherwise.}
   \end{cases}
 \]

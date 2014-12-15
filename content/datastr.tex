@@ -246,7 +246,7 @@ Composing two micro functions means to compose their update-map denotations:\mto
 
 We can now show how the correlated-calls definitions of the meet and composition operations on micro functions allow us to detect infeasible paths in a program.
 \begin{example}\label{ex:cc}
-  The edges of the exploded supergraph in Figure~\ref{fig:cc_edgefn_example} correspond to the edges of an IFDS taint analysis. We can see that there is a path from the node $(\highlight{\startmain}{greyblue},\,\Lambda)$ to $(\highlight{\texttt{print(s)}}{lightsalmonpink},\,\texttt s)$. This means that the IFDS taint analysis considers \texttt s to be a secret value that is leaked at the print statement.
+  The edges of the exploded supergraph in Figure~\ref{fig:cc_edgefn_example} correspond to the edges of an IFDS taint analysis. We can see that there is a path from the node $(\highlight{\startmain}{greyblue},\,\mathbf0)$ to $(\highlight{\texttt{print(s)}}{lightsalmonpink},\,\texttt s)$. This means that the IFDS taint analysis considers \texttt s to be a secret value that is leaked at the print statement.
   
   The correlated-calls analysis, on the other hand, detects that the path to $(\highlight{\texttt{print(s)}}{lightsalmonpink},\,\texttt s)$ is infeasible: at the print node, the lattice element corresponding to the fact \verb's' contains a mapping $\texttt a\to\top_T$.
   
