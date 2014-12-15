@@ -45,7 +45,7 @@ For all $r\in R$ and $m\in R\to2^T$,
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalMeet}}]
   For all $r\in R$ and $m\in R\to2^T$,
 \begin{align*}
-  &\left(\denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}\right)(m)(r)\\
+  \left(\denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}\right)&(m)(r)\\
   &=(\denote{\setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}})(m)(r)\\
   &=(m(r)\cap(I(r)\cup I'(r))\cup U(r)\cup U'(r)\\
   &=(m(r)\cap I(r))\cup U(r)\cup(m(r)\cap I'(r))\cup U'(r)\\
@@ -316,29 +316,13 @@ Finally, we can prove the Soundness Lemma.
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:sound}}] 
 According to~\eqref{eq:ideresult}, we can rewrite~\eqref{eq:transCcDef} as
-\begin{equation}\label{eq:transCcResultCc}
+\begin{align*}\label{eq:transCcResultCc}
   \backCC(\resultIDE(\transCC_R(P)))(n)
-  =\{d\,|\,\forall r\in R\,.\,\mvp{\textsf{Env}}(n,\,d))(r)\ne\top_T\}.
-\end{equation}
-\mtodo{TODO rest of proof!}
-Let $\rho=\resultIDE(\transCC_R(P))$. Then
-  \begin{align*}
-    \backCC(\rho)(n)
-    &=D_n^\Subset(\rho)\\
-    &=\left\{d'\ |\ 
-        d'\in\mvp F(n)\,\wedge\,\forall r\in R:\ \rho(n,\ d')(r)\ne\top_T\right\}.
-  \end{align*}
-  Since $\mvp F(n)=\bigsqcap_{q\in\ivp(n)}M_F(q)(\varnothing)$, and $p\in\ivp(n)$, it follows that
-    \begin{align*}
-      d&\in M_F(p)(\varnothing)\\&\subseteq\mvp F(n)\,.
-    \end{align*}
-  At the same time, for all receivers $r\in R$,
-  \begin{align*}
-    \rho(n,\,d)(r)
-    &=\left(\bigsqcap_{q\in\ivp(n)}\mpddef q d\right)(r)\\
-    &=\bigsqcap_{q\in\ivp(n)}\mpddef q d(r)\,.
-  \end{align*}
-  According to~Lemma~\ref{lem:sound3}, $\mpd(r)\ne\top_T$.
+  &=\{d'\,|\,\forall r\in R\,.\,\mvp{\textsf{Env}}(n,\,d'))(r)\ne\top_T\}\\
+  &=\left\{d'\,|\,\forall r\in R\,.\bigsqcap_{q\in\textsf{VP}(n)}\menv(q)(\Omega)(d')(r)\ne\top_T\right\}\\
+  &=\left\{d'\,|\,\forall r\in R\,.\bigsqcap_{q\in\textsf{VP}(n)}\mpddef q {d'}(r)\ne\top_T\right\}.
+\end{align*}
+  According to~Lemma~\ref{lem:sound3}, since $d\in M_F(p)(\varnothing)$, then $\mpd(r)\ne\top_T$.
   Since $p\in\ivp(n)$,
   \begin{align*}
     \mpd(r)\subseteq\bigsqcap_{q\in\ivp(n)}\mpddef qd(r)\,.

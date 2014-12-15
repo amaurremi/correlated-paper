@@ -674,7 +674,7 @@ to each supergraph edge.
 
 The output of the IDE algorithm is, for each node $n$ in the supergraph,
 the \textit{meet-over-all-valid-paths} solution
-  $\mvp{\textsf{Env}}(n)=\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\top)$,
+  $\mvp{\textsf{Env}}(n)=\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\top)$,\mtodo{Should it be $\Omega$ instead of $\top$?}
 where $M_\textsf{Env}$ is extended from edges to paths by composition.
 
 \commentout{
