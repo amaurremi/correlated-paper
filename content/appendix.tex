@@ -322,7 +322,8 @@ According to~\eqref{eq:ideresult}, we can rewrite~\eqref{eq:transCcDef} as
   &=\left\{d'\,|\,\forall r\in R\,.\bigsqcap_{q\in\textsf{VP}(n)}\menv(q)(\Omega)(d')(r)\ne\top_T\right\}\\
   &=\left\{d'\,|\,\forall r\in R\,.\bigsqcap_{q\in\textsf{VP}(n)}\mpddef q {d'}(r)\ne\top_T\right\}.
 \end{align*}
-  According to~Lemma~\ref{lem:sound3}, since $d\in M_F(p)(\varnothing)$, then for any $r\in R$, $\mpd(r)\ne\top_T$. \mtodo{Finish proof}
+  According to~Lemma~\ref{lem:sound3}, since $d\in M_F(p)(\varnothing)$, then for any $r\in R$, $\mpd(r)\ne\top_T$. 
+  Since $\mpd(r)$ is a non-empty set that is contained in $\bigsqcap_{q\in\textsf{VP}(n)}\mpddef q {d}(r)$, it follows that $$\bigsqcap_{q\in\textsf{VP}(n)}\mpddef q {d}(r)\ne\top_T.$$ Therefore, $d\in \backCC(\resultIDE(\transCC_R(P)))(n)$.
 \end{proof}
 
 \subsection*{Correlated Call Receivers}
