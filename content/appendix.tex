@@ -633,6 +633,15 @@ For all $r\in R$ and $m\in R\to2^T$,
 \end{proof}
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalMeet}}]
+  For all $r\in R$ and $m\in R\to2^T$,
+\begin{align*}
+  &\left(\denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}\right)(m)(r)\\
+  &=(\denote{\setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}})(m)(r)\\
+  &=(m(r)\cap(I(r)\cup I'(r))\cup U(r)\cup U'(r)\\
+  &=(m(r)\cap I(r))\cup U(r)\cup(m(r)\cap I'(r))\cup U'(r)\\
+  &=\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)\\
+  &=\left(\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}\right)(m)(r).\qedhere
+\end{align*}
 \end{proof}
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:efficient}}]

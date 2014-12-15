@@ -499,8 +499,11 @@ of the denoted functions:
     \[
         \denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}
         = 
-        \denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}.
+        \denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}},
     \]
+    where
+    $\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}
+     =\lambda m.\lambda r.\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)$.\mtodo{I added the definition of the meet of two functions.}
 \end{lemma}
 \otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
 
