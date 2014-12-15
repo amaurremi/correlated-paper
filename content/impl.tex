@@ -326,7 +326,7 @@ is converted to an IFDS result as follows:
 
 In the correlated-calls transformation lattice $\lcc$, a map that maps any receiver
 to the empty set of possible types means that the corresponding data flow path is
-infeasible. Therefore, a result $\rho=\resultIDE(\transCC S(P))$ of the correlated-calls IDE analysis is
+infeasible. Therefore, a result $\rho=\resultIDE(\transCC _S(P))$ of the correlated-calls IDE analysis is
 converted to an IFDS result as follows:
 \begin{equation}\label{eq:transCcDef}
   \backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)\neq\top_T\}.
