@@ -320,11 +320,12 @@ Therefore, a result $\rho=\resultIDE(\transEq(P))$ of the equivalence IDE analys
 is converted to an IFDS result as follows:
 \begin{equation}\label{eq:transEqDef}
   \backEq(\rho) = \lambda n.\{d\mid\rho(n)(d)\ne\top\}.
-\end{equation}
+\end{equation}\mtodo{Another change was that Ondrej defined $\backEq$ as $\lambda n.\{d\mid\rho(n)(d)=\top\}$
+and that he defined $\backEq$ related to the equivalence transformation.}
 
 In the correlated-calls transformation lattice $\lcc$, a map that maps any receiver
 to the empty set of possible types means that the corresponding data flow path is
-infeasible. Therefore, a result $\rho=\resultIDE(\transCC S(P))$ of the correlated-calls IDE analysis is
+infeasible. Therefore, a result $\rho=\resultIDE(\transCC _S(P))$ of the correlated-calls IDE analysis is
 converted to an IFDS result as follows:
 \begin{equation}\label{eq:transCcDef}
   \backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)\neq\top_T\}.
