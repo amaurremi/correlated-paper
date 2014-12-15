@@ -1,9 +1,92 @@
 \section*{Appendix}
-In this appendix we present the proofs to the Lemmas introduced in Section~\ref{sec:ccdatastr}.
+In this appendix we present the proofs to the Lemmas introduced in Section~\ref{sec:cca}.
+
+\subsection*{Representation of Micro Functions}
+We start by presenting the proofs to the lemmas about the representation of micro functions.
+
+\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalEq}}]
+First, we need to show that for all $r\in R$ and ${m\in R\to2^T}$, if $I(r)=I'(r)$ and $U(r)=U'(r)$, then $\denote{\setpair IU}(m)(r)=\denote{\setpair{I'}{U'}}(m)(r)$. Indeed, we can see that
+\begin{align*}
+  \denote{\setpair IU}(m)(r)
+  &=\left(\lambda m'\,.\,\lambda r'\,.\,(m'(r')\cap I(r'))\cup U(r')\right)(m)(r)\\
+  &=(m(r)\cap I(r))\cup U(r)\\
+  &=(m(r)\cap I'(r))\cup U'(r)\\
+  &=\left(\lambda m'\,.\,\lambda r'\,.\,(m'(r')\cap I'(r'))\cup U'(r')\right)(m)(r)\\
+  &=\denote{\setpair{I'}{U'}}(m)(r).
+\end{align*}
+
+For the other direction, we need to show that if for any $r\in R$ and ${m\in R\to2^T}$, $(m(r)\cap I(r))\cup U(r)=(m(r)\cap I'(r))\cup U'(r)$, then for all $r'\in R$, $I(r')=I'(r')$ and $U(r')=U'(r')$.
+
+To prove that $U(r')=U'(r')$, we will pick $m(r)=\varnothing$.
+Then by our assumption, for all $r$, $U(r)=U'(r)$, and hence $U(r')=U'(r')$.
+
+To prove that $I(r')=I'(r')$, let us pick $m=I$. Then the assumption
+is $I(r)\cup U(r)=(I(r)\cap I'(r))\cup U'(r)$. By our definition, $U(r)\subseteq I(r)$, and we just proved that $U(r')=U'(r)$. Theorefore, $I(r)=(I(r)\cap I'(r))\cup U'(r)$.
+Additionally, $U'(r)\subseteq I'(r)$ and $U'(r)\subseteq I(r)$ (because $U'(r)=U(r)\subseteq I(r)$). This means that $U'(r)\subseteq I(r)\cap I'(r)$. Therefore, $I(r)=I(r)\cap I'(r)$,
+and we can conclude that $I(r)=I'(r)$.
+\end{proof}
+
+\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalComp}}]
+For all $r\in R$ and $m\in R\to2^T$,
+\begin{align*}
+  &\denote{\setpair IU\circ\setpair{I'}{U'}}(m)(r)\\
+  &=\denote{\setpair{\lambda r'\,.\,(I(r')\cap I'(r'))\cup U(r')}
+                    {\lambda r'\,.\,(I(r')\cap U'(r'))\cup U(r')}}(m)(r)\\
+  &=(m(r)\cap(I(r)\cap I'(r))\cup U(r))\cup(I(r)\cap U'(r))\cup U(r)\\
+  &=(m(r)\cap I'(r))\cup I(r)\cup (U'(r)\cap I(r))\cup U(r)\\
+  &=(((m(r)\cap I'(r))\cup U'(r))\cap I(r))\cup U(r)\\
+  &=\left(\lambda r'.(((m(r')\cap I'(r'))\cup U'(r'))\cap I(r'))\cup U(r')\right)(r)\\
+  &=\left(\lambda m'.\lambda r'.(m'(r')\cap I(r'))\cup U(r')\right)
+    \left(\left(\lambda m'.\lambda r'.(m'(r')\cap I'(r'))\cup U'(r')\right)  (m)\right)(r)\\
+  &=\left(\denote{\setpair IU}\circ\denote{\setpair{I'}{U'}}\right)(m)(r).\qedhere
+\end{align*}
+\end{proof}
+
+\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalMeet}}]
+  For all $r\in R$ and $m\in R\to2^T$,
+\begin{align*}
+  &\left(\denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}\right)(m)(r)\\
+  &=(\denote{\setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}})(m)(r)\\
+  &=(m(r)\cap(I(r)\cup I'(r))\cup U(r)\cup U'(r)\\
+  &=(m(r)\cap I(r))\cup U(r)\cup(m(r)\cap I'(r))\cup U'(r)\\
+  &=\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)\\
+  &=\left(\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}\right)(m)(r).\qedhere
+\end{align*}
+\end{proof}
+
+\commentout{
+\begin{proof}[\textbf{Proof of Lemma~\ref{lem:efficient}}]
+  \begin{enumerate}
+    \item The identity function is represented as
+      \[
+        \denote{\id}=\{(r,\,\langle \bot_T,\,\top_T\rangle)\,|\,r\in \rcc\}\,;
+      \]
+      the top function is represented as
+      \[
+        \denote{\lambda m\,.\,\topcc}=\{(r,\,\langle \top_T,\,\top_T\rangle)\,|\,r\in \rcc\}\,.
+      \]
+    \item Equations~\eqref{eq:compclosed} and~\eqref{eq:meetclosed} show that the representation of micro functions is closed under composition and meet.
+    \item To show that our representation for micro functions forms a lattice with finite height, let us first show that $\lcc_\rcc:\,\rcc\to2^T$ forms a lattice. Since $T$ is a finite set, $(2^T,\,\subseteq)$ is a finite-height lattice. $\rcc$ is a finite set. Hence, the mapping
+    \[
+      \rcc\mapsto2^T=\{(r,\,t)\,|\,r\in \rcc,\,t\in 2^T\}=\lcc_\rcc
+    \]        
+    also forms a finite-height lattice \cite{nielson1999principles}. 
+    
+    Furthermore, $\lcc_\rcc$ is a finite set. 
+    Every element of $\lcc_\rcc$ can be applied to $|\rcc|$ receivers, where each receiver is mapped to a set of types. There are $|\rcc|\cdot2^{|T|}$ different possibilities to form those mappings, so
+    \[
+      |\lcc_\rcc|=|\rcc|\cdot2^{|T|}.
+    \]
+    Therefore, $\lcc_\rcc\mapsto \lcc_\rcc$ also forms a finite-height lattice.
+    \item All operations can be computed in $O(\rcc\times T)$ time. Note that the $\rcc$ and $T$ sets are an input to the correlated-calls analysis, and the time it takes to compute the meet or composition of micro functions is independent of the representation of the specific operand micro functions.
+    \item The space bound is $O(\rcc\times T)$.
+  \end{enumerate}
+\end{proof}
+}
 
 \subsection*{Soundness and Precision}
 
-We start by proving the Lemmas of Soundness and Precision of the correlated-calls analysis.
+In this part of the Appendix we prove the Lemmas of Soundness and Precision of the correlated-calls analysis.
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:subsetifds}}]
   Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
@@ -590,86 +673,3 @@ Since, according to Lemma~\ref{lem:ccrectop}, $\resultIDE(\transCC_{\{r\}}(P))(n
     \qedhere
   \end{align*}
 \end{proof}
-
-\section*{Representation of Micro Functions}
-In this part of the appendix we present the proofs to the Lemmas related to the representation of micro functions with update maps.
-
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalEq}}]
-First, we need to show that for all $r\in R$ and ${m\in R\to2^T}$, if $I(r)=I'(r)$ and $U(r)=U'(r)$, then $\denote{\setpair IU}(m)(r)=\denote{\setpair{I'}{U'}}(m)(r)$. Indeed, we can see that
-\begin{align*}
-  \denote{\setpair IU}(m)(r)
-  &=\left(\lambda m'\,.\,\lambda r'\,.\,(m'(r')\cap I(r'))\cup U(r')\right)(m)(r)\\
-  &=(m(r)\cap I(r))\cup U(r)\\
-  &=(m(r)\cap I'(r))\cup U'(r)\\
-  &=\left(\lambda m'\,.\,\lambda r'\,.\,(m'(r')\cap I'(r'))\cup U'(r')\right)(m)(r)\\
-  &=\denote{\setpair{I'}{U'}}(m)(r).
-\end{align*}
-
-For the other direction, we need to show that if for any $r\in R$ and ${m\in R\to2^T}$, $(m(r)\cap I(r))\cup U(r)=(m(r)\cap I'(r))\cup U'(r)$, then for all $r'\in R$, $I(r')=I'(r')$ and $U(r')=U'(r')$.
-
-To prove that $U(r')=U'(r')$, we will pick $m(r)=\varnothing$.
-Then by our assumption, for all $r$, $U(r)=U'(r)$, and hence $U(r')=U'(r')$.
-
-To prove that $I(r')=I'(r')$, let us pick $m=I$. Then the assumption
-is $I(r)\cup U(r)=(I(r)\cap I'(r))\cup U'(r)$. By our definition, $U(r)\subseteq I(r)$, and we just proved that $U(r')=U'(r)$. Theorefore, $I(r)=(I(r)\cap I'(r))\cup U'(r)$.
-Additionally, $U'(r)\subseteq I'(r)$ and $U'(r)\subseteq I(r)$ (because $U'(r)=U(r)\subseteq I(r)$). This means that $U'(r)\subseteq I(r)\cap I'(r)$. Therefore, $I(r)=I(r)\cap I'(r)$,
-and we can conclude that $I(r)=I'(r)$.
-\end{proof}
-
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalComp}}]
-For all $r\in R$ and $m\in R\to2^T$,
-\begin{align*}
-  &\denote{\setpair IU\circ\setpair{I'}{U'}}(m)(r)\\
-  &=\denote{\setpair{\lambda r'\,.\,(I(r')\cap I'(r'))\cup U(r')}
-                    {\lambda r'\,.\,(I(r')\cap U'(r'))\cup U(r')}}(m)(r)\\
-  &=(m(r)\cap(I(r)\cap I'(r))\cup U(r))\cup(I(r)\cap U'(r))\cup U(r)\\
-  &=(m(r)\cap I'(r))\cup I(r)\cup (U'(r)\cap I(r))\cup U(r)\\
-  &=(((m(r)\cap I'(r))\cup U'(r))\cap I(r))\cup U(r)\\
-  &=\left(\lambda r'.(((m(r')\cap I'(r'))\cup U'(r'))\cap I(r'))\cup U(r')\right)(r)\\
-  &=\left(\lambda m'.\lambda r'.(m'(r')\cap I(r'))\cup U(r')\right)
-    \left(\left(\lambda m'.\lambda r'.(m'(r')\cap I'(r'))\cup U'(r')\right)  (m)\right)(r)\\
-  &=\left(\denote{\setpair IU}\circ\denote{\setpair{I'}{U'}}\right)(m)(r).\qedhere
-\end{align*}
-\end{proof}
-
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalMeet}}]
-  For all $r\in R$ and $m\in R\to2^T$,
-\begin{align*}
-  &\left(\denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}\right)(m)(r)\\
-  &=(\denote{\setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}})(m)(r)\\
-  &=(m(r)\cap(I(r)\cup I'(r))\cup U(r)\cup U'(r)\\
-  &=(m(r)\cap I(r))\cup U(r)\cup(m(r)\cap I'(r))\cup U'(r)\\
-  &=\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)\\
-  &=\left(\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}\right)(m)(r).\qedhere
-\end{align*}
-\end{proof}
-
-\commentout{
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:efficient}}]
-  \begin{enumerate}
-    \item The identity function is represented as
-      \[
-        \denote{\id}=\{(r,\,\langle \bot_T,\,\top_T\rangle)\,|\,r\in \rcc\}\,;
-      \]
-      the top function is represented as
-      \[
-        \denote{\lambda m\,.\,\topcc}=\{(r,\,\langle \top_T,\,\top_T\rangle)\,|\,r\in \rcc\}\,.
-      \]
-    \item Equations~\eqref{eq:compclosed} and~\eqref{eq:meetclosed} show that the representation of micro functions is closed under composition and meet.
-    \item To show that our representation for micro functions forms a lattice with finite height, let us first show that $\lcc_\rcc:\,\rcc\to2^T$ forms a lattice. Since $T$ is a finite set, $(2^T,\,\subseteq)$ is a finite-height lattice. $\rcc$ is a finite set. Hence, the mapping
-    \[
-      \rcc\mapsto2^T=\{(r,\,t)\,|\,r\in \rcc,\,t\in 2^T\}=\lcc_\rcc
-    \]        
-    also forms a finite-height lattice \cite{nielson1999principles}. 
-    
-    Furthermore, $\lcc_\rcc$ is a finite set. 
-    Every element of $\lcc_\rcc$ can be applied to $|\rcc|$ receivers, where each receiver is mapped to a set of types. There are $|\rcc|\cdot2^{|T|}$ different possibilities to form those mappings, so
-    \[
-      |\lcc_\rcc|=|\rcc|\cdot2^{|T|}.
-    \]
-    Therefore, $\lcc_\rcc\mapsto \lcc_\rcc$ also forms a finite-height lattice.
-    \item All operations can be computed in $O(\rcc\times T)$ time. Note that the $\rcc$ and $T$ sets are an input to the correlated-calls analysis, and the time it takes to compute the meet or composition of micro functions is independent of the representation of the specific operand micro functions.
-    \item The space bound is $O(\rcc\times T)$.
-  \end{enumerate}
-\end{proof}
-}
