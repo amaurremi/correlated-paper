@@ -55,8 +55,8 @@
     \node [n] (return_bar_v) [right=\nd of return_bar_z] {};
     \node [n] (end_main_v) [right=\nd of end_main_z] {};
 % main method edges
-    \path[->](st_main_z) edge (asgn_a_z);
-    \path[->](asgn_a_z) edge (call_foo_z);
+    \path[->, ultra thick](st_main_z) edge (asgn_a_z);
+    \path[->, ultra thick](asgn_a_z) edge (call_foo_z);
     \path[->](call_foo_z) edge (return_foo_z);
     \path[->](return_foo_z) edge (call_bar_z);
     \path[->](call_bar_z) edge (return_bar_z);
@@ -64,7 +64,7 @@
     \path[->](st_main_v) edge (asgn_a_v);
     \path[->](asgn_a_v) edge (call_foo_v);
     \path[->](call_foo_v) edge (return_foo_v);
-    \path[->](return_foo_v) edge (call_bar_v);
+    \path[->, ultra thick](return_foo_v) edge (call_bar_v);
     \path[->](call_bar_v) edge (return_bar_v);
     \path[->](return_bar_v) edge (end_main_v);  
     
@@ -80,14 +80,14 @@
     \node [n] (return_secret_z) [left=\nd of return_secret_p] {};
     \node [n] (end_a_foo_z) [left=\nd of end_a_foo_p] {};
 %A.foo method edges
-    \path[->](st_a_foo_z) edge (return_secret_z); 
+    \path[->, ultra thick](st_a_foo_z) edge (return_secret_z); 
     \path[->](return_secret_z) edge node[arrowtext,near start,above right=0.4cm and -.15cm,rotate=-60]{$\lambda m.\botcc$} (end_a_foo_z); 
-    \path[->,dashed](call_foo_z) edge [out=38,in=238]  (st_a_foo_z);
+    \path[->,dashed, ultra thick](call_foo_z) edge [out=38,in=238]  (st_a_foo_z);
     \path[->,dashed](end_a_foo_z) edge [out=200,in=43] (return_foo_z);
-    \path[->,dashed](end_a_foo_p) edge  [out=200,in=43] node[arrowtext,below,rotate=30]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$} (return_foo_v);
+    \path[->,dashed, ultra thick](end_a_foo_p) edge  [out=200,in=43] node[arrowtext,below,rotate=30]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$} (return_foo_v);
     \path[->](st_a_foo_p) edge (return_secret_p); 
     \path[->](return_secret_p) edge (end_a_foo_p);
-    \path[->](return_secret_z) edge (end_a_foo_p);
+    \path[->, ultra thick](return_secret_z) edge (end_a_foo_p);
     
 %A.bar method nodes
     \node [supergraph_y] (st_a_bar) [right = 6*\dist of st_a_foo] {\textsf{start}$_{\texttt{A.bar}}$};
@@ -134,10 +134,10 @@
 %B.bar method edges
     \path[->](st_b_bar_z) edge (print_z);
     \path[->](print_z) edge (end_b_bar_z);
-    \path[->](st_b_bar_s) edge (print_s);
+    \path[->, ultra thick](st_b_bar_s) edge (print_s);
     \path[->](print_s) edge (end_b_bar_s);
     \path[->,dashed](call_bar_z) edge [out=40,in=140,color=lightsalmonpink] (st_b_bar_z);
-    \path[->,dashed](call_bar_v) edge [out=20,in=160,color=lightsalmonpink] node[arrowtext,above right=-.4cm and .4cm,rotate=-10]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt B\}]$} (st_b_bar_s);
+    \path[->,dashed, ultra thick](call_bar_v) edge [out=20,in=160,color=lightsalmonpink] node[arrowtext,above right=-.4cm and .4cm,rotate=-10]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt B\}]$} (st_b_bar_s);
     \path[->,dashed](end_b_bar_z) edge [out=210,in=-40,color=lightsalmonpink] (return_bar_z);    
 }
 \end{tikzpicture}

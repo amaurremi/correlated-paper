@@ -42,7 +42,7 @@ $f$, $\tau(s,f)$ gives the set of all runtime types of $r$ that cause $r.m(\ldot
 to dispatch to $f$: $\tau(s,f) = \{t\mid \textsf{lookup}(s,t)=f\}$.
 
 %\otodo{do we ever use $\src$ and $\target$?}
-We denote the source and end nodes of a graph edge $e$ as $\src e$ and $\target e$.
+%We denote the source and end nodes of a graph edge $e$ as $\src e$ and $\target e$.
 
 \commentout{
 \begin{example}
@@ -458,7 +458,7 @@ In this way, the IFDS algorithm reduces the input data-flow problem to a graph-r
 \begin{example}
   The exploded supergraph for Listing~\ref{list:ccexample} is shown in Figure~\ref{fig:cc_edgefn_example}.
   The labels on the edges will be explained in Section~\ref{sec:bgide}
-  We can see that there is a realizable path
+  We can see that there is a realizable path, highlighted in bold,
   from the start node of the exploded graph to the variable \verb's' at~the~node~$\textsf{print(s)}$ in the \verb'B.bar' method. This means that at that node, \verb's' is considered secret.
 
 \commentout{  
@@ -686,8 +686,10 @@ to each supergraph edge.
 
 The output of the IDE algorithm is, for each node $n$ in the supergraph,
 the \textit{meet-over-all-valid-paths} solution
-  $\mvp{\textsf{Env}}(n)=\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\top)$,\mtodo{Should it be $\Omega$ instead of $\top$?}
-where $M_\textsf{Env}$ is extended from edges to paths by composition.
+$\mvp{\textsf{Env}}(n)=\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\top_\textsf{Env})$,
+%\mtodo{Should it be $\Omega$ instead of $\top$?}
+where $\top_\textsf{Env} = \lambda d.\top$ is the top element of the lattice of environments,
+and $M_\textsf{Env}$ is extended from edges to paths by composition.
 
 \commentout{
 and
@@ -856,22 +858,22 @@ is defined as
 \newcommand{\microedge}[3]{#1\xrightarrow{#3}#2}
 \begin{align*}
     R_t =& \{ \microedge{\mathbf0}{\mathbf0}{\lambda l.l} \} \cup
-    \{\microedge{\mathbf0}{d_j}{\lambda l.t(\Omega)(d_j)} \mid d_j \in D\}\\
+    \{\microedge{\mathbf0}{d_j}{\lambda l.t(\top_{\textsf{Env}})(d_j)} \mid d_j \in D\}\\
     &\cup
-    \{\microedge{d_i}{d_j}{\lambda l.t(\Omega[d_i\to l])(d_j)} \mid d_i, d_j \in D\}.
+    \{\microedge{d_i}{d_j}{\lambda l.t(\top_{\textsf{Env}}[d_i\to l])(d_j)} \mid d_i, d_j \in D\}.
 \end{align*}
 }
-Let $\Omega = \lambda d.\top$ be the environment that maps every element of $D$ to $\top$.
+%Let $\top_{\textsf{Env}} = \lambda d.\top$ be the environment that maps every element of $D$ to $\top$.
 %\ftodo{
    %What is the relationship between $\Omega$ and $\Delta$?
 %}
 %\otodo{What do you mean by $\Delta$?}
 Thanks to distributivity, every environment transformer 
 $t : \textsf{Env}(D,L) \to \textsf{Env}(D,L)$
-can be decomposed into its effect on $\Omega$ and on a set of environments $\Omega[d_i\to l]$
-that map every element except one ($d_i$) to $\top$:
+can be decomposed into its effect on $\top_{\textsf{Env}}$ and on a set of environments $\top_{\textsf{Env}}[d_i\to l]$
+that map every element to $\top$ except one ($d_i$):
 \[
-    t(m)(d_j) = \lambda l. t(\Omega)(d_j) \sqcap \bigsqcap_{d_i\in D} \lambda l. t(\Omega[d_i\to l])(d_j).
+    t(m)(d_j) = \lambda l. t(\top_{\textsf{Env}})(d_j) \sqcap \bigsqcap_{d_i\in D} \lambda l. t(\top_{\textsf{Env}}[d_i\to l])(d_j).
 \]
 The functions $\lambda l. \cdots$ in this decomposition are the micro-functions that
 appear on the edges of the pointwise representation edges from $\mathbf0$ to each $d_j$ and from

@@ -78,7 +78,7 @@ The meaning of an edge in the labeled exploded supergraph is the following. Let 
 As shown in~Sagiv et al.~\cite{sagiv1996precise}, the relationship between environment transformers and edge functions can be described with the following equations. For individual edges $(n_1,\,n_2)\in E^*$,
 \begin{align}\label{eq:envTransToEdgeFnEdge}
   \menv&((n_1,\,n_2))(\textsf{env})(d)\notag\\
-  &=\edgefn((n_1,\,\Lambda),\,(n_2,\,d))(\top)\sqcap\bigsqcap_{d'\in D}\edgefn((n_1,\,d'),\,(n_2,\,d))(\textsf{env}(d'))\,,
+  &=\edgefn((n_1,\,\mathbf0),\,(n_2,\,d))(\top)\sqcap\bigsqcap_{d'\in D}\edgefn((n_1,\,d'),\,(n_2,\,d))(\textsf{env}(d'))\,,
 \end{align}
 where $\textsf{env}$ is an environment $\textsf{Env}(D,\,L)$. Informally, for a given control-flow-supergraph edge $e$ and data-flow fact $d$, the $M_\textsf{Env}$ function captures the meet of the edge function applied to all possible exploded-graph edges along $e$.
 
@@ -95,7 +95,7 @@ where each edge of the exploded supergraph corresponds to a micro function.
 
 
 \section{Correlated Calls Analysis}\label{sec:cca}
-The correlated-calls analysis is defined as a transformation from an arbitrary IFDS problem to a corresponding IDE problem. The solution of the IDE problem is converted to a solution of the original IFDS problem. The converted IFDS result can be more precise than the original IFDS result because it avoids infeasible paths corresponding to correlated calls.
+The correlated-calls analysis is defined as a transformation from an arbitrary IFDS problem to a corresponding IDE problem. The solution of this IDE problem can be converted to a solution of the original IFDS problem. The converted IFDS result can be more precise than the original IFDS result because it avoids infeasible paths corresponding to correlated calls.
 
 %In this section, we first discuss what is necessary to define IFDS and IDE problems. Next we describe how to convert any IFDS problem into an equivalent IDE problem, and, given a solution to the generated IDE problem, how to obtain the result of the original IFDS problem. We then show how to transform an IFDS problem into an IDE problem using the correlated-calls transformation, and how to convert the solution to the latter IDE problem into a more precise IFDS result.
 
@@ -108,8 +108,8 @@ Let $G^\#$ be the exploded supergraph of an IFDS problem. A \emph{transformation
 $\mathcal T:\ (G^\#)\to (G^\#,\,L,\,\edgefn)$
 converts it into an equivalent IDE problem. We consider two transformations:
 \begin{itemize}
-	\item an equivalence transformation $\transEq$ (pronounced ``t-equiv'') that generates IDE problems with the same precision as the original IFDS problem, and
-  \item a correlated-call transformation $\transCC$ (pronounced ``t-c-c'') that generates IDE problems that exclude infeasible paths.
+    \item an \textit{equivalence transformation} $\transEq$ (pronounced ``t-equiv'') that generates IDE problems with the same precision as the original IFDS problem, and
+    \item a \textit{correlated-calls transformation} $\transCC$ (pronounced ``t-c-c'') that generates IDE problems that exclude infeasible paths.
 \end{itemize}
 Both transformations keep the exploded supergraph $G^\#$ the same, and only generate different edge functions.
 %In each case we also show how to convert the result of the generated IDE problem to a result of the original IFDS problem.
@@ -131,12 +131,11 @@ The edge functions $\edgefn^\equiv$ are defined as
 \begin{equation}
     \edgefn^\equiv=
     \begin{cases}
-      \lambda e\,.\,\lambda m\,.\,\bot&\text{if $d_1(e)=\Lambda$ and $d_2(e)\ne\Lambda$;}\\
-      \lambda e\,.\,\id&\text{otherwise,}
+        \lambda e\,.\,\lambda m\,.\,\bot&\text{if $e=(n_1,\mathbf0)\to(n_2,d_2)$, where $d_2 \neq \mathbf0$;}\\
+      \lambda e\,.\,\id&\text{otherwise.}
     \end{cases}
 \end{equation}
-where $d_1(e)$ is the source fact of an edge $e$ and $d_2(e)$ is its target fact. 
-At a~``diagonal'' edge from a $\Lambda$-fact to a non-$\Lambda$-fact
+At a~``diagonal'' edge from a $\mathbf0$-fact to a non-$\mathbf0$-fact
 $d$, the micro function returns $\bot$
 to make
 the fact $d$ reachable. All other micro-functions are the identity function.
@@ -205,15 +204,14 @@ set of all types. This is made precise by the following definition:
 \begin{definition}\label{def:microfn}
 Given a previously fixed set $S \subseteq R$ of receivers, the micro-function $\varepsilon_S(e)$
 of a supergraph edge $e$ is defined as:
-                    \otodo{define $n_1(e)$ globally somewhere early on, and consider using a more decriptive name like src instead of $n_1$}
+                    %\otodo{define $n_1(e)$ globally somewhere early on, and consider using a more decriptive name like src instead of $n_1$}
   \begin{align}\label{eq:varepsilon}
       &\varepsilon_S(e)= \lambda m\,.\,\\
         &\begin{cases}
             m[r\to m(r)\cap \tau(s,\,f)],
             &\text{\parbox{75mm}{
-                if $e$ is a call-start edge, $r.c()$ is
-                the call site at $\src e$, $f$ is the called
-                procedure with signature $s$,
+                    if $e$ is a call-start edge $r.c() \to \textsf{start}_f$ that calls
+                procedure $f$ with signature $s$,
                 and $r\in S$;}}\\[3ex]
         \parbox{30mm}{\[\begin{array}{l}
                 m[r\to m(r)\cap \tau(s,\,f)]\\
@@ -223,18 +221,16 @@ of a supergraph edge $e$ is defined as:
         }
         &
         \text{\parbox{75mm}{
-                if $e$ is an end-return edge,
-                $r.c()$ is the call
-                corresponding to the return node
-                at $\target e$,
-                $f$ is the called method with
-                signature $s$,
+                if $e$ is an end-return edge
+                $\textsf{end}_f \to \textsf{return}_{r.c()}$
+                from method $f$ with signature $s$ to the return node corresponding
+                to the call $r.c()$,
                 $v_1,\,\dots,\,v_k\in S$ are the local variables
                 in $f$,
                 and $r\in S$;}}\\
             m\left[r\to \bot_T\right],
-            &\text{\parbox{75mm}{if $\src e$ contains an assignment
-                    for $r\in S$;}}\\
+            &\text{\parbox{75mm}{if $e = n_1 \to n_2$ and $n_1$ contains an assignment
+                    to $r\in S$;}}\\
             m
                 &\text{otherwise.}
         \end{cases}
@@ -258,9 +254,9 @@ In the above definition, the purpose of the set $S$ is to limit the set of consi
 
 We can now define $\edgefn$, which assigns a micro-function to each edge in
 the exploded supergraph. 
-Along a $\Lambda$-edge, the micro function is the identity. 
+Along a $\mathbf0$-edge, the micro function is the identity. 
 All other functions can be described with $\varepsilon_S$.
-On a ``diagonal'' edge from $\Lambda$ to a non-$\Lambda$ fact that corresponds
+On a ``diagonal'' edge from $\mathbf0$ to a non-$\mathbf0$ fact that corresponds
 to some data flow fact becoming reachable, $\varepsilon_S(e)$ is applied to the initial
 map $\botcc$ that conservatively allows every receiver to point to an object of any type.
 On all other edges, $\varepsilon_S(e)$ is applied to the existing map before the edge.
@@ -270,8 +266,8 @@ For each edge $e = (n_1,d_1) \to (n_2,d_2)$, $\ccedgefn S(e)$ is defined as foll
   \begin{equation}\label{eq:edgefndef}
       \ccedgefn S(e)=
         \begin{cases}
-          \id  &\text{if $d_1=d_2=\Lambda$},\\
-          \lambda m\,.\,\varepsilon_S(e)(\botcc) &\text{if $d_1=\Lambda$ and $d_2\ne\Lambda$},\\
+          \id  &\text{if $d_1=d_2=\mathbf0$},\\
+          \lambda m\,.\,\varepsilon_S(e)(\botcc) &\text{if $d_1=\mathbf0$ and $d_2\ne\mathbf0$},\\
           \lambda m\,.\,\varepsilon_S(e)(m)  &\text{otherwise.}
         \end{cases}
   \end{equation}
@@ -280,9 +276,9 @@ For each edge $e = (n_1,d_1) \to (n_2,d_2)$, $\ccedgefn S(e)$ is defined as foll
 
 
 \begin{example}
-  Consider the program from Listing~\ref{list:ccexample}, whose exploded supergraph appeared in Figure~\ref{fig:cc_edgefn_example}.
+  Consider the program from Figure~\ref{list:ccexample}, whose exploded supergraph appeared in Figure~\ref{fig:cc_edgefn_example}.
 
-  Returning a secret value in method \code{A.foo} creates a ``diagonal'' edge from the $\Lambda$-fact to the method's return value $r$. 
+  Returning a secret value in method \code{A.foo} creates a ``diagonal'' edge from the $\mathbf0$-fact to the method's return value $r$. 
   The diagonal edge is labeled with the micro function $\lambda m\,.\,\botcc$. Thus, at the end node of the method, every receiver is mapped to the set of all types~$\bot_T$.
   
 On the end-return edge from \code{A.foo} to \code{main}, the set of types for the receiver \code{a} is restricted by the micro function $\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code A\}]$ on the edge corresponding to the assignment of the return value $r$ to \code v.
@@ -299,7 +295,7 @@ result in an information leak is actually infeasible.
 
 %After we have shown the definitions for the meet and composition operations, we will show in Example~\ref{ex:cc} how the correlated-calls analysis uses the presented micro functions to detect infeasible paths.
 
-Finally, the correlated-calls transformation is defined as
+Finally, the correlated-calls transformation is defined as\\
     $\transCC_S((G^\#))=\left(G^\#,\,\lcc_S,\,\ccedgefn S\right)$.
 
 %Then, for an edge $e$, the correlated-call micro functions can be defined as $\ccedgefn R$ and a correlated-calls transformation is defined as $\transCC_R$.
@@ -340,7 +336,7 @@ The output of an IFDS analysis states whether a node is reachable in the explode
 
 \begin{mdelete}
 \begin{example}\label{ex:ifdsresult}
-  The solution to the taint-analysis IFDS problem $\mathcal P$ in Listing~\ref{list:examplejava} whose exploded supergraph is presented in Figure~\ref{fig:exampleexploded} looks as follows:
+  The solution to the taint-analysis IFDS problem $\mathcal P$ in Figure~\ref{list:examplejava} whose exploded supergraph is presented in Figure~\ref{fig:exampleexploded} looks as follows:
   \small\begin{align*}
     \resultIFDS(\mathcal P)=\{&(\highlight{\textsf{return}_\texttt{secret}}{greyblue},\,\{\texttt a\}),
       &(\highlight{\textsf{start}_\texttt f}{lightsalmonpink},\,\{\texttt s\}),
@@ -444,7 +440,10 @@ support function application, comparison, and be closed under function compositi
 and meet. We now propose such a representation for the correlated-calls micro-functions.
 
 The representation of a micro-function is a map from receivers to pairs of sets of
-types $I(r)$ and $U(r)$, where $U(r)$ is required to be a subset of $I(r)$. We use the notation
+types $I(r)$ and $U(r)$, where $U(r)$ is required to be a subset of $I(r)$. 
+Intuitively, the micro-function takes the existing set of possible types of the
+receiver $r$, intersects it with $I(r)$, then unions it with $U(r)$.
+We use the notation
 $\setpair{I}{U}$ to represent such a map, and $I(r)$ and $U(r)$ to look up the
 sets corresponding to a particular receiver $r$. We define the meaning $\denote{\setpair{I}{U}}$
 of a representation $\setpair{I}{U}$ as follows: $\denote{\setpair{I}{U}} = \lambda m\,.\,\lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.
@@ -470,6 +469,8 @@ implementation of comparison corresponds to equality of the represented micro-fu
         \denote{\setpair{I}{U}} = \denote{\setpair{I'}{U'}}.
     \] 
 \end{lemma}
+The proofs of all of the lemmas and theorems in the paper are provided in the supplemental
+material submitted with the paper.
 \otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
 
 \otodo{The normalization function $\mathcal N$ was only needed in composition. I therefore
