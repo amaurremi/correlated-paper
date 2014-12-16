@@ -6,27 +6,17 @@ We start by presenting the proofs to the lemmas about the representation of micr
 
 \equalEq*
 \begin{proof}
-    OL: Can't we just say the following?
+   % OL: Can't we just say the following?
+   First, we need to show that for all $r\in R$, if $I(r)=I'(r)$ and $U(r)=U'(r)$, then $\denote{\setpair IU}=\denote{\setpair{I'}{U'}}$. Indeed, we can see that
     \begin{align*}
-        \denote{\setpair {I}{U}}\\
+        \denote{\setpair {I}{U}}
        & = \lambda m. \lambda r. (m(r) \cap I(r))\cup U(r))\\
        & = \lambda m. \lambda r. (m(r) \cap I'(r))\cup U'(r))\\
        & = 
-        \denote{\setpair {I'}{U'}}\\
+        \denote{\setpair {I'}{U'}}.
     \end{align*}
-    
 
-First, we need to show that for all $r\in R$ and ${m\in R\to2^T}$, if $I(r)=I'(r)$ and $U(r)=U'(r)$, then $\denote{\setpair IU}(m)(r)=\denote{\setpair{I'}{U'}}(m)(r)$. Indeed, we can see that
-\begin{align*}
-  \denote{\setpair IU}(m)(r)
-  &=\left(\lambda m'\,.\,\lambda r'\,.\,(m'(r')\cap I(r'))\cup U(r')\right)(m)(r)\\
-  &=(m(r)\cap I(r))\cup U(r)\\
-  &=(m(r)\cap I'(r))\cup U'(r)\\
-  &=\left(\lambda m'\,.\,\lambda r'\,.\,(m'(r')\cap I'(r'))\cup U'(r')\right)(m)(r)\\
-  &=\denote{\setpair{I'}{U'}}(m)(r).
-\end{align*}
-
-OL: Again, we can keep it simpler:
+%OL: Again, we can keep it simpler:
 For the other direction:
 \begin{align*}
 &&
@@ -66,35 +56,28 @@ I(r) &= I(r) \cap I'(r)\\
 &\implies \forall r.&
 I(r) &\subseteq I'(r)\\
 \end{align*}
+\mtodo{I agree that this is much better than what I had. I think from $I(r) = I(r) \cap I'(r)$ we can conclude that $I(r)=I'(r)$.}
 Symmetrically, we can also establish that $\forall r.I'(r) \subseteq I(r)$ by applying the functions to $I'$ instead of to $I$. Therefore, $I = I'$.
-
-
-For the other direction, we need to show that if for any $r\in R$ and ${m\in R\to2^T}$, $(m(r)\cap I(r))\cup U(r)=(m(r)\cap I'(r))\cup U'(r)$, then for all $r'\in R$, $I(r')=I'(r')$ and $U(r')=U'(r')$.
-
-To prove that $U(r')=U'(r')$, we will pick $m(r)=\varnothing$.
-Then by our assumption, for all $r$, $U(r)=U'(r)$, and hence $U(r')=U'(r')$.
-
-To prove that $I(r')=I'(r')$, let us pick $m=I$. Then the assumption
-is $I(r)\cup U(r)=(I(r)\cap I'(r))\cup U'(r)$. By our definition, $U(r)\subseteq I(r)$, and we just proved that $U(r')=U'(r)$. Theorefore, $I(r)=(I(r)\cap I'(r))\cup U'(r)$.
-Additionally, $U'(r)\subseteq I'(r)$ and $U'(r)\subseteq I(r)$ (because $U'(r)=U(r)\subseteq I(r)$). This means that $U'(r)\subseteq I(r)\cap I'(r)$. Therefore, $I(r)=I(r)\cap I'(r)$,
-and we can conclude that $I(r)=I'(r)$.
 \end{proof}
 
-\otodo{The (m)(r) does not seem necessary. Can we replace $r'$ with $r$ and $m'$ with $m$?}
 \equalComp*
+\otodo{The (m)(r) does not seem necessary. Can we replace $r'$ with $r$ and $m'$ with $m$?}
 \begin{proof}
-For all $r\in R$ and $m\in R\to2^T$,
 \begin{align*}
-  &\denote{\setpair IU\circ\setpair{I'}{U'}}(m)(r)\\
-  &=\denote{\setpair{\lambda r'\,.\,(I(r')\cap I'(r'))\cup U(r')}
-                    {\lambda r'\,.\,(I(r')\cap U'(r'))\cup U(r')}}(m)(r)\\
-  &=(m(r)\cap(I(r)\cap I'(r))\cup U(r))\cup(I(r)\cap U'(r))\cup U(r)\\
-  &=(m(r)\cap I'(r))\cup I(r)\cup (U'(r)\cap I(r))\cup U(r)\\
-  &=(((m(r)\cap I'(r))\cup U'(r))\cap I(r))\cup U(r)\\
-  &=\left(\lambda r'.(((m(r')\cap I'(r'))\cup U'(r'))\cap I(r'))\cup U(r')\right)(r)\\
-  &=\left(\lambda m'.\lambda r'.(m'(r')\cap I(r'))\cup U(r')\right)
-    \left(\left(\lambda m'.\lambda r'.(m'(r')\cap I'(r'))\cup U'(r')\right)  (m)\right)(r)\\
-  &=\left(\denote{\setpair IU}\circ\denote{\setpair{I'}{U'}}\right)(m)(r).\qedhere
+  &\denote{\setpair IU\circ\setpair{I'}{U'}}\\
+  =&\denote{\setpair{\lambda r\,.\,(I(r')\cap I'(r))\cup U(r)}
+                    {\lambda r\,.\,(I(r)\cap U'(r))\cup U(r)}}\\
+  =&\lambda m\,.\,\lambda r\,.\,(m(r)\cap(I(r)\cap I'(r))\cup U(r))\cup(I(r)\cap U'(r))\cup U(r)\\
+  =&\lambda m\,.\,\lambda r\,.\,(m(r)\cap I'(r))\cup I(r)\cup (U'(r)\cap I(r))\cup U(r)\\
+  =&\lambda m\,.\,\lambda r\,.\,(((m(r)\cap I'(r))\cup U'(r))\cap I(r))\cup U(r)\\
+  =&\lambda m\,.\,\lambda r\,.\,(((m(r)\cap I'(r))\cup U'(r))\cap I(r))\cup U(r)\\
+  =&\lambda m\,.\,\left(\lambda m'\,.\,\lambda r\,.\,(m'(r)\cap I(r))\cup U(r)\right)
+    \left(
+    \left(\lambda r\,.\,(m(r)\cap I'(r))\cup U'(r)\right)
+    \right)\\
+  =&\left(\lambda m\,.\,\lambda r\,.\,(m(r)\cap I(r))\cup U(r)\right)\circ
+    \left(\lambda m\,.\,\lambda r\,.\,(m(r)\cap I'(r))\cup U'(r)\right)\\
+  =&\denote{\setpair IU}\circ\denote{\setpair{I'}{U'}}.\qedhere
 \end{align*}
 \end{proof}
 
@@ -102,12 +85,12 @@ For all $r\in R$ and $m\in R\to2^T$,
 \begin{proof}
   For all $r\in R$ and $m\in R\to2^T$,
 \begin{align*}
-  \left(\denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}\right)&(m)(r)\\
-  &=(\denote{\setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}})(m)(r)\\
-  &=(m(r)\cap(I(r)\cup I'(r))\cup U(r)\cup U'(r)\\
-  &=(m(r)\cap I(r))\cup U(r)\cup(m(r)\cap I'(r))\cup U'(r)\\
-  &=\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)\\
-  &=\left(\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}\right)(m)(r).\qedhere
+  &\left(\denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}\right)(m)(r)\\
+  =&(\denote{\setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}})(m)(r)\\
+  =&(m(r)\cap(I(r)\cup I'(r))\cup U(r)\cup U'(r)\\
+  =&(m(r)\cap I(r))\cup U(r)\cup(m(r)\cap I'(r))\cup U'(r)\\
+  =&\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)\\
+  =&\left(\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}\right)(m)(r).\qedhere
 \end{align*}
 \end{proof}
 
