@@ -30,7 +30,9 @@ considered by IFDS.
 
 This paper presents an approach to dataflow analysis that avoids a type
 of infeasible path that arises in object-oriented programs when two or more
-methods are dynamically dispatched on the same receiver object. In such cases, if the
+methods are dynamically dispatched on the same receiver object.
+\mtodo{Should we define the term ``receiver''?}
+In such cases, if the
 method calls are polymorphic (i.e., if they dispatch to different method definitions 
 depending on the type of the receiver expression at run time), then their dispatch 
 behaviors will be correlated. A recent paper \cite{DBLP:journals/scp/Tip15} identified

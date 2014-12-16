@@ -99,6 +99,50 @@ we would like to emphasize that our technique generally applies to \textit{any}
 dataflow analysis problem that can be expressed in the IFDS framework. This includes
 many common analysis tasks such as \TODO{please add a few examples + citations} 
 
+\subsection{Occurrences of Correlated Calls}
+How often do correlated calls occur in practice? To assess the benefit of the correlated-calls analysis, we counted the number of correlated calls that occurred programs of the Dacapo benchmarks~\cite{blackburn2006dacapo}, using the WALA framework for static analysis on Java bytecode~\cite{fink2012wala}.
+Our goal was to obtain an upper bound on the number of redundant IFDS-result nodes that could be potentially removed by our analysis. The results are shown in Table~\ref{tab:dacapostat}.
+
+In the table, the number of all call sites in a program is denoted as $C$. 
+Polymorphic call sites are denoted as $C_P$, and correlated call sites as $C^\Subset$. 
+The first four columns indicate the overall number of various call sites and correlated-call receivers in a program. 
+The last three columns indicate the ratio of polymorphic to all call sites, the ratio of correlated to polymorphic call sites, and the ratio of correlated call sites to correlated-call receivers.
+
+\begin{table}
+\caption{Frequencies of correlated-call occurrences in the Dacapo benchmarks}\label{tab:dacapostat}
+\centering
+%\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lrrrr
+>{\columncolor[HTML]{FFFFFF}}r 
+>{\columncolor[HTML]{FFFFFF}}l r@{}}
+\toprule
+\textbf{Benchmark}  &
+  \multicolumn{1}{c}{\textbf{$|C|$}} & 
+  \multicolumn{1}{c}{\textbf{$|C_P|$}} & 
+  \multicolumn{1}{c}{\textbf{$|C^\Subset|$}} & 
+  \multicolumn{1}{c}{\textbf{$|\rcc|$}} & 
+  {\textbf{\begin{tabular}[c]{@{}l@{}}$\cfrac{|C_P|}{|C|}$\end{tabular}}} & 
+  {\textbf{\begin{tabular}[c]{@{}l@{}}$\cfrac{|C^\Subset|}{|C_P|}$\end{tabular}}} & 
+  \textbf{\begin{tabular}[c]{@{}l@{}}$\cfrac{|C^\Subset|}{|\rcc|}$\end{tabular}} \\ \midrule
+\textbf{antlr}      & 7,610                             & 428                                   & 299                              & 70                                   & {\textbf{6\%}}                                                      & {\textbf{70\%}}                                                     & 4                                                                \\
+\textbf{bloat}      & 18,157                            & 933                                   & 429                              & 119                                  & {\textbf{5\%}}                                                      & {\textbf{46\%}}                                                     & 4                                                                \\
+\textbf{chart}      & 18,101                            & 466                                   & 195                              & 61                                   & {\textbf{3\%}}                                                      & {\textbf{42\%}}                                                     & 3                                                                \\
+\textbf{eclipse}    & 3,222                             & 100                                   & 35                               & 10                                   & {\textbf{3\%}}                                                      & {\textbf{35\%}}                                                     & 4                                                                \\
+\textbf{fop}        & 4,831                             & 129                                   & 40                               & 12                                   & {\textbf{3\%}}                                                      & {\textbf{31\%}}                                                     & 3                                                                \\
+\textbf{hsqldb}     & 3,573                             & 81                                    & 35                               & 10                                   & {\textbf{2\%}}                                                      & {\textbf{43\%}}                                                     & 4                                                                \\
+\textbf{jython}     & 12,149                            & 487                                   & 129                              & 54                                   & {\textbf{4\%}}                                                      & {\textbf{26\%}}                                                     & 2                                                                \\
+\textbf{luindex}    & 7,190                             & 188                                   & 79                               & 29                                   & {\textbf{3\%}}                                                      & {\textbf{42\%}}                                                     & 3                                                                \\
+\textbf{lusearch}   & 9,043                             & 350                                   & 126                              & 47                                   & {\textbf{4\%}}                                                      & {\textbf{36\%}}                                                     & 3                                                                \\
+\textbf{pmd}        & 10,972                            & 219                                   & 68                               & 23                                   & {\textbf{2\%}}                                                      & {\textbf{31\%}}                                                     & 3                                                                \\
+\textbf{xalan}      & 3,889                             & 110                                   & 35                               & 10                                   & {\textbf{3\%}}                                                      & {\textbf{32\%}}                                                     & 4                                                                \\
+\textbf{Geom. mean} & \textbf{7,572}                    & \textbf{240}                          & \textbf{91}                      & \textbf{29}                          & {\textbf{3\%}}                                                      & {\textbf{38\%}}                                                     & \textbf{3}                                                       \\ \bottomrule
+\end{tabular}
+%}
+\end{table}
+
+We can see that on average, 3\% of all call sites $C$ are polymorphic call sites $C_P$.
+\mtodo{Should we explain in a footnote why the number of polymorphic call sites is so low?}
+Out of those call sites, 38\% are correlated call sites $C^\Subset$. We also see that for one correlated-call receiver, there are on average three correlated calls. 
 
  
   

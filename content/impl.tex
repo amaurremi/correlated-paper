@@ -564,3 +564,14 @@ We have also shown in Lemma~\ref{lem:subsetifds} that for an IFDS problem $P$, t
 Finally, we showed in Lemma~\ref{lem:onlycorrrec} that a correlated-call transformation to IDE that considers only correlated-call receivers $\rcc$ achieves the same result that is obtained when considering all receivers $R$.
 
 %This is the general idea of the correlated-calls analysis. The analysis involves a transformation from IFDS to IDE problems. To implement an IDE problem, it is necessary to define a representation of lattice elements and micro functions. An efficient representation of those data structures for the correlated-calls analysis is presented in the next section.
+
+\subsection{Implementation of the Correlated-Calls Analysis}
+The correlated-calls analysis was implemented in the Scala programming language~\cite{odersky2004overview}. 
+We chose Java as the target language for client programs of the analysis.
+To retrieve information about an input program, such as its control-flow supergraph or the set of receivers and their types, we used the WALA framework for static analysis on Java bytecode~\cite{fink2012wala}.
+
+Since WALA currently only contains an implementation of IFDS, we implemented IDE from scratch. Instead of using WALA's IFDS implementation, to run an IFDS problem, we converted it to an IDE problem and used our own IDE solver.
+
+We tested the implementation of the correlated-calls analysis using an IFDS taint-analysis implementation as a client analysis. We converted the IFDS taint analysis into an IDE problem with an implementation of $\transCC_\rcc$.
+
+We extensively tested the correlated-calls analysis to ensure that in the absence of correlated calls in an input program, the analysis produced the same results as an IFDS-equivalent analysis, and in the presence of correlated calls, the result was more precise.
