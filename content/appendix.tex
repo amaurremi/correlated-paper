@@ -130,6 +130,7 @@ In this part of the Appendix we prove the Lemmas of Soundness and Precision of t
 \precision*
 \begin{proof}
     \otodo{It's Section 3.2.}
+    \mtodo{Section 3.2 talks about the IFDS algorithm, but it doesn't explicitly say how the result of an IFDS analysis looks like and doesn't introduce the notation $\resultIFDS$.}
   Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
   nodes $n\in N^*$ to sets of data-flow facts $\delta\in2^D$. Specifically,
   \begin{equation}
@@ -148,8 +149,8 @@ In this part of the Appendix we prove the Lemmas of Soundness and Precision of t
 
 To prove the Soundness Lemma, we first introduce Lemmas~\ref{lem:sound1} and~\ref{lem:sound3}.
 
-We will denote the top element in the environment lattice as
-$\Omega=\lambda d\,.\,\topcc$.
+As previously we will denote the top element in the environment lattice as
+$\top_\textsf{Env}$.
 \otodo{I've been using $\top_\textsf{Env}$ for clarity.}
 
 For the purpose of the proofs, we will rewrite Equation~\eqref{eq:edgefndef} that defines an edge function as follows:
@@ -170,7 +171,7 @@ For the purpose of the proofs, we will rewrite Equation~\eqref{eq:edgefndef} tha
 
 Additionally, for a path $p=[\startmain,\,\dots]$ and a fact $d\in D$, we will denote the lattice element that is mapped to $d$ according to the flow functions of path $p$ as follows:
 \begin{equation}
-  \mpd=\menv(p)(\Omega)(d)\,.
+  \mpd=\menv(p)(\top_\textsf{Env})(d)\,.
 \end{equation}
 
 The following Lemma shows that the lattice elements (receiver-to-types maps) of a correlated-calls IDE analysis correctly overapproximate the possible types of a receiver in a program execution.
@@ -199,9 +200,9 @@ Let $p=[\startmain,\,\dots,\,n]$ be some concrete execution trace of the program
   Observe that
   \begin{align*}
     \mppd
-    &=\menv(p')(\Omega)(d)\\
-    &=\left(\menv(e_k)\circ\menv(e_{k-1})\circ\ldots\circ\menv(e_1)\right)(\Omega)(d)\\
-    &=\menv(e_k)\left(\menv(p)(\Omega)\right)(d)\,.
+    &=\menv(p')(\top_\textsf{Env})(d)\\
+    &=\left(\menv(e_k)\circ\menv(e_{k-1})\circ\ldots\circ\menv(e_1)\right)(\top_\textsf{Env})(d)\\
+    &=\menv(e_k)\left(\menv(p)(\top_\textsf{Env})\right)(d)\,.
   \end{align*}
   
 As shown in~Sagiv et al.~\cite{sagiv1996precise}, the relationship between environment transformers and edge functions can be described with the following equation. For an edge $(n_1,\,n_2)\in E^*$ an environment $\textsf{env}$ that maps $D$ to $L$, and a fact $d\in D$,
@@ -211,11 +212,11 @@ As shown in~Sagiv et al.~\cite{sagiv1996precise}, the relationship between envir
 \end{align}  
 Then, according to~\eqref{eq:envTransToEdgeFnEdge},\mtodo{Is it okay that in~\eqref{eq:envTransToEdgeFnEdge}, we use $\edgefn$, and below we use $\ccedgefn R$?}
   \begin{align*}
-    &\menv(e_k)\left(\menv(p)(\Omega)\right)(d)(r)\\
+    &\menv(e_k)\left(\menv(p)(\top_\textsf{Env})\right)(d)(r)\\
       =&\bigg(\ccedgefn R((n_{k-1},\,\Lambda),\,(n_k,\,d))(\topcc)\sqcap\\
-       &\bigsqcap_{d'\in D}\ccedgefn R((n_{k-1},\,d'),\,(n_k,\,d))(\menv(p)(\Omega)(d'))\bigg)(r)\\
+       &\bigsqcap_{d'\in D}\ccedgefn R((n_{k-1},\,d'),\,(n_k,\,d))(\menv(p)(\top_\textsf{Env})(d'))\bigg)(r)\\
       \supseteq&
-        \bigsqcap_{d'\in D}\ccedgefn R((n_{k-1},\,d'),\,(n_k,\,d))(\menv(p)(\Omega)(d'))(r)\\
+        \bigsqcap_{d'\in D}\ccedgefn R((n_{k-1},\,d'),\,(n_k,\,d))(\menv(p)(\top_\textsf{Env})(d'))(r)\\
       \supseteq&\,\ccedgefn R((n_{k-1},\,d_{k-1}),\,(n_k,\,d))(\mpdkm)(r)\,.
   \end{align*}
   Therefore, 
@@ -363,7 +364,7 @@ According to~\eqref{eq:ideresult}, we can rewrite~\eqref{eq:transCcDef} as
 \begin{align*}\label{eq:transCcResultCc}
   \backCC(\resultIDE(\transCC_R(P)))(n)
   &=\{d'\,|\,\forall r\in R\,.\,\mvp{\textsf{Env}}(n,\,d'))(r)\ne\top_T\}\\
-  &=\left\{d'\,|\,\forall r\in R\,.\bigsqcap_{q\in\textsf{VP}(n)}\menv(q)(\Omega)(d')(r)\ne\top_T\right\}\\
+  &=\left\{d'\,|\,\forall r\in R\,.\bigsqcap_{q\in\textsf{VP}(n)}\menv(q)(\top_\textsf{Env})(d')(r)\ne\top_T\right\}\\
   &=\left\{d'\,|\,\forall r\in R\,.\bigsqcap_{q\in\textsf{VP}(n)}\mpddef q {d'}(r)\ne\top_T\right\}.
 \end{align*}
   According to~Lemma~\ref{lem:sound3}, since $d\in M_F(p)(\varnothing)$, then for any $r\in R$, $\mpd(r)\ne\top_T$. 
@@ -484,7 +485,7 @@ The following Lemma shows that the correlated-calls analysis computes the result
   \begin{align}
     \resultIDE\left(\transCC_S(P)\right)(n)(d)(r)
     &=\mvp{\textsf{Env}}(n,\,d)(r)\notag\\
-    &=\left(\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\Omega)(d)\right)(r)\notag\\
+    &=\left(\bigsqcap_{q\in\ivp(n)}M_\textsf{Env}(q)(\top_\textsf{Env})(d)\right)(r)\notag\\
     &=\left(\bigsqcap_{q\in\ivp(n)}\bigsqcap_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn S(q')(\topcc)\right)(r)\notag\\
     &=\bigcup_{q\in\ivp(n)}\bigcup_{q'\in\mathsf{RP}(q,\,d)}\ccedgefn S(q')(\topcc)(r)\,.\label{eq:resultThroughEdgefn}
   \end{align}
