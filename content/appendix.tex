@@ -2,9 +2,20 @@
 In this appendix we present the proofs to the Lemmas introduced in Section~\ref{sec:cca}.
 
 \subsection*{Representation of Micro Functions}
+\otodo{Repeat the lemmas here before each proof.}
 We start by presenting the proofs to the lemmas about the representation of micro functions.
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalEq}}]
+    OL: Can't we just say the following?
+    \begin{align*}
+        \denote{\setpair {I}{U}}\\
+       & = \lambda m. \lambda r. (m(r) \cap I(r))\cup U(r))\\
+       & = \lambda m. \lambda r. (m(r) \cap I'(r))\cup U'(r))\\
+       & = 
+        \denote{\setpair {I'}{U'}}\\
+    \end{align*}
+    
+
 First, we need to show that for all $r\in R$ and ${m\in R\to2^T}$, if $I(r)=I'(r)$ and $U(r)=U'(r)$, then $\denote{\setpair IU}(m)(r)=\denote{\setpair{I'}{U'}}(m)(r)$. Indeed, we can see that
 \begin{align*}
   \denote{\setpair IU}(m)(r)
@@ -14,6 +25,49 @@ First, we need to show that for all $r\in R$ and ${m\in R\to2^T}$, if $I(r)=I'(r
   &=\left(\lambda m'\,.\,\lambda r'\,.\,(m'(r')\cap I'(r'))\cup U'(r')\right)(m)(r)\\
   &=\denote{\setpair{I'}{U'}}(m)(r).
 \end{align*}
+
+OL: Again, we can keep it simpler:
+For the other direction:
+\begin{align*}
+&&
+    \denote{\setpair{I}{U}} &= \denote{\setpair{I'}{U'}}\\
+&\implies &
+    \denote{\setpair{I}{U}}(\lambda r. \emptyset) &= \denote{\setpair{I'}{U'}}(\lambda r. \emptyset)\\
+&\implies &
+(\lambda m.\lambda r.(m(r)\cap I(r))\cup U(r))(\lambda r.\emptyset) &=
+(\lambda m.\lambda r.(m(r)\cap I'(r))\cup U'(r))(\lambda r.\emptyset) \\
+&\implies &
+\lambda r.(\emptyset \cap I(r))\cup U(r) &=
+\lambda r.(\emptyset \cap I'(r))\cup U'(r) \\
+&\implies &
+\lambda r.U(r) &=
+\lambda r.U'(r) \\
+&\implies &
+U &=
+U' \\
+\end{align*}
+Similarly:
+\begin{align*}
+&&
+    \denote{\setpair{I}{U}} &= \denote{\setpair{I'}{U'}}\\
+&\implies &
+\denote{\setpair{I}{U}}(I) &= \denote{\setpair{I'}{U'}}(I)\\
+&\implies &
+(\lambda m.\lambda r.(m(r)\cap I(r))\cup U(r))(I) &=
+(\lambda m.\lambda r.(m(r)\cap I'(r))\cup U'(r))(I) \\
+&\implies &
+\lambda r.(I(r) \cap I(r))\cup U(r) &=
+\lambda r.(I(r) \cap I'(r))\cup U'(r) \\
+&\implies &
+\lambda r.(I(r) \cap I(r)) &=
+\lambda r.(I(r) \cap I'(r)) \textrm{ since $\forall r.U(r) \subseteq I(r)$} \\
+&\implies \forall r.&
+I(r) &= I(r) \cap I'(r)\\
+&\implies \forall r.&
+I(r) &\subseteq I'(r)\\
+\end{align*}
+Symmetrically, we can also establish that $\forall r.I'(r) \subseteq I(r)$ by applying the functions to $I'$ instead of to $I$. Therefore, $I = I'$.
+
 
 For the other direction, we need to show that if for any $r\in R$ and ${m\in R\to2^T}$, $(m(r)\cap I(r))\cup U(r)=(m(r)\cap I'(r))\cup U'(r)$, then for all $r'\in R$, $I(r')=I'(r')$ and $U(r')=U'(r')$.
 
@@ -26,6 +80,7 @@ Additionally, $U'(r)\subseteq I'(r)$ and $U'(r)\subseteq I(r)$ (because $U'(r)=U
 and we can conclude that $I(r)=I'(r)$.
 \end{proof}
 
+\otodo{The (m)(r) does not seem necessary. Can we replace $r'$ with $r$ and $m'$ with $m$?}
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalComp}}]
 For all $r\in R$ and $m\in R\to2^T$,
 \begin{align*}
@@ -89,11 +144,13 @@ For all $r\in R$ and $m\in R\to2^T$,
 In this part of the Appendix we prove the Lemmas of Soundness and Precision of the correlated-calls analysis.
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:subsetifds}}]
+    \otodo{It's Section 3.2.}
   Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
   nodes $n\in N^*$ to sets of data-flow facts $\delta\in2^D$. Specifically,
   \begin{equation}
     \resultIFDS(P)=\lambda n\,.\,\mvp F(n)\,.
   \end{equation}
+  \otodo{Where do we mention $\backEq$ in this lemma?}
   The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
   \begin{align*}
     \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
@@ -108,6 +165,7 @@ To prove the Soundness Lemma, we first introduce Lemmas~\ref{lem:sound1} and~\re
 
 We will denote the top element in the environment lattice as
 $\Omega=\lambda d\,.\,\topcc$.
+\otodo{I've been using $\top_\textsf{Env}$ for clarity.}
 
 For the purpose of the proofs, we will rewrite Equation~\eqref{eq:edgefndef} that defines an edge function as follows:
   \begin{equation}\label{eq:edgefnThroughDelta}
