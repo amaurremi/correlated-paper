@@ -83,14 +83,13 @@ Symmetrically, we can also establish that $\forall r.I'(r) \subseteq I(r)$ by ap
 
 \equalMeet*
 \begin{proof}
-  For all $r\in R$ and $m\in R\to2^T$,
 \begin{align*}
-  &\left(\denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}\right)(m)(r)\\
-  =&(\denote{\setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}})(m)(r)\\
-  =&(m(r)\cap(I(r)\cup I'(r))\cup U(r)\cup U'(r)\\
-  =&(m(r)\cap I(r))\cup U(r)\cup(m(r)\cap I'(r))\cup U'(r)\\
-  =&\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)\\
-  =&\left(\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}\right)(m)(r).\qedhere
+  &\denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}\\
+  =&\denote{\setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}}\\
+  =&\lambda m\,.\,\lambda r\,.\,(m(r)\cap(I(r)\cup I'(r))\cup U(r)\cup U'(r)\\
+  =&\lambda m\,.\,\lambda r\,.\,(m(r)\cap I(r))\cup U(r)\cup(m(r)\cap I'(r))\cup U'(r)\\
+  =&\lambda m\,.\,\lambda r\,.\,\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)\\
+  =&\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}.\qedhere
 \end{align*}
 \end{proof}
 
