@@ -278,10 +278,10 @@ Then, according to~\eqref{eq:envTransToEdgeFnEdge},\mtodo{Is it okay that in~\eq
 We will now show that on a node of a concrete execution path, the correlated-calls analysis does not map receivers to $\top_T$. In other words, the analysis never considers nodes of a concrete execution path unreachable.
 
 \begin{lemma}\label{lem:sound3}
-  Let $p=[\startmain,\,\dots,\,n]$ be a concrete execution path, $r\in R$ a receiver, and $d\in D$ a data-flow fact. Then if $d\in M_F(p)(\varnothing)$,
+  Let $p=[\startmain,\,\dots,\,n]$ be a concrete execution path, $r\in R$ a receiver, and $d\in D$ a data-flow fact. Then
   \begin{equation}
-    \mpd(r)\ne\top_T\,.
-  \end{equation}
+    d\in M_F(p)(\varnothing)\iff\mpd(r)\ne\top_T\,.
+  \end{equation}\mtodo{Prove other direction}
 \end{lemma}
 \begin{proof}
   By induction on the length of the execution trace.
@@ -294,7 +294,7 @@ We will now show that on a node of a concrete execution path, the correlated-cal
   \begin{equation}
     \uptau=\mpdkm(r)\,.
   \end{equation}
-  Assume the Lemma holds for that for a concrete execution path $$p=[\startmain,\,n_1,\,\dots,\,n_{k-1}]\,,$$ i.e. $\uptau\ne\top_T$ for an arbitrary $r\in R$ and $d_{k-1}\in D$.
+  Assume the Lemma holds for a concrete execution path $$p=[\startmain,\,n_1,\,\dots,\,n_{k-1}]\,,$$ i.e. $\uptau\ne\top_T$ for an arbitrary $r\in R$ and $d_{k-1}\in D$.
   
   \textit{Induction step:}
     Let $p'=[\startmain,\,n_1,\,\dots,n_{k-1},\,n_k]$ be a concrete execution path.
@@ -356,19 +356,19 @@ According to~\eqref{eq:ideresult}, we can rewrite~\eqref{eq:transCcDef} as
     \mtodo{Section 3.2 talks about the IFDS algorithm, but it doesn't explicitly say how the result of an IFDS analysis looks like and doesn't introduce the notation $\resultIFDS$.}
   Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
   nodes $n\in N^*$ to sets of data-flow facts $\delta\in2^D$. Specifically,
-  \begin{equation}
-    \resultIFDS(P)=\lambda n\,.\,\mvp F(n)\,.
-  \end{equation}
-  \otodo{Where do we mention $\backEq$ in this lemma?}
-  %The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
-  An IFDS result The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
+  \begin{align*}
+    \resultIFDS(P)&=\lambda n\,.\,\mvp F(n)\\
+    &=\bigsqcap_{q\in\textsf{VP}(n)}M_F(q)(\top).
+  \end{align*}
+  At the same time,
   \begin{align*}
     \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
-    &=\left(\lambda n'\,.\,\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n')(d)(r)\ne\top_T\right\}\right)(n)\\
-    &=\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n')(d)(r)\ne\top_T\right\}\\
-    &\subseteq\left\{d\,|\,\resultIDE(\transCC_R(P))(n)(d)\ne\topcc\right\}\\
-    &=\backEq\left(\resultIDE(\transCC_R(P))(n)\right).\qedhere
+    &=\left(\lambda n\,.\,\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n)(d)(r)\ne\top_T\right\}\right)(n)\\
+    &=\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n)(d)(r)\ne\top_T\right\}\\
+    &=\left\{d\,|\,\forall r\in R\,.\,\bigsqcap_{q\in\textsf{VP}(n)}\xi(q,\,d)(r)\ne\top_T\right\}.
   \end{align*}
+  This means that for each $d\in\backCC(\resultIDE(\transCC R(P)))(n)$ and for each path $q\in\textsf{VP}(n)$, $\xi(q,\,d)\ne\top_T$. Therefore, according to~Lemma~\ref{lem:sound3}, for each $q$, $d\in M_F(q)(\top)$. It follows that $d\in\bigsqcap_{q\in\textsf{VP}(n)}M_F(q)(\top)=\resultIFDS(P)(n)$. 
+  In other words, if $d\in\backCC(\resultIDE(\transCC R(P)))(n)$, then $d\in\resultIFDS(P)(n)$.
 \end{proof}
 
 \subsection*{Correlated Call Receivers}
