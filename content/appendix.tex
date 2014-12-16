@@ -2,10 +2,10 @@
 In this appendix we present the proofs to the Lemmas introduced in Section~\ref{sec:cca}.
 
 \subsection*{Representation of Micro Functions}
-\otodo{Repeat the lemmas here before each proof.}
 We start by presenting the proofs to the lemmas about the representation of micro functions.
 
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalEq}}]
+\equalEq*
+\begin{proof}
     OL: Can't we just say the following?
     \begin{align*}
         \denote{\setpair {I}{U}}\\
@@ -81,7 +81,8 @@ and we can conclude that $I(r)=I'(r)$.
 \end{proof}
 
 \otodo{The (m)(r) does not seem necessary. Can we replace $r'$ with $r$ and $m'$ with $m$?}
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalComp}}]
+\equalComp*
+\begin{proof}
 For all $r\in R$ and $m\in R\to2^T$,
 \begin{align*}
   &\denote{\setpair IU\circ\setpair{I'}{U'}}(m)(r)\\
@@ -97,7 +98,8 @@ For all $r\in R$ and $m\in R\to2^T$,
 \end{align*}
 \end{proof}
 
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:equalMeet}}]
+\equalMeet*
+\begin{proof}
   For all $r\in R$ and $m\in R\to2^T$,
 \begin{align*}
   \left(\denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}\right)&(m)(r)\\
@@ -143,7 +145,8 @@ For all $r\in R$ and $m\in R\to2^T$,
 
 In this part of the Appendix we prove the Lemmas of Soundness and Precision of the correlated-calls analysis.
 
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:subsetifds}}]
+\precision*
+\begin{proof}
     \otodo{It's Section 3.2.}
   Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
   nodes $n\in N^*$ to sets of data-flow facts $\delta\in2^D$. Specifically,
@@ -372,7 +375,8 @@ For the following proofs, recall from Section~\ref{sec:ideToIfds} that the resul
 
 Finally, we can prove the Soundness Lemma.
 
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:sound}}] 
+\sound*
+\begin{proof}
 According to~\eqref{eq:ideresult}, we can rewrite~\eqref{eq:transCcDef} as
 \begin{align*}\label{eq:transCcResultCc}
   \backCC(\resultIDE(\transCC_R(P)))(n)

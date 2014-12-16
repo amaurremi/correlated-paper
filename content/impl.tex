@@ -461,14 +461,15 @@ the representation: $\setpair{I}{U}(m) = \lambda r\,.\,(m(r) \cap I(r)) \cup U(r
 To compare two micro-functions for equality, it suffices to compare the corresponding
 sets $I(r)$ and $U(r)$ for all receivers $r$. The following lemma shows that this
 implementation of comparison corresponds to equality of the represented micro-functions:
-\begin{lemma}\label{lem:equalEq}
+\begin{restatable}{lemma}{equalEq}
+\label{lem:equalEq}
     For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
     \[
         \forall r\,.\,I(r) = I'(r) \land U(r) = U'(r)
         \iff
         \denote{\setpair{I}{U}} = \denote{\setpair{I'}{U'}}.
     \] 
-\end{lemma}
+\end{restatable}
 The proofs of all of the lemmas and theorems in the paper are provided in the supplemental
 material submitted with the paper.
 \otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
@@ -480,21 +481,22 @@ The composition of two micro-function representations is defined as follows:
 $\setpair{I}{U} \circ \setpair{I'}{U'} = \setpair{\lambda r\,.\,(I(r) \cap I'(r))\cup U(r)}{\lambda r\,.\,(I(r)\cap U'(r))\cup U(r)}$.
 The following lemma shows that this implementation corresponds to the composition
 of the denoted functions:
-\begin{lemma}\label{lem:equalComp}
+\begin{restatable}{lemma}{equalComp}\label{lem:equalComp}
     For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
     \[
         \denote{\setpair{I}{U} \circ \setpair{I'}{U'}}
         = 
         \denote{\setpair{I}{U}} \circ \denote{\setpair{I'}{U'}}.
     \]
-\end{lemma}
+\end{restatable}
 \otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
 
 The meet of two micro-function representations is defined as follows:
 $\setpair{I}{U} \sqcap \setpair{I'}{U'} = \setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}$.
 The following lemma shows that this implementation corresponds to the meet
 of the denoted functions:
-\begin{lemma}\label{lem:equalMeet}
+\begin{restatable}{lemma}{equalMeet}\label{lem:equalMeet}
+\label{lem:equalMeet}
     For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
     \[
         \denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}
@@ -504,7 +506,7 @@ of the denoted functions:
     where
     $\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}
      =\lambda m.\lambda r.\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)$.\mtodo{I added the definition of the meet of two functions.}
-\end{lemma}
+\end{restatable}
 \otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
 
 \otodo{Sagiv et al. define a notion of an ``efficient'' implementation of micro-functions.
@@ -519,25 +521,25 @@ of the denoted functions:
 
 In the following lemma we show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.
 
-\begin{lemma}[Precision]\label{lem:subsetifds}
+\begin{restatable}[Precision]{lemma}{precision}\label{lem:subsetifds}
     For an IFDS problem $P$ and all ${n\in N^*}$,
     \begin{equation}\label{eq:correct}
       \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
       \subseteq
       \resultIFDS(P)(n)\,.
     \end{equation}
-\end{lemma}
+\end{restatable}
 
 We will next show that our analysis is sound, i.e. that the result of an IDE problem obtained through a correlated-calls transformation removes only facts that occur on infeasible paths. 
 
-\begin{lemma}[Soundness]\label{lem:sound}
+\begin{restatable}[Soundness]{lemma}{sound}\label{lem:sound}
   Let $p=[\startmain,\,\dots,\,n]$ be a concrete execution path, and let $d\in D$.
   If $d\in M_F(p)(\varnothing),$
   then
   \begin{equation}
     d\in \backCC\left(\resultIDE(\transCC_R(P))\right)(n)\,.
   \end{equation}
-\end{lemma}
+\end{restatable}
 
 \subsection{Correlated-Call Receivers}\label{sec:ccreceivers}
 \otodo{should this be a section or subsection? should it be moved somewhere else (or maybe not included at all)?}
