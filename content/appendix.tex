@@ -281,7 +281,7 @@ We will now show that on a node of a concrete execution path, the correlated-cal
   Let $p=[\startmain,\,\dots,\,n]$ be a concrete execution path, $r\in R$ a receiver, and $d\in D$ a data-flow fact. Then
   \begin{equation}
     d\in M_F(p)(\varnothing)\iff\mpd(r)\ne\top_T\,.
-  \end{equation}\mtodo{Prove other direction}
+  \end{equation}
 \end{lemma}
 \begin{proof}
   We start by proving that if $d\in M_F(p)(\varnothing)$, then $\mpd(r)\ne\top_T$, by induction on the length of the execution trace.
@@ -329,7 +329,9 @@ We will now show that on a node of a concrete execution path, the correlated-cal
     
     The same reasoning applies to the case where $e_k$ is a call-start edge.\\
     
-    For the other direction, we will prove that if $\mpd(r)\ne\top_T$, then $d\in M_F(p)(\varnothing)$.
+    For the other direction, we need to show that if $\mpd(r)\ne\top_T$, then $d\in M_F(p)(\varnothing)$.
+    
+    The fact that $\mpd(r)\ne\top_T$ means that there exists a realizable path corresponding to the fact $d$ along path $p$, and, by definition, $d$ must be contained in $M_F(p)(\varnothing)$.\mtodo{Is this hand-wavy?}
 \end{proof}
 
 For the following proofs, recall from Section~\ref{sec:ideToIfds} that the result of an IDE analysis maps a lattice element to each node in the exploded supergraph. Specifically, for an IDE problem $Q$, the result $\resultIDE(Q):\ N^*\to(D\to L)$ maps nodes of the supergraph to pairs of data-flow facts and lattice elements~\cite{sagiv1996precise}:
