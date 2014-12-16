@@ -642,7 +642,7 @@ supergraph. More specifically, the input generally provides a function
 $f: N^* \times D \times N^* \to 2^D$. Given a (non-exploded) supergraph edge $n \to n'$ and a dataflow fact $d$,
 $f(n,d,n')$ returns the set of all $d'$ such that the exploded supergraph contains the edge $(n,d) \to (n',d')$.
 For convenience, the function $f$ can be split up into separate functions that handle the cases when
-the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.
+the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.\mtodo{Do we leave the start-to-return edge out as a special case of intraprocedural edge?}
 
 %We presented an overview of the IFDS analysis. IFDS problems are transformed into IDE problems by the correlated-calls analysis. The IDE framework is described in the next section.
 
@@ -926,13 +926,11 @@ the input dataflow functions to be provided in their pointwise representation
 as exploded supergraph edges labelled with micro-functions.
 %\mtodo{Should we cite the ``Practical extensions'' paper here that talks about the on-demand IFDS algorithm?}
 Specifically,
-the input is generally provided as a function $f: N^* \times D \times N^* \to (D \to F)$,
+the input is generally provided as a function $f: (N^* \times D) \times (N^* \times D) \to F$,
 where $F$ is the set of representations of micro-functions from $L$ to $L$.
-Given a (non-exploded) supergraph edge $n \to n'$ and a dataflow fact $d$,
-$f(n,d,n')$ returns a map that gives, for each fact $d'$, the micro-function $f$
-that appears on the exploded supergraph edge $(n,d) \to (n',d')$.
-Like in the IFDS algorithm, the function $f$ can be split up into separate functions that handle the cases when
-the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.
+Given an exploded supergraph edge $e=(n,\,d) \to (n',\,d')$,
+$f((n,\,d),\,(n',\,d'))$ returns the micro-function that appears on the exploded supergraph edge $e$.
+Like in the IFDS algorithm, the function $f$ can be split up into separate functions that handle the cases when $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.
 
 
 \otodo{In the next section, we talk about \textsf{EdgeFn}, which is inconsistent with how
