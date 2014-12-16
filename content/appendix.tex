@@ -284,7 +284,7 @@ We will now show that on a node of a concrete execution path, the correlated-cal
   \end{equation}\mtodo{Prove other direction}
 \end{lemma}
 \begin{proof}
-  By induction on the length of the execution trace.
+  We start by proving that if $d\in M_F(p)(\varnothing)$, then $\mpd(r)\ne\top_T$, by induction on the length of the execution trace.
   
   \textit{Basis:} 
     Let $p=[\startmain]$. Since the only realizable path corresponding to $p$ is $[(\startmain,\,\Lambda)]$, there is no fact $d\in D$ such that $d\in M_F(p)(\varnothing)$, and the claim follows immediately.
@@ -327,7 +327,9 @@ We will now show that on a node of a concrete execution path, the correlated-cal
 
     According to Lemma~\ref{lem:sound1} and by the induction hypothesis, the runtime type $t$ of $r$ must be contained in $\mpdkm(r)=\uptau$. At the same time, by definition, $t$ is part of $\tau(s,\,f)$. Therefore, $t\in\uptau\cap\tau(s,\,f)\subseteq\efek$, which means that $\efek\ne\top_T$.
     
-    The same reasoning applies to the case where $e_k$ is a call-start edge.
+    The same reasoning applies to the case where $e_k$ is a call-start edge.\\
+    
+    For the other direction, we will prove that if $\mpd(r)\ne\top_T$, then $d\in M_F(p)(\varnothing)$.
 \end{proof}
 
 For the following proofs, recall from Section~\ref{sec:ideToIfds} that the result of an IDE analysis maps a lattice element to each node in the exploded supergraph. Specifically, for an IDE problem $Q$, the result $\resultIDE(Q):\ N^*\to(D\to L)$ maps nodes of the supergraph to pairs of data-flow facts and lattice elements~\cite{sagiv1996precise}:
@@ -363,12 +365,11 @@ According to~\eqref{eq:ideresult}, we can rewrite~\eqref{eq:transCcDef} as
   At the same time,
   \begin{align*}
     \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
-    &=\left(\lambda n\,.\,\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n)(d)(r)\ne\top_T\right\}\right)(n)\\
     &=\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n)(d)(r)\ne\top_T\right\}\\
     &=\left\{d\,|\,\forall r\in R\,.\,\bigsqcap_{q\in\textsf{VP}(n)}\xi(q,\,d)(r)\ne\top_T\right\}.
   \end{align*}
-  This means that for each $d\in\backCC(\resultIDE(\transCC R(P)))(n)$ and for each path $q\in\textsf{VP}(n)$, $\xi(q,\,d)\ne\top_T$. Therefore, according to~Lemma~\ref{lem:sound3}, for each $q$, $d\in M_F(q)(\top)$. It follows that $d\in\bigsqcap_{q\in\textsf{VP}(n)}M_F(q)(\top)=\resultIFDS(P)(n)$. 
-  In other words, if $d\in\backCC(\resultIDE(\transCC R(P)))(n)$, then $d\in\resultIFDS(P)(n)$.
+  This means that for any given $d\in\backCC(\resultIDE(\transCC R(P)))(n)$ and path $q\in\textsf{VP}(n)$, $\xi(q,\,d)\ne\top_T$. Therefore, according to~Lemma~\ref{lem:sound3}, $d\in M_F(q)(\top)$. It follows that $d\in\bigsqcap_{q\in\textsf{VP}(n)}M_F(q)(\top)$, which is equal to $\resultIFDS(P)(n)$. 
+  Hence, we have shown that if $d\in\backCC(\resultIDE(\transCC R(P)))(n)$, then $d\in\resultIFDS(P)(n)$.
 \end{proof}
 
 \subsection*{Correlated Call Receivers}
