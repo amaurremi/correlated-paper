@@ -144,11 +144,13 @@ For all $r\in R$ and $m\in R\to2^T$,
 In this part of the Appendix we prove the Lemmas of Soundness and Precision of the correlated-calls analysis.
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:subsetifds}}]
+    \otodo{It's Section 3.2.}
   Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
   nodes $n\in N^*$ to sets of data-flow facts $\delta\in2^D$. Specifically,
   \begin{equation}
     \resultIFDS(P)=\lambda n\,.\,\mvp F(n)\,.
   \end{equation}
+  \otodo{Where do we mention $\backEq$ in this lemma?}
   The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
   \begin{align*}
     \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
@@ -163,6 +165,7 @@ To prove the Soundness Lemma, we first introduce Lemmas~\ref{lem:sound1} and~\re
 
 We will denote the top element in the environment lattice as
 $\Omega=\lambda d\,.\,\topcc$.
+\otodo{I've been using $\top_\textsf{Env}$ for clarity.}
 
 For the purpose of the proofs, we will rewrite Equation~\eqref{eq:edgefndef} that defines an edge function as follows:
   \begin{equation}\label{eq:edgefnThroughDelta}
