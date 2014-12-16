@@ -519,18 +519,7 @@ of the denoted functions:
 
 \subsection{Theoretical Results}
 
-In the following lemma we show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.
-
-\begin{restatable}[Precision]{lemma}{precision}\label{lem:subsetifds}
-    For an IFDS problem $P$ and all ${n\in N^*}$,
-    \begin{equation}\label{eq:correct}
-      \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
-      \subseteq
-      \resultIFDS(P)(n)\,.
-    \end{equation}
-\end{restatable}
-
-We will next show that our analysis is sound, i.e. that the result of an IDE problem obtained through a correlated-calls transformation removes only facts that occur on infeasible paths. 
+In the following lemma we show that our analysis is sound, i.e. that the result of an IDE problem obtained through a correlated-calls transformation removes only facts that occur on infeasible paths. 
 
 \begin{restatable}[Soundness]{lemma}{sound}\label{lem:sound}
   Let $p=[\startmain,\,\dots,\,n]$ be a concrete execution path, and let $d\in D$.
@@ -539,6 +528,17 @@ We will next show that our analysis is sound, i.e. that the result of an IDE pro
   \begin{equation}
     d\in \backCC\left(\resultIDE(\transCC_R(P))\right)(n)\,.
   \end{equation}
+\end{restatable}
+
+We next show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.
+
+\begin{restatable}[Precision]{lemma}{precision}\label{lem:subsetifds}
+    For an IFDS problem $P$ and all ${n\in N^*}$,
+    \begin{equation}\label{eq:correct}
+      \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
+      \subseteq
+      \resultIFDS(P)(n)\,.
+    \end{equation}
 \end{restatable}
 
 \subsection{Correlated-Call Receivers}\label{sec:ccreceivers}

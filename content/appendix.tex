@@ -127,31 +127,10 @@ Symmetrically, we can also establish that $\forall r.I'(r) \subseteq I(r)$ by ap
 
 In this part of the Appendix we prove the Lemmas of Soundness and Precision of the correlated-calls analysis.
 
-\precision*
-\begin{proof}
-    \otodo{It's Section 3.2.}
-    \mtodo{Section 3.2 talks about the IFDS algorithm, but it doesn't explicitly say how the result of an IFDS analysis looks like and doesn't introduce the notation $\resultIFDS$.}
-  Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
-  nodes $n\in N^*$ to sets of data-flow facts $\delta\in2^D$. Specifically,
-  \begin{equation}
-    \resultIFDS(P)=\lambda n\,.\,\mvp F(n)\,.
-  \end{equation}
-  \otodo{Where do we mention $\backEq$ in this lemma?}
-  The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
-  \begin{align*}
-    \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
-    &=\left(\lambda n'\,.\,\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n')(d)(r)\ne\top_T\right\}\right)(n)\\
-    &=\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n')(d)(r)\ne\top_T\right\}\\
-    &\subseteq\left\{d\,|\,\resultIDE(\transCC_R(P))(n)(d)\ne\topcc\right\}\\
-    &=\backEq\left(\resultIDE(\transCC_R(P))(n)\right).\qedhere
-  \end{align*}
-\end{proof}
-
 To prove the Soundness Lemma, we first introduce Lemmas~\ref{lem:sound1} and~\ref{lem:sound3}.
 
-As previously we will denote the top element in the environment lattice as
-$\top_\textsf{Env}$.
-\otodo{I've been using $\top_\textsf{Env}$ for clarity.}
+As previously we will denote the top element in the environment lattice as~$\top_\textsf{Env}$.
+%\otodo{I've been using $\top_\textsf{Env}$ for clarity.}
 
 For the purpose of the proofs, we will rewrite Equation~\eqref{eq:edgefndef} that defines an edge function as follows:
   \begin{equation}\label{eq:edgefnThroughDelta}
@@ -356,7 +335,7 @@ For the following proofs, recall from Section~\ref{sec:ideToIfds} that the resul
   \resultIDE(Q)=\lambda n\,.\,\lambda d\,.\,\mvp{\textsf{Env}}(n,\,d))\,.
 \end{equation}
 
-Finally, we can prove the Soundness Lemma.
+We can now prove the Soundness Lemma.
 
 \sound*
 \begin{proof}
@@ -369,6 +348,27 @@ According to~\eqref{eq:ideresult}, we can rewrite~\eqref{eq:transCcDef} as
 \end{align*}
   According to~Lemma~\ref{lem:sound3}, since $d\in M_F(p)(\varnothing)$, then for any $r\in R$, $\mpd(r)\ne\top_T$. 
   Since $\mpd(r)$ is a non-empty set that is contained in $\bigsqcap_{q\in\textsf{VP}(n)}\mpddef q {d}(r)$, it follows that $$\bigsqcap_{q\in\textsf{VP}(n)}\mpddef q {d}(r)\ne\top_T.$$ Therefore, $d\in \backCC(\resultIDE(\transCC_R(P)))(n)$.
+\end{proof}
+
+\precision*
+\begin{proof}
+    \otodo{It's Section 3.2.}
+    \mtodo{Section 3.2 talks about the IFDS algorithm, but it doesn't explicitly say how the result of an IFDS analysis looks like and doesn't introduce the notation $\resultIFDS$.}
+  Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
+  nodes $n\in N^*$ to sets of data-flow facts $\delta\in2^D$. Specifically,
+  \begin{equation}
+    \resultIFDS(P)=\lambda n\,.\,\mvp F(n)\,.
+  \end{equation}
+  \otodo{Where do we mention $\backEq$ in this lemma?}
+  %The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
+  An IFDS result The transformation $\backCC$ is the same as $\backEq$, except that it can remove data-flow facts from the result:
+  \begin{align*}
+    \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
+    &=\left(\lambda n'\,.\,\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n')(d)(r)\ne\top_T\right\}\right)(n)\\
+    &=\left\{d\,|\,\forall r\in R\,.\,\resultIDE(\transCC_R(P))(n')(d)(r)\ne\top_T\right\}\\
+    &\subseteq\left\{d\,|\,\resultIDE(\transCC_R(P))(n)(d)\ne\topcc\right\}\\
+    &=\backEq\left(\resultIDE(\transCC_R(P))(n)\right).\qedhere
+  \end{align*}
 \end{proof}
 
 \subsection*{Correlated Call Receivers}
