@@ -31,7 +31,7 @@ considered by IFDS.
 This paper presents an approach to dataflow analysis that avoids a type
 of infeasible path that arises in object-oriented programs when two or more
 methods are dynamically dispatched on the same receiver object.
-\mtodo{Should we define the term ``receiver''?}
+%\mtodo{Should we define the term ``receiver''?}
 In such cases, if the
 method calls are polymorphic (i.e., if they dispatch to different method definitions 
 depending on the type of the receiver expression at run time), then their dispatch 
@@ -69,21 +69,26 @@ in Figure~\ref{fig:transformations}%
 
 We implemented the correlated-calls transformation and the IDE algorithm in Scala,
 on top of the WALA framework for static analysis of JVM bytecode~\cite{fink2012wala}.
-We also report on preliminary experiments in which our correlated-calls transformation
-is applied to an IFDS formulation of a simple taint analysis. Our results show that
-solving the resulting IDE problem avoids infeasible paths due to correlated calls as
-expected.
+Our prototype implementation was tested extensively by using it to transform an IFDS-based 
+taint analysis into a more precise IDE-based taint analysis, and applying the latter
+to small example programs with correlated calls. Our prototype along with all tests
+will be made available to the artifact evaluation committee.
 
-In summary, the contributions of this paper are as follows:
-\begin{itemize}
-  \item
-    We present a general approach for transforming IFDS problems into corresponding
-    IDE problems that avoid infeasible paths due to correlated method calls and
-    prove its correctness. 
-  \item
-    We implemented the approach in Scala, on top of the WALA program analysis framework
-    and report on preliminary experiments. 
-\end{itemize}
+%We also report on preliminary experiments in which our correlated-calls transformation
+%is applied to an IFDS formulation of a simple taint analysis. Our results show that
+%solving the resulting IDE problem avoids infeasible paths due to correlated calls as
+%expected.
+%
+%In summary, the contributions of this paper are as follows:
+%\begin{itemize}
+%  \item
+%    We present a general approach for transforming IFDS problems into corresponding
+%    IDE problems that avoid infeasible paths due to correlated method calls and
+%    prove its correctness. 
+%  \item
+%    We implemented the approach in Scala, on top of the WALA program analysis framework
+%    and report on preliminary experiments. 
+%\end{itemize}
 
 The remainder of this paper is organized as follows.
 %
@@ -91,15 +96,12 @@ Section~\ref{sec:MotivatingExample} presents a motivating example.
 %
 Section~\ref{sec:bg} reviews the IFDS and IDE algorithms.
 %
-Section~\ref{sec:ccdatastr} presents the correlated-calls transformation
+Section~\ref{sec:cca} presents the correlated-calls transformation
 and sketches a proof of its correctness%
 \footnote{
   Detailed proofs of our lemmas and theorems can be found in
   the supplemental materials that are included with this submission.
 }.
-%
-The implementation of our approach and preliminary experiments are discussed
-in Section~\ref{chapter:eval}.
 %
 Related work is discussed in Section~\ref{sec:Related}.
 %
