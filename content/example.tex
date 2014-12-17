@@ -168,9 +168,7 @@ One could design an IFDS analysis to detect this kind of bug.
 
 The implementation of \code{TraversableOnce.toArray} is actually correct because the above
 code is guarded with a test:
-\begin{verbatim}
-if(this.isTraversableAgain) ...
-\end{verbatim}
+\inputMinted{java}{isTraversable.java}
 When the \code{isTraversableAgain} method returns false, as it does for
 an iterator, the \code{toArray} method uses a different
 (less efficient) implementation. The bug report would therefore be a false positive. 
