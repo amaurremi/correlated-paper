@@ -91,7 +91,7 @@
   \path[->] (st_b_bar) edge (print);
   \path[->] (print) edge (end_b_bar);
   
-%inter-procedural edges
+%interprocedural edges
   \path[->,dashed,ultra thick] (call_foo) edge[out=20,in=190] (st_a_foo);
   \path[->,dashed] (call_foo) edge[color=lightsalmonpink,out=-20,in=135] (st_b_foo);
   \path[->,dashed] (call_bar) edge[out=25,in=220] (st_a_bar);
@@ -106,8 +106,8 @@
     \node [description] (intra_arrow_right) [right = \dist of intra_arrow_left] {};
     \node [description] (inter_arrow_left) [below = .5*\dist of intra_arrow_left] {};
     \node [description] (inter_arrow_right) [below = .5*\dist of intra_arrow_right] {};
-    \path[->](intra_arrow_left) edge node[right = .5*\dist]{intra-procedural edge} (intra_arrow_right);
-    \path[dashed,->](inter_arrow_left) edge node[right = .5*\dist]{inter-procedural edge} (inter_arrow_right); 
+    \path[->](intra_arrow_left) edge node[right = .5*\dist]{intraprocedural edge} (intra_arrow_right);
+    \path[dashed,->](inter_arrow_left) edge node[right = .5*\dist]{interprocedural edge} (inter_arrow_right); 
 }
 \end{tikzpicture}
    \end{minipage}
