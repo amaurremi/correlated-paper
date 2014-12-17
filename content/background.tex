@@ -635,6 +635,7 @@ To convert a representation relation $R_f$ back into the original flow function 
 \end{align}
 }
 
+\commentout{
 A practical implementation of the IFDS algorithm generally takes as input a representation of the
 exploded supergraph edges $E^\sharp$ instead of explicit dataflow functions $M_F$. This is convenient because
 the two are equivalent in expressiveness, and because the IFDS algorithm works internally with the exploded
@@ -643,6 +644,7 @@ $f: N^* \times D \times N^* \to 2^D$. Given a (non-exploded) supergraph edge $n 
 $f(n,d,n')$ returns the set of all $d'$ such that the exploded supergraph contains the edge $(n,d) \to (n',d')$.
 For convenience, the function $f$ can be split up into separate functions that handle the cases when
 the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.\mtodo{Do we leave the start-to-return edge out as a special case of intraprocedural edge?}
+}
 
 %We presented an overview of the IFDS analysis. IFDS problems are transformed into IDE problems by the correlated-calls analysis. The IDE framework is described in the next section.
 
@@ -921,21 +923,19 @@ that is general enough to express the basic micro-functions of the dataflow func
 instructions, and that supports computing the meet and composition of micro-functions.
 
 
-Similar to the IFDS algorithm, a practical implementation of the IDE algorithm requires
+%Similar to the IFDS algorithm,
+A practical implementation of the IDE algorithm requires
 the input dataflow functions to be provided in their pointwise representation
 as exploded supergraph edges labelled with micro-functions.
 %\mtodo{Should we cite the ``Practical extensions'' paper here that talks about the on-demand IFDS algorithm?}
 Specifically,
-the input is generally provided as a function $f: (N^* \times D) \times (N^* \times D) \to F$,
+the input is generally provided as a function $\textsf{EdgeFn}: (N^* \times D) \times (N^* \times D) \to F$,
 where $F$ is the set of representations of micro-functions from $L$ to $L$.
 Given an exploded supergraph edge $e=(n,\,d) \to (n',\,d')$,
-$f((n,\,d),\,(n',\,d'))$ returns the micro-function that appears on the exploded supergraph edge $e$.
-Like in the IFDS algorithm, the function $f$ can be split up into separate functions that handle the cases when $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.
+$\textsf{EdgeFn}((n,\,d),\,(n',\,d'))$ returns the micro-function that appears on the exploded supergraph edge $e$.
+%Like in the IFDS algorithm,
+In an implementation, it can be convenient to split the function $\textsf{EdgeFn}$ into separate functions that handle the cases when $n\to n'$ is an intraprocedural edge, a call-to-return edge, a call-to-start edge, or an end-to-return edge.
 
-
-\otodo{In the next section, we talk about \textsf{EdgeFn}, which is inconsistent with how
-    we define the functions to be implemented here. We need to make the two sections consistent,
-    one way or the other.}
 
 \commentout{
 Given a labeled exploded supergraph, the IDE algorithm computes the environments for all nodes in the CFG.
