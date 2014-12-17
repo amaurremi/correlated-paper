@@ -97,8 +97,10 @@ shown how a false positive reported by a standard IFDS-based algorithm is elimin
 While the discussion in this section has focused on the specific problem of taint analysis,
 we would like to emphasize that our technique generally applies to \textit{any}
 dataflow analysis problem that can be expressed in the IFDS framework. This includes
-many common analysis tasks such as reaching definitions, constant propagation, etc.
-\ftodo{Ondrej, can you give a few more/better examples?}
+many common analysis tasks such as reaching definitions, constant propagation, slicing,
+typestate analysis, pointer analysis, and lightweight
+shape analysis.
+%\ftodo{Ondrej, can you give a few more/better examples?}
 
 \subsection{Occurrences of Correlated Calls}
 How often do correlated calls occur in practice? To assess the benefit of the correlated-calls analysis, we counted the number of correlated calls that occur in programs of the Dacapo benchmarks~\cite{blackburn2006dacapo}, using the WALA framework for static analysis on Java bytecode~\cite{fink2012wala}.
@@ -108,6 +110,10 @@ In the table, the number of all call sites in a program is denoted as $C$.
 Polymorphic call sites are denoted as $C_P$, and correlated call sites as $C^\Subset$. 
 The first four columns indicate the overall number of various call sites and correlated-call receivers in a program. 
 The last three columns indicate the ratio of polymorphic to all call sites, the ratio of correlated to polymorphic call sites, and the ratio of correlated call sites to correlated-call receivers.
+In this context, we deem a call site to be polymorphic if its statically computed call graph
+contains edges from the call site to multiple target methods.
+We deem a call site to be a correlated call site if it is polymorphic and there is
+at least one other polymorphic call site on the same receiver.
 
 \begin{table}
 \caption{Frequencies of correlated-call occurrences in the Dacapo benchmarks}\label{tab:dacapostat}
@@ -141,9 +147,10 @@ The last three columns indicate the ratio of polymorphic to all call sites, the 
 %}
 \end{table}
 
-In these programs, on average, only 3\% of all call sites $C$ are polymorphic call sites $C_P$.
-\mtodo{Should we explain in a footnote why the number of polymorphic call sites is so low?}
-However, it is worth noting that out of those call sites, a significant fraction (38\%) are correlated 
+In these programs, on average, 3\% of all call sites $C$ are polymorphic call sites $C_P$.
+%\mtodo{Should we explain in a footnote why the number of polymorphic call sites is so low?}
+%\otodo{We don't have an explanation.}
+Out of these polymorphic call sites, a significant fraction (38\%) are correlated 
 call sites $C^\Subset$. We also see that, on average,  each correlated-call receiver is involved in three correlated calls. 
 
  
