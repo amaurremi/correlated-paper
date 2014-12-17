@@ -56,12 +56,13 @@ I(r) &= I(r) \cap I'(r)\\
 &\implies \forall r.&
 I(r) &\subseteq I'(r)\\
 \end{align*}
-\mtodo{I agree that this is much better than what I had. I think from $I(r) = I(r) \cap I'(r)$ we can conclude that $I(r)=I'(r)$.}
+%\mtodo{I agree that this is much better than what I had. I think from $I(r) = I(r) \cap I'(r)$ we can conclude that $I(r)=I'(r)$.}
+%\otodo{No. {1,2} = {1,2} \cap {1,2,3}, but {1,2} is not equal to {1,2,3}.}
 Symmetrically, we can also establish that $\forall r.I'(r) \subseteq I(r)$ by applying the functions to $I'$ instead of to $I$. Therefore, $I = I'$.
 \end{proof}
 
 \equalComp*
-\otodo{The (m)(r) does not seem necessary. Can we replace $r'$ with $r$ and $m'$ with $m$?}
+%\otodo{The (m)(r) does not seem necessary. Can we replace $r'$ with $r$ and $m'$ with $m$?}
 \begin{proof}
 \begin{align*}
   &\denote{\setpair IU\circ\setpair{I'}{U'}}\\
@@ -69,7 +70,6 @@ Symmetrically, we can also establish that $\forall r.I'(r) \subseteq I(r)$ by ap
                     {\lambda r\,.\,(I(r)\cap U'(r))\cup U(r)}}\\
   =&\lambda m\,.\,\lambda r\,.\,(m(r)\cap(I(r)\cap I'(r))\cup U(r))\cup(I(r)\cap U'(r))\cup U(r)\\
   =&\lambda m\,.\,\lambda r\,.\,(m(r)\cap I'(r))\cup I(r)\cup (U'(r)\cap I(r))\cup U(r)\\
-  =&\lambda m\,.\,\lambda r\,.\,(((m(r)\cap I'(r))\cup U'(r))\cap I(r))\cup U(r)\\
   =&\lambda m\,.\,\lambda r\,.\,(((m(r)\cap I'(r))\cup U'(r))\cap I(r))\cup U(r)\\
   =&\lambda m\,.\,\left(\lambda m'\,.\,\lambda r\,.\,(m'(r)\cap I(r))\cup U(r)\right)
     \left(
@@ -136,14 +136,14 @@ For the purpose of the proofs, we will rewrite Equation~\eqref{eq:edgefndef} tha
   \begin{equation}\label{eq:edgefnThroughDelta}
     \ccedgefn S=\lambda e\,.\,
     \begin{cases}
-      \id&\text{if $d_1=d_2=\Lambda$,}\\
+      \id&\text{if $d_1=d_2=\mathbf0$,}\\
       \lambda m\,.\,\varepsilon(e)(\delta(m))&\text{otherwise},
     \end{cases}
   \end{equation}
   where $S\subseteq R$, $d_1$ and $d_2$ are the source and target facts, and for a map $m\in\lcc_U$, $\delta(m)$ is either $m$ or $\botcc$:
   \begin{equation}\label{eq:deltadef}
     \delta(m)=\begin{cases}
-      \botcc&\text{if $d_1=\Lambda$}\\
+      \botcc&\text{if $d_1=\mathbf0$}\\
       m&\text{otherwise.}
     \end{cases}
   \end{equation}
@@ -174,7 +174,7 @@ Let $p=[\startmain,\,\dots,\,n]$ be some concrete execution trace of the program
   
   \textit{Induction step:} Let $p'=[\startmain,\,\dots,n_{k-1},\,n_k]$ and $t'\in T$ be the type to which $r$ is mapped at $n_k$.
   
-  For each $i$, let $e_i$ be the edge $((n_{i-1},\,d_{i-1}),\,(n_i,\,d_i))$. Note that $$e_1=((\startmain,\,\Lambda),\,(n_1,\,d_1))\,.$$  
+  For each $i$, let $e_i$ be the edge $((n_{i-1},\,d_{i-1}),\,(n_i,\,d_i))$. Note that $$e_1=((\startmain,\,\mathbf0),\,(n_1,\,d_1))\,.$$  
 
   Observe that
   \begin{align*}
@@ -187,12 +187,14 @@ Let $p=[\startmain,\,\dots,\,n]$ be some concrete execution trace of the program
 As shown in~Sagiv et al.~\cite{sagiv1996precise}, the relationship between environment transformers and edge functions can be described with the following equation. For an edge $(n_1,\,n_2)\in E^*$ an environment $\textsf{env}$ that maps $D$ to $L$, and a fact $d\in D$,
 \begin{align}\label{eq:envTransToEdgeFnEdge}
   \menv&((n_1,\,n_2))(\textsf{env})(d)\notag\\
-  &=\edgefn((n_1,\,\Lambda),\,(n_2,\,d))(\top)\sqcap\bigsqcap_{d'\in D}\edgefn((n_1,\,d'),\,(n_2,\,d))(\textsf{env}(d'))\,.
+  &=\edgefn((n_1,\,\mathbf0),\,(n_2,\,d))(\top)\sqcap\bigsqcap_{d'\in D}\edgefn((n_1,\,d'),\,(n_2,\,d))(\textsf{env}(d'))\,.
 \end{align}  
-Then, according to~\eqref{eq:envTransToEdgeFnEdge},\mtodo{Is it okay that in~\eqref{eq:envTransToEdgeFnEdge}, we use $\edgefn$, and below we use $\ccedgefn R$?}
+Then, according to~\eqref{eq:envTransToEdgeFnEdge},
+%\mtodo{Is it okay that in~\eqref{eq:envTransToEdgeFnEdge}, we use $\edgefn$, and below we use $\ccedgefn R$?}
+%\otodo{Yes, that's fine.}
   \begin{align*}
     &\menv(e_k)\left(\menv(p)(\top_\textsf{Env})\right)(d)(r)\\
-      =&\bigg(\ccedgefn R((n_{k-1},\,\Lambda),\,(n_k,\,d))(\topcc)\sqcap\\
+      =&\bigg(\ccedgefn R((n_{k-1},\,\mathbf0),\,(n_k,\,d))(\topcc)\sqcap\\
        &\bigsqcap_{d'\in D}\ccedgefn R((n_{k-1},\,d'),\,(n_k,\,d))(\menv(p)(\top_\textsf{Env})(d'))\bigg)(r)\\
       \supseteq&
         \bigsqcap_{d'\in D}\ccedgefn R((n_{k-1},\,d'),\,(n_k,\,d))(\menv(p)(\top_\textsf{Env})(d'))(r)\\
@@ -211,7 +213,7 @@ Then, according to~\eqref{eq:envTransToEdgeFnEdge},\mtodo{Is it okay that in~\eq
   
   According to~\eqref{eq:edgefnThroughDelta}, there are two cases in which $\ccedgefn R(e_k)$ could fall.
 
-  If $d_{k-1}=d_k=\Lambda$, then $d_k\notin M_F(p)(\varnothing)$, since it does not belong to the set $D$, and the Lemma trivially holds.
+  If $d_{k-1}=d_k=\mathbf0$, then $d_k\notin M_F(p)(\varnothing)$, since it does not belong to the set $D$, and the Lemma trivially holds.
   
   Otherwise, 
   \[
@@ -287,7 +289,7 @@ We will now show that on a node of a concrete execution path, the correlated-cal
   We start by proving that if $d\in M_F(p)(\varnothing)$, then $\mpd(r)\ne\top_T$, by induction on the length of the execution trace.
   
   \textit{Basis:} 
-    Let $p=[\startmain]$. Since the only realizable path corresponding to $p$ is $[(\startmain,\,\Lambda)]$, there is no fact $d\in D$ such that $d\in M_F(p)(\varnothing)$, and the claim follows immediately.
+    Let $p=[\startmain]$. Since the only realizable path corresponding to $p$ is $[(\startmain,\,\mathbf0)]$, there is no fact $d\in D$ such that $d\in M_F(p)(\varnothing)$, and the claim follows immediately.
   
   \textit{Induction hypothesis:} 
   Let $p=[\startmain,\,\dots,\,n_{k-1}]$. Let $\uptau$ be the set of types to which $r$ is mapped by $\mpdkm$:
@@ -356,8 +358,8 @@ According to~\eqref{eq:ideresult}, we can rewrite~\eqref{eq:transCcDef} as
 
 \precision*
 \begin{proof}
-    \otodo{It's Section 3.2.}
-    \mtodo{Section 3.2 talks about the IFDS algorithm, but it doesn't explicitly say how the result of an IFDS analysis looks like and doesn't introduce the notation $\resultIFDS$.}
+    %\otodo{It's Section 3.2.}
+    %\mtodo{Section 3.2 talks about the IFDS algorithm, but it doesn't explicitly say how the result of an IFDS analysis looks like and doesn't introduce the notation $\resultIFDS$.}
   Let $P$ be an IFDS problem. Recall from Section~\ref{sec:ideToIfds} that the result of an IFDS analysis $\resultIFDS(P)$ maps supergraph
   nodes $n\in N^*$ to sets of data-flow facts $\delta\in2^D$. Specifically,
   \begin{align*}
@@ -382,7 +384,7 @@ In this section, we will denote the set of realizable paths corresponding to a v
 First, we introduce a Lemma showing that the types to which a given receiver is mapped in the result of the algorithm is not affected by other receivers and the types to which they are mapped.
 
 \begin{lemma}\label{lem:recindepedgefn}
-  Let $P$ be an IFDS problem. Let $N^*$ be the supergraph for $P$, $D$ the set of data-flow facts, $n\in N^*$ a node, and $p=[\startmain,\,\dots,\,n]$ a path in the supergraph. Let $d\in D\cup\{\Lambda\}$.
+  Let $P$ be an IFDS problem. Let $N^*$ be the supergraph for $P$, $D$ the set of data-flow facts, $n\in N^*$ a node, and $p=[\startmain,\,\dots,\,n]$ a path in the supergraph. Let $d\in D\cup\{\mathbf0\}$.
   Then for any realizable path $p'\in\textsf{RP}(p,\,d)$, set $S\subseteq R$, and receiver $r\in S$,
   \begin{equation}
     \ccedgefn S(p')(\topcc)(r)=
@@ -392,16 +394,16 @@ First, we introduce a Lemma showing that the types to which a given receiver is 
 \begin{proof}
   By induction on the length of $p$.
   
-  \textit{Basis:} $p'=[(\startmain,\,\Lambda)]$. Then $\ccedgefn S(p')=\id=\ccedgefn{\{r\}}(p')$, and the Lemma follows directly.
+  \textit{Basis:} $p'=[(\startmain,\,\mathbf0)]$. Then $\ccedgefn S(p')=\id=\ccedgefn{\{r\}}(p')$, and the Lemma follows directly.
   
-  \textit{Induction hypothesis:} Suppose that for a path $q=[(\startmain,\,\Lambda),\,\dots,\,(n_{k-1},\,d_{k-1})]$, where $q\in\textsf{RP}(n,\,d)$, the Lemma holds, i.e. both edge functions map $r$ to the same set of types $\uptau$:
+  \textit{Induction hypothesis:} Suppose that for a path $q=[(\startmain,\,\mathbf0),\,\dots,\,(n_{k-1},\,d_{k-1})]$, where $q\in\textsf{RP}(n,\,d)$, the Lemma holds, i.e. both edge functions map $r$ to the same set of types $\uptau$:
   \begin{align*}
     \uptau
     &=\ccedgefn S(q)(\topcc)(r)\\
     &=\ccedgefn{\{r\}}(q)(\topcc)(r)\,.
   \end{align*}
   
-  \textit{Induction step:} Let $q'=[(\startmain,\,\Lambda),\,\dots,\,(n_{k-1},\,d_{k-1}),\,(n_k,\,d_k)]$ and the edge $e_k=((n_{k-1},\,d_{k-1}),\,(n_k,\,d_k))$.
+  \textit{Induction step:} Let $q'=[(\startmain,\,\mathbf0),\,\dots,\,(n_{k-1},\,d_{k-1}),\,(n_k,\,d_k)]$ and the edge $e_k=((n_{k-1},\,d_{k-1}),\,(n_k,\,d_k))$.
   
   Observe that for any set $U\subseteq R$ such that $r\in U$,
   \begin{align}\label{eq:edgefnU}
@@ -411,7 +413,7 @@ First, we introduce a Lemma showing that the types to which a given receiver is 
   
   We can see from~\eqref{eq:edgefnThroughDelta} that there are two cases.  
   
-  If $d_{k-1}=d_k=\Lambda$, $\ccedgefn S(e_k)=\id=\ccedgefn{\{r\}}(e_k)$, and, due to~\eqref{eq:edgefnU},
+  If $d_{k-1}=d_k=\mathbf0$, $\ccedgefn S(e_k)=\id=\ccedgefn{\{r\}}(e_k)$, and, due to~\eqref{eq:edgefnU},
   \begin{align*}
     \ccedgefn S(q')(\topcc)(r)&=\uptau\\
     &=\ccedgefn{\{r\}}(q')(\topcc)(r)\,.
@@ -430,7 +432,7 @@ First, we introduce a Lemma showing that the types to which a given receiver is 
         \[
           \ccedgefn U(q')(\topcc)(r)=\delta(\ccedgefn U(q)(\topcc))(r)\cap\tau(s,\,f).
         \]
-        If $d_{k-1}=\Lambda$, then $\delta(\ccedgefn U(q)(\topcc))(r)=\botcc(r)=\bot_T$. If $d_{k-1}\ne\Lambda$, then $\delta(\ccedgefn U(q)(\topcc))(r)=\ccedgefn U(q)(\topcc)(r)=\uptau$. The set $\tau(s,\,f)$ is the same for either case.
+        If $d_{k-1}=\mathbf0$, then $\delta(\ccedgefn U(q)(\topcc))(r)=\botcc(r)=\bot_T$. If $d_{k-1}\ne\mathbf0$, then $\delta(\ccedgefn U(q)(\topcc))(r)=\ccedgefn U(q)(\topcc)(r)=\uptau$. The set $\tau(s,\,f)$ is the same for either case.
     
         Therefore, the value of $\ccedgefn U(q')(\topcc)(r)$ has the same result regardless of $U$,
         which means that $\ccedgefn S(q')(\topcc)(r)=\ccedgefn{\{r\}}(q')(\topcc)(r)$, and the Lemma holds.
@@ -509,12 +511,12 @@ The next lemma shows that the set of types to which a receiver is mapped in a co
   \]
 \end{lemma}
 \begin{proof}
-  Let $p$ have the following form\footnote{It can be shown from the definition of a pointwise representation in~Sagiv et al.~\cite{sagiv1996precise} that in a realizable path, there is never an edge from a fact of the set $D$ to a $\Lambda$ fact. Therefore, we can represent $p$ as a sequence of nodes that has a prefix of $\Lambda$-fact nodes, after which all nodes are non-$\Lambda$ facts.}:
+  Let $p$ have the following form\footnote{It can be shown from the definition of a pointwise representation in~Sagiv et al.~\cite{sagiv1996precise} that in a realizable path, there is never an edge from a fact of the set $D$ to a $\mathbf0$ fact. Therefore, we can represent $p$ as a sequence of nodes that has a prefix of $\mathbf0$-fact nodes, after which all nodes are non-$\mathbf0$ facts.}:
   \[
-    p=[(\startmain,\,\Lambda),\,(n_1,\,\Lambda),\,\dots,\,(n_k,\,\Lambda),
+    p=[(\startmain,\,\mathbf0),\,(n_1,\,\mathbf0),\,\dots,\,(n_k,\,\mathbf0),
        (n_{k+1},\,d_{k+1}),\,\dots,\,(n_{k+l},\,d_{k+l})]\,,
   \]
-  where $l\ge1$ and the facts for all nodes up to $n_k$ are equal to $\Lambda$ and $d_{k+i}\in D$ for $0<i\le l$.
+  where $l\ge1$ and the facts for all nodes up to $n_k$ are equal to $\mathbf0$ and $d_{k+i}\in D$ for $0<i\le l$.
   
   As previously, for all $i$, we will denote the edge $(n_i,\,n_{i+1})$ by $e_i$.  
   
@@ -538,7 +540,7 @@ The next lemma shows that the set of types to which a receiver is mapped in a co
       \botcc&\text{otherwise\footnotemark.}
     \end{cases}
   \]
-  \footnotetext{Since $d_k=\Lambda$ and $d_{k+1}\ne\Lambda$, the micro function for the edge $e_{k+1} $ is equal to $\lambda m\,.\,\varepsilon_{\{r\}}(e_{k+1})(\botcc)$. From the definition of $\varepsilon_S$~\eqref{eq:varepsilon} we can see that the only case where $\varepsilon_{\{r\}}(e_{k+1})(m)$ would not be equal to $\botcc$ is when $e_{k+1}$ is call-start or end-return edge.}
+  \footnotetext{Since $d_k=\mathbf0$ and $d_{k+1}\ne\mathbf0$, the micro function for the edge $e_{k+1} $ is equal to $\lambda m\,.\,\varepsilon_{\{r\}}(e_{k+1})(\botcc)$. From the definition of $\varepsilon_S$~\eqref{eq:varepsilon} we can see that the only case where $\varepsilon_{\{r\}}(e_{k+1})(m)$ would not be equal to $\botcc$ is when $e_{k+1}$ is call-start or end-return edge.}
   
   Therefore,
   \begin{align}\label{eq:edgefnbeta}
@@ -567,10 +569,10 @@ If $\beta=\botcc[r\to\tau(s,\,f)]$, then
 and $\gamma=1$.
 
 \textit{Induction hypothesis:}
-Assume that for a path $p=[(\startmain,\,\Lambda),\,\dots,\,(n_{k+l},\,d_{k+l})]$, the Lemma holds for $\gamma=N$, where $N\ge0$.
+Assume that for a path $p=[(\startmain,\,\mathbf0),\,\dots,\,(n_{k+l},\,d_{k+l})]$, the Lemma holds for $\gamma=N$, where $N\ge0$.
 
 \textit{Induction step:}
-Let $p'=[(\startmain,\,\Lambda),\,\dots,\,(n_{k+l},\,d_{k+l}),\,(n_{k+l+1},\,d_{k+l+1})]$.
+Let $p'=[(\startmain,\,\mathbf0),\,\dots,\,(n_{k+l},\,d_{k+l}),\,(n_{k+l+1},\,d_{k+l+1})]$.
 
 Recall that
 \begin{align*}
@@ -668,6 +670,8 @@ We will now show that if a receiver ever gets mapped to top, then it is a correl
 \end{proof}
 
 Finally, we present the proof for Lemma~\ref{lem:onlycorrrec} which states that a correlated-calls analysis that considers all receivers computes the same result as an analysis that considers only correlated-call receivers.
+
+\otodo{restate the lemma before the proof}
 
 \begin{proof}[\textbf{Proof of Lemma~\ref{lem:onlycorrrec}}]
   By definition of $\backCC$,
