@@ -162,7 +162,7 @@ Sets of types are ordered by the superset relation, and this is lifted to maps f
 to sets of types, so the bottom element $\botcc$ maps every receiver to the set of all types,
 and the top element $\topcc$ maps every receiver to the empty set of types.
 During an actual execution, every receiver $r$ points to an object of some
-runtime type. \otodo{What if $r$ points to null?} Therefore, a data flow fact
+runtime type. Therefore, a data flow fact
 is unreachable along any feasible path if its corresponding lattice element
 maps any receiver to the empty set of types.
 
@@ -318,6 +318,7 @@ is converted to an IFDS result as follows:
   \backEq(\rho) = \lambda n.\{d\mid\rho(n)(d)\ne\top\}.
 \end{equation}\mtodo{Another change was that Ondrej defined $\backEq$ as $\lambda n.\{d\mid\rho(n)(d)=\top\}$
 and that he defined $\backEq$ related to the equivalence transformation.}
+\otodo{I don't understand this comment. What does it mean?}
 
 In the correlated-calls transformation lattice $\lcc$, a map that maps any receiver
 to the empty set of possible types means that the corresponding data flow path is
@@ -456,7 +457,9 @@ All of the basic micro-functions defined in Definition~\ref{def:microfn} can be 
 in this representation.
 
 The implementation of function application follows directly from the definition of
-the representation: $\setpair{I}{U}(m) = \lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.\mtodo{Should this be the denotation of $\setpair IU$?}
+the representation: $\setpair{I}{U}(m) = \lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.
+%\mtodo{Should this be the denotation of $\setpair IU$?}
+%\otodo{No. It is an implementation of the apply operation.}
 
 To compare two micro-functions for equality, it suffices to compare the corresponding
 sets $I(r)$ and $U(r)$ for all receivers $r$. The following lemma shows that this
@@ -472,11 +475,7 @@ implementation of comparison corresponds to equality of the represented micro-fu
 \end{restatable}
 The proofs of all of the lemmas and theorems in the paper are provided in the supplemental
 material submitted with the paper.
-\otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
 
-\otodo{The normalization function $\mathcal N$ was only needed in composition. I therefore
-    ``inlined'' it into composition to save space. This makes composition a bit harder to intuitively
-    verify, but saves complexity here. The verification can be in the proof in the supplementary appendix.}
 The composition of two micro-function representations is defined as follows:
 $\setpair{I}{U} \circ \setpair{I'}{U'} = \setpair{\lambda r\,.\,(I(r) \cap I'(r))\cup U(r)}{\lambda r\,.\,(I(r)\cap U'(r))\cup U(r)}$.
 The following lemma shows that this implementation corresponds to the composition
@@ -489,7 +488,6 @@ of the denoted functions:
         \denote{\setpair{I}{U}} \circ \denote{\setpair{I'}{U'}}.
     \]
 \end{restatable}
-\otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
 
 The meet of two micro-function representations is defined as follows:
 $\setpair{I}{U} \sqcap \setpair{I'}{U'} = \setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}$.
@@ -506,8 +504,7 @@ of the denoted functions:
     where
     $\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}
      =\lambda m.\lambda r.\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)$.
-\end{restatable}\mtodo{I added the definition of the meet of two functions.}
-\otodo{Prove this lemma in the appendix. The parts of the proof can be found in section 5.}
+\end{restatable}%\mtodo{I added the definition of the meet of two functions.}
 
 \otodo{Sagiv et al. define a notion of an ``efficient'' implementation of micro-functions.
     If the micro-functions are ``efficient'', then the asymptotic complexity bounds proven by
@@ -542,7 +539,6 @@ We next show that the result of an IDE problem obtained through a correlated-cal
 \end{restatable}
 
 \subsection{Correlated-Call Receivers}\label{sec:ccreceivers}
-\otodo{should this be a section or subsection? should it be moved somewhere else (or maybe not included at all)?}
 We will now show that in a correlated-calls transformation, it is enough to consider only some of the receivers of set $R$.
 
 \begin{definition}
