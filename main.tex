@@ -36,17 +36,7 @@
 %\tocauthor{Authors' Instructions} % TODO
 \maketitle
 
-\begin{abstract}
-We present a technique to improve the precision of data-flow analyses on object-oriented programs in the presence of 	\textit{correlated calls}. Two method calls are correlated if they are polymorphic and are invoked on the same object. Correlated calls are problematic because they can make  existing data-flow analyses consider certain infeasible data-flow paths as valid. This leads to loss in precision of the analysis solution.
-
-We show how infeasible paths can be eliminated for \textit{Inter-procedural Finite Distributive Subset} (IFDS) problems, a large class of data-flow analysis problems. We show how the precision of IFDS problems can be improved in the presence of correlated calls, by using the \textit{Inter-procedural Distributive Environment} (IDE) algorithm to eliminate infeasible paths.  Using IDE, we eliminate the infeasible paths and obtain a more precise result for the original IFDS problem.
-
-Our analysis is implemented in Scala, using the WALA framework for static program analysis on Java bytecode.
-
-%\keywords{We would like to encourage you to list your keywords within
-%the abstract section}
-\end{abstract}
-
+\input{content/abstract}
 \input{content/intro}
 \input{content/example}
 \input{content/background}

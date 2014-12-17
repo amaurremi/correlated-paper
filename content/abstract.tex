@@ -1,0 +1,18 @@
+\begin{abstract}
+    When two methods are invoked on the same object, the dispatch behaviors of these
+    method calls will be correlated. If two correlated method calls are polymorphic 
+    (i.e., they dispatch to different method definitions depending on the type of 
+    the receiver object), a program's interprocedural control flow graph (ICFG)
+    will contain infeasible paths. Existing algorithms for dataflow analysis 
+    are unable to ignore such infeasible paths, giving rise to loss of precision.     
+
+	We show how infeasible paths due to correlated calls can be eliminated for 
+	\textit{Interprocedural Finite Distributive Subset} (IFDS) problems, a large class 
+	of data-flow analysis problems with broad applications. Our approach is to
+	transform an IFDS problem into an \textit{Interprocedural Distributive 
+	Environment} (IDE) problem, in which edge functions are designed in a
+	way that enables us to ignore dataflow along infeasible paths. A solution
+	to this IDE problem can be mapped back to the solution space of the original
+	IFDS problem. We prove the correctness of our approach, and report on
+	some preliminary experiments with our prototype implementation. 
+\end{abstract}
