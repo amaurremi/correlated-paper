@@ -69,7 +69,7 @@ to different implementations of these methods in classes \code{A} and \code{B},
 because the variable \code{a} that serves as the receiver for the call may be bound to
  objects of type \code{A} or type \code{B} at run time. 
 However, consider the fact that the methods \code{foo()} and \code{bar()} are invoked
-on \textit{the same object}. This means that the behaviors of the two method calls
+on \textit{the same object}. This means that the behaviours of the two method calls
 are \textit{correlated}: if the call to \code{foo()} dispatches to \code{A.foo()},
 then the call to \code{bar()} must dispatch to \code{A.bar()}, and if the call
 to \code{foo()} dispatches to \code{B.foo()}, then the call to \code{bar()} must 

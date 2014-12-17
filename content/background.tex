@@ -271,7 +271,7 @@ where $G^*=(N^*,\,E^*)$ is the supergraph of the input program with nodes $N^*$ 
 $D$ is a finite set of \textit{data-flow facts},
 $F$ is a set of distributive dataflow functions of type $2^D\to2^D$,
 $M_F:\,E^*\to F$ assigns a dataflow function to each supergraph edge,
-and $\sqcap$ is the \textit{meet operator} on the powerset $2^D$, either union or intersection.
+and $\sqcap$ is the \textit{meet operator} on the power set $2^D$, either union or intersection.
 In our presentation, the meet operator will always be union, but all of the results apply dually when the
 meet is intersection.
 
@@ -899,7 +899,7 @@ equivalent to an edge with micro-function $\lambda l.\top$.
     analysis using environments $\textsf{Env}(D,L)$, where $D$ is the set of
     variables and $L$ is a map from receiver variables to sets of possible
     types. The interpretation of such an environment $e$ is that a given variable
-    $v \in D$ may contain a secret value in an exeuction in which the runtime
+    $v \in D$ may contain a secret value in an execution in which the runtime
     types of the objects pointed to be the receiver variables are in the sets
     specified by $e(v)$.
 \end{example}

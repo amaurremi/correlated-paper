@@ -35,7 +35,7 @@ methods are dynamically dispatched on the same receiver object.
 In such cases, if the
 method calls are polymorphic (i.e., if they dispatch to different method definitions 
 depending on the type of the receiver expression at run time), then their dispatch 
-behaviors will be correlated. A recent paper \cite{DBLP:journals/scp/Tip15} identified
+behaviours will be correlated. A recent paper \cite{DBLP:journals/scp/Tip15} identified
 this problem but did not present a concrete solution or algorithm, and we are not aware 
 of any existing dataflow analysis that is capable of avoiding infeasible paths that arise 
 in the presence of correlated method calls.
