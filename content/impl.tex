@@ -506,6 +506,7 @@ of the denoted functions:
      =\lambda m.\lambda r.\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)$.
 \end{restatable}%\mtodo{I added the definition of the meet of two functions.}
 
+\subsection{Efficiency}
 \otodo{Sagiv et al. define a notion of an ``efficient'' implementation of micro-functions.
     If the micro-functions are ``efficient'', then the asymptotic complexity bounds proven by
     Sagiv hold. Our implementation is ``efficient'' if we assume that the number of correlated
@@ -513,6 +514,17 @@ of the denoted functions:
     it's linear in the size of the program, then we would need to add a factor to their complexity
     bounds. Their bound is $O(ED^3)$, while ours would be $O(ED^3R)$. But then we can't directly use their complexity proof; we would have to adapt it.
     I'm leaning towards leaving out any mention of ``efficient'' implementation.}
+As defined in~Sagiv et al.~\cite{sagiv1996precise}, a representation of micro functions is efficient if the following conditions hold:
+\begin{enumerate}
+	\item There is a representation for the identity and top functions.
+  \item The representation is closed under the meet and composition operations.
+  \item The micro functions form a finite-height lattice.
+  \item The apply, meet, composition, and equality-check operations can be computed in constant time.
+  \item There is a constant bound on the storage space for a micro function representation.
+\end{enumerate}
+\begin{restatable}{lemma}{efficient}\label{lem:efficient}
+  The correlated-call representation of a micro function is efficient.
+\end{restatable}
 
 \subsection{Theoretical Results}
 
