@@ -1,4 +1,4 @@
-\section{Motivating Example}
+\section{Background and Motivation}
   \label{sec:MotivatingExample}
   
 In this section, we illustrate our approach using a small motivating example that
@@ -157,18 +157,38 @@ call sites $C^\Subset$. We also see that, on average,  each correlated-call rece
   
 \subsection{An Example from the Scala Collections Library}
 The Scala collections library contains the trait \code{TraversableOnce} that is
-shared by both collections and iterators over them. The \code{toArray} method of this trait
+shared by both collections and iterators over them. 
+\ftodo{
+  I think it would be helpful to show a little more of the code of the trait here,
+  such as the trait declaration and the signature of the toArray method containing the
+  correlated calls. You can abbreviate everything else with ...
+}
+The \code{toArray} method of this trait
 creates an array and copies the contents of the collection or iterator into it:
 \inputMinted{scala}{collectionsExample.scala}
-\otodo{Marianna, can you figure out how to get LaTeX to syntax-highlight this?} 
-When \code{this} is an iterator rather than a collection, the call to \code{this.size}
-extracts all elements of the iterator to count them. At the call to \code{copyToArray},
+%\otodo{Marianna, can you figure out how to get LaTeX to syntax-highlight this?} 
+When \code{this} refers to an iterator rather than a collection, the call to \code{this.size}
+extracts all elements of the iterator to count them.
+\ftodo{
+  Would it make sense to show the code for the size method, and refer to the line numbers
+  of that method in the above sentence?  
+}
+ At the call to \code{copyToArray},
 the iterator is already empty, so nothing is copied to the newly created array.
+\ftodo{
+Would it make sense to show the code for copyToArray here?
+}
 One could design an IFDS analysis to detect this kind of bug.
 
-The implementation of \code{TraversableOnce.toArray} is actually correct because the above
+However, the implementation of \code{TraversableOnce.toArray} is actually correct because the above
 code is guarded with a test:
 \inputMinted{scala}{isTraversable.scala}
+\ftodo{
+  It is confusing that this code fragment is labeled with line number 19 although it presumably
+  occurs in the code before the previously discussed two lines. I think it is better to show
+  all of the code at once, in a figure, and include at least the headers of all the methods mentioned
+  here.
+}
 When the \code{isTraversableAgain} method returns false, as it does for
 an iterator, the \code{toArray} method uses a different
 (less efficient) implementation. The bug report would therefore be a false positive. 
@@ -181,6 +201,8 @@ true, then call \code{size} and \code{copyToArray} on an iterator. Our correlate
 calls analysis could determine that this path is infeasible because it calls the
 collection version of \code{isTraversableAgain} but the iterator versions of
 \code{size} and \code{copyToArray}.
+\ftodo{Would it be helpful to create a diagram of the relevant fragments of the supergraph,
+with the infeasible path in bold?} 
 
 \commentout{
     For reference, here is the full code of the method:
