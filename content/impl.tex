@@ -551,12 +551,12 @@ We will denote the set of correlated-call receivers as $\rcc$.
 We will describe a ``reduced'' correlated-calls transformation in which we only consider receivers from $\rcc$ and ignore other receivers of $R$. We will show that IDE problems obtained through ordinary and reduced correlated-calls transformations yield the same results.
 In other words, we show that if a correlated calls analysis considers only correlated-call receivers, no precision is lost.
 
-\begin{lemma}\label{lem:onlycorrrec}
+\begin{restatable}{lemma}{onlycorrrec}\label{lem:onlycorrrec}
   Let $P$ be an IFDS problem. Then
   \begin{equation}
     \backCC\left(\resultIDE\left(\transCC_\rcc(P)\right)\right)=\backCC(\resultIDE\left(\transCC_R(P)\right))\,.
   \end{equation}
-\end{lemma}
+\end{restatable}
 
 To summarize, Lemma~\ref{lem:sound} shows that the result of a correlated-calls analysis is sound since it overapproximates the data flow of all possible concrete execution paths.
 We have also shown in Lemma~\ref{lem:subsetifds} that for an IFDS problem $P$, the correlated-calls analysis improves the precision of the original IFDS result $\resultIFDS(P)$, because the correlated-calls result $\resultIDE(\transCC(P))$ underapproximates an equivalence-IDE result $\resultIDE(\transEq(P))$.
