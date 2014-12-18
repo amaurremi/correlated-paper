@@ -18,7 +18,7 @@ In the implementation of our work, we use WALA to build and traverse the supergr
 
 Soot is a framework for program analysis and optimization on Java bytecode, developed by the Sable Research Group at McGill University. Unlike WALA, Soot also has an implementation of the IDE algorithm. The IFDS and IDE implementations for Soot are part of the Heros project~\cite{bodden2012inter}.
 
-Whereas one advantage of Soot's IFDS implementation (and other static analysis tools) is ease of use and extensibility, WALA's primary focus is efficiency. For example, WALA uses bit-vectors to represent some of the analysis data types, like local variables and parameters. Another difference is that WALA's intermediate representation of a program uses static single assignment (SSA) form~\cite{cytron1991efficiently}. SSA form is a representation of the program in which each variable has only one definition (assignment). SSA can make dataflow analysis simpler and more efficient~\cite{appel1998ssa}.
+Whereas one advantage of Soot's IFDS implementation (and other static analysis tools) is ease of use and extensibility, WALA's primary focus is efficiency. For example, WALA uses bit-vectors to represent some of the analysis data types, like local variables and parameters. Another difference is that WALA's intermediate representation of a program uses static single assignment (SSA) form~\cite{cytron1991efficiently}. SSA form is a representation of the program in which each variable has only one definition (assignment). SSA can make data-flow analysis simpler and more efficient~\cite{appel1998ssa}.
 }
 
 Several extensions of the IFDS algorithm have been proposed to improve its precision,

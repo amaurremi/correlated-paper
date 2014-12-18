@@ -241,7 +241,7 @@ because it constructs summaries of the effects of called procedures.
 \commentout{The IFDS analysis is a version of the classic \textit{functional approach} to data-flow analysis proposed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}.}
 \commentout{In other data-flow algorithms not based on the functional approach, the result of the analysis at the entry of a procedure ``merges'' the incoming data obtained from all callers of the procedure. As a consequence, there is one global data-flow result computed at the end of the procedure. Context-sensitivity, however, allows an analysis to compute the data-flow result for a given procedure as a \textit{function} of the data-flow value at the start of the procedure. 
 In other words, the analysis result for a procedure varies depending on where the procedure was called from. This significantly improves the precision of a data-flow analysis, which is why context-sensitivity is an important advantage of IFDS over classic data-flow algorithms.}
-The IFDS framework is applicable to \textit{interprocedural} data flow problems whose domain is \textit{subsets} of a \textit{finite} set $D$,
+The IFDS framework is applicable to \textit{interprocedural} data-flow problems whose domain is \textit{subsets} of a \textit{finite} set $D$,
 and whose data-flow functions are \textit{distributive}.
 A function $f$ is distributive if 
 $f(x_1\sqcap x_2)=f(x_1)\sqcap f(x_2)$.
@@ -267,8 +267,8 @@ The input to the IFDS algorithm is specified as
   $(G^*,\,D,\,F,\,M_F,\,\sqcap)$,
 where $G^*=(N^*,\,E^*)$ is the supergraph of the input program with nodes $N^*$ and edges $E^*$,
 $D$ is a finite set of \textit{data-flow facts},
-$F$ is a set of distributive dataflow functions of type $2^D\to2^D$,
-$M_F:\,E^*\to F$ assigns a dataflow function to each supergraph edge,
+$F$ is a set of distributive data-flow functions of type $2^D\to2^D$,
+$M_F:\,E^*\to F$ assigns a data-flow function to each supergraph edge,
 and $\sqcap$ is the \textit{meet operator} on the powerset $2^D$, either union or intersection.
 In our presentation, the meet operator will always be union, but all of the results apply dually when the
 meet is intersection.
@@ -277,7 +277,7 @@ The output of the IFDS algorithm is, for each node $n$ in the supergraph, the \t
  $\mvp{F}(n)=\bigsqcap_{q\in\ivp(n)}M_F(q)(\top)$, where $M_F$ is extended from edges to paths by composition.
 
 \commentout{
-is a function that maps supergraph edges to dataflow functions, and $M_F$ is extended to paths by composition\footnote{%
+is a function that maps supergraph edges to data-flow functions, and $M_F$ is extended to paths by composition\footnote{%
   Let $A$ be a set and $f:\,E^*\to(A\to A)$ a function from supergraph edges to functions on $A$.
   We say that $f$ is extended to  paths by composition to denote that for a path $q$ consisting of the edges $e_1,\,\dots,\,e_k$, $f(q)=f(e_k)\circ\ldots\circ f(e_1)\circ\id$.
 }. The \textit{meet operator} $\sqcap$ is either union or intersection.
@@ -292,7 +292,7 @@ function $f$ from $2^D$ to $2^D$ by a \textit{representation relation} $R_f \sub
 \times
 (D \cup \{0\})$. The representation relation can be visualized as a bipartite graph
 with edges from one instance of $D \cup \{0\}$ to another instance of $D \cup \{0\}$.
-The IFDS algorithm uses such graphs to efficiently represent both the input dataflow functions
+The IFDS algorithm uses such graphs to efficiently represent both the input data-flow functions
 and the summary functions that it computes for called procedures.
 Specifically, the representation relation $R_f$ of a function $f$ is defined as:
 \[
@@ -303,7 +303,7 @@ R_f=\{(\mathbf0,\,\mathbf0)\}\cup
 %Each pair $(d_i,\,d_j)\in R_f$ corresponds to an edge $((n_1,\,d_i),\,(n_2,\,d_j))$ in the exploded supergraph.
 
 \commentout{
-Note that $R_f$ constructs pairs of dataflow facts so that
+Note that $R_f$ constructs pairs of data-flow facts so that
 \begin{itemize}
   \item there is always an edge $(\mathbf0,\,\mathbf0)$ corresponding to the CFG edge;
   \item if there is an edge $(\mathbf0,\,d_j)$, then there is no other edge leading to $d_j$; in particular, there is never an edge $(d_i,\,\mathbf0)$ where $d_i\ne\mathbf0$.
@@ -314,7 +314,7 @@ Note that $R_f$ constructs pairs of dataflow facts so that
     Given $D=\{u,\,v,\,w\}$ and $f(S) = S\setminus\{v\} \cup \{u\}$,
     the representation relation 
   %The representation relation $R_f$ for a set of data-flow facts 
-  %and dataflow function $f=\lambda S\,.\,S\setminus\{v\}\cup\{u\}$ looks as follows:
+  %and data-flow function $f=\lambda S\,.\,S\setminus\{v\}\cup\{u\}$ looks as follows:
   $
     R_f=\{(\mathbf0,\,\mathbf0),\,(\mathbf0,\,u),\,(w,\,w)\}
 $, which can be visualized with the following graph:
@@ -415,15 +415,15 @@ The representation relation distributes over composition and meet:
 
 Composition of two distributive
 functions $f$ and $f'$ corresponds to finding reachable nodes in a graph composed from their representation
-relations $R_f$ and $R_{f'}$. Therefore, evaluating the composed dataflow function for a control
+relations $R_f$ and $R_{f'}$. Therefore, evaluating the composed data-flow function for a control
 flow path corresponds to finding reachable nodes in a graph composed from the representation relations
-of the dataflow functions for individual instructions.
+of the data-flow functions for individual instructions.
 
 It is this graph of representation relations that the IFDS algorithm operates on.
 In this graph, called the \textit{exploded supergraph}, each node is a pair $(n,d)$, where
 $n\in N^*$ is a node of the control-flow supergraph and $d$ is an element of $D\cup\{0\}$.
 For each edge $(n \to n') \in E^*$, the exploded supergraph contains a set of edges
-$(n,d_i) \to (n',d_j)$, which form the representation relation of the dataflow function
+$(n,d_i) \to (n',d_j)$, which form the representation relation of the data-flow function
 $M_F(n \to n')$. The IFDS algorithm finds all exploded supergraph edges that are reachable by
 \textit{realizable} paths in the exploded supergraph. A path
 is \textit{realizable} if its projection to the (non-exploded) supergraph is a valid
@@ -635,10 +635,10 @@ To convert a representation relation $R_f$ back into the original flow function 
 
 \commentout{
 A practical implementation of the IFDS algorithm generally takes as input a representation of the
-exploded supergraph edges $E^\sharp$ instead of explicit dataflow functions $M_F$. This is convenient because
+exploded supergraph edges $E^\sharp$ instead of explicit data-flow functions $M_F$. This is convenient because
 the two are equivalent in expressiveness, and because the IFDS algorithm works internally with the exploded
 supergraph. More specifically, the input generally provides a function
-$f: N^* \times D \times N^* \to 2^D$. Given a (non-exploded) supergraph edge $n \to n'$ and a dataflow fact $d$,
+$f: N^* \times D \times N^* \to 2^D$. Given a (non-exploded) supergraph edge $n \to n'$ and a data-flow fact $d$,
 $f(n,d,n')$ returns the set of all $d'$ such that the exploded supergraph contains the edge $(n,d) \to (n',d')$.
 For convenience, the function $f$ can be split up into separate functions that handle the cases when
 the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.
@@ -663,9 +663,9 @@ Just as in the IFDS analysis, the IDE algorithm reduces a data-flow problem to a
 
 The IDE algorithm~\cite{sagiv1996precise} extends IFDS to
 \textit{interprocedural} \textit{distributive} \textit{environment}
-problems. An \textit{environment} problem is an analysis whose dataflow
+problems. An \textit{environment} problem is an analysis whose data-flow
 lattice is the lattice $\textsf{Env}(D,L)$ of maps from a finite set $D$ to a meet semilattice
-$L$ of finite height, ordered pointwise. Like IFDS, IDE requires the dataflow functions to be distributive.
+$L$ of finite height, ordered pointwise. Like IFDS, IDE requires the data-flow functions to be distributive.
 
 
 \commentout{
@@ -682,7 +682,7 @@ The input to the IDE algorithm is
 where $G^*$ is a control-flow supergraph,
 $D$ is a set of data-flow facts,
 $L$ is a meet semilattice of finite height,
-and $M_\textsf{Env}:\,E^*\to(\textsf{Env}(D,\,L)\to \textsf{Env}(D,\,L))$ assigns a dataflow function
+and $M_\textsf{Env}:\,E^*\to(\textsf{Env}(D,\,L)\to \textsf{Env}(D,\,L))$ assigns a data-flow function
 to each supergraph edge.
 
 The output of the IDE algorithm is, for each node $n$ in the supergraph,
@@ -918,13 +918,13 @@ node and fact, the algorithm computes a micro-function equal to the meet of the 
 of all the realizable paths from the program entry point to the pair.
 
 In order to do this efficiently, the IDE algorithm requires a representation of micro-functions
-that is general enough to express the basic micro-functions of the dataflow functions for individual
+that is general enough to express the basic micro-functions of the data-flow functions for individual
 instructions, and that supports computing the meet and composition of micro-functions.
 
 
 %Similar to the IFDS algorithm,
 A practical implementation of the IDE algorithm requires
-the input dataflow functions to be provided in their pointwise representation
+the input data-flow functions to be provided in their pointwise representation
 as exploded supergraph edges labelled with micro-functions.
 %\mtodo{Should we cite the ``Practical extensions'' paper here that talks about the on-demand IFDS algorithm?}
 Specifically,

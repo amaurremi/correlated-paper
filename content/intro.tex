@@ -24,11 +24,11 @@ characteristic of IFDS is that it avoids infeasible interprocedural paths in whi
 and returns to/from functions are not properly matched. Sagiv, Reps, and Horwitz
 also presented the \textit{Interprocedural Distributive Environment} (IDE) algorithm
 \cite{sagiv1996precise} that similarly only considers properly matched call/return
-edges, but that supports a broader range of dataflow problems by expanding the 
+edges, but that supports a broader range of data-flow problems by expanding the 
 domain of flow functions to \textit{environments} that go beyond the data-flow facts 
 considered by IFDS.
 
-This paper presents an approach to dataflow analysis that avoids a type
+This paper presents an approach to data-flow analysis that avoids a type
 of infeasible path that arises in object-oriented programs when two or more
 methods are dynamically dispatched on the same receiver object.
 %\mtodo{Should we define the term ``receiver''?}
@@ -37,14 +37,14 @@ method calls are polymorphic (i.e., if they dispatch to different method definit
 depending on the type of the receiver expression at run time), then their dispatch 
 behaviours will be correlated. A recent paper~\cite{DBLP:journals/scp/Tip15} identified
 this problem but did not present a concrete solution or algorithm, and we are not aware 
-of any existing dataflow analysis that is capable of avoiding infeasible paths that arise 
+of any existing data-flow analysis that is capable of avoiding infeasible paths that arise 
 in the presence of correlated method calls.
 
 \input{figures/fig-transformation}
 
 The approach taken in our work is to transform a standard IFDS problem into an
 IDE problem that precisely accounts for infeasible paths due to correlated calls. 
-The results of this IDE problem can be mapped back to the dataflow domain of the 
+The results of this IDE problem can be mapped back to the data-flow domain of the 
 original IFDS problem.
 
 We present a formalization of the transformation and prove its correctness

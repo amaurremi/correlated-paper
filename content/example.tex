@@ -3,7 +3,7 @@
   
 In this section, we illustrate our approach using a small motivating example that
 shows how our technique can be used to improve the precision of taint analysis.
-A taint analysis is a specialized dataflow analysis for computing how string values
+A taint analysis is a specialized data-flow analysis for computing how string values
 may flow from ``sources'', which are typically statements that read untrusted input, 
 to ``sinks'', which are typically security-sensitive
 operations such as calls to 
@@ -54,11 +54,11 @@ edges
   from the nodes labeled $\highlight{\code{end}_\code{A.bar}}{bisque}$ and $\highlight{\code{end}_\code{B.bar}}{lightsalmonpink}$ 
   to the node labeled  $\highlight{\code{return}_\code{bar}}{greyblue}$. 
  
-Informally speaking, an IFDS-based dataflow analysis propagates dataflow facts along the edges
+Informally speaking, an IFDS-based data-flow analysis propagates data-flow facts along the edges
 of a control flow supergraph such as the one in Figure~\ref{fig:examplesupergraph}. The
 IFDS algorithm was carefully designed to avoid infeasible paths that may arise in the
 presence of multiple calls to the same method. However, in this example all methods are
-called in exactly one place, so IFDS is unable to eliminate dataflow along any of the
+called in exactly one place, so IFDS is unable to eliminate data flow along any of the
 paths shown in the figure. As a result, IFDS-based taint analysis algorithms such as
 \cite{DBLP:conf/issta/GuarnieriPTDTB11,DBLP:conf/pldi/ArztRFBBKTOM14} would report 
 that the secret value read on line~\ref{line:Afoo}
@@ -85,7 +85,7 @@ Informally speaking, our approach associates with each edge in an
 interprocedural CFG a function that records the types of 
 variables that are used as the receiver of correlated method calls. Paths that 
 are composed of edges in which the same receiver expression has different types
-are infeasible, and the propagation of dataflow facts along such paths is
+are infeasible, and the propagation of data-flow facts along such paths is
 prevented. Applying our technique to an IFDS-based taint analysis would enable
 the resulting IDE-based taint analysis to determine that no secret value can flow from
 line~\ref{line:Afoo} to the print statement on line~\ref{line:Bbar}. 
@@ -96,7 +96,7 @@ become infeasible in the presence of correlated calls. In particular, we have
 shown how a false positive reported by a standard IFDS-based algorithm is eliminated.
 While the discussion in this section has focused on the specific problem of taint analysis,
 we would like to emphasize that our technique generally applies to \textit{any}
-dataflow analysis problem that can be expressed in the IFDS framework. This includes
+data-flow-analysis problem that can be expressed in the IFDS framework. This includes
 many common analysis tasks such as reaching definitions, constant propagation, slicing,
 typestate analysis, pointer analysis, and lightweight
 shape analysis.

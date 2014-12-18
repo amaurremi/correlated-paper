@@ -43,7 +43,7 @@ Recall that an IFDS problem instance is defined as a five-tuple
 \[
     (G^*,\ D,\ F,\ M_F,\,\sqcap)\,,
 \]
-where $G^*=(N^*,\,E^*)$ is the control-flow supergraph of the program, $D$ is the set of dataflow facts, $F\subseteq2^D\to2^D$ is a set of distributive dataflow functions, and the function $$M_F:\,E^*\to(2^D\to2^D)$$ maps the supergraph edges to dataflow functions, and is extended to paths by composition.
+where $G^*=(N^*,\,E^*)$ is the control-flow supergraph of the program, $D$ is the set of data-flow facts, $F\subseteq2^D\to2^D$ is a set of distributive data-flow functions, and the function $$M_F:\,E^*\to(2^D\to2^D)$$ maps the supergraph edges to data-flow functions, and is extended to paths by composition.
 
 In practice, an IFDS problem can be defined by providing an exploded supergraph
 $G^\#=(N^\#,\,E^\#)$. Each node of $G^\#$ is a pair $(n,\ d)$, where $n\in N^*$ is a node in the control-flow supergraph and $d\in (D\cup\{\mathbf{0}\}),\ \mathbf0\notin D$, where $\mathbf0$ is an auxiliary fact that is necessary for the IFDS algorithm.
@@ -56,7 +56,7 @@ An IDE problem instance is a four-tuple
 \[
     (G^*,\ D,\ L,\ \menv),
 \]
-where $G^*$ and $D$ are defined in the same way as for IFDS. $L$ is a finite-height lattice that represents the values to which dataflow facts are mapped in an IDE problem. An environment $Env(D, L)$ maps dataflow facts to lattice elements. Finally, the map $$M_{\textsf{Env}}:\,E^*\to(\textsf{Env}(D, L)\to \textsf{Env}(D, L))$$ is a function from the control-flow-supergraph edges to environment transformers, extended to paths by composition.
+where $G^*$ and $D$ are defined in the same way as for IFDS. $L$ is a finite-height lattice that represents the values to which data-flow facts are mapped in an IDE problem. An environment $Env(D, L)$ maps data-flow facts to lattice elements. Finally, the map $$M_{\textsf{Env}}:\,E^*\to(\textsf{Env}(D, L)\to \textsf{Env}(D, L))$$ is a function from the control-flow-supergraph edges to environment transformers, extended to paths by composition.
 
 An IDE problem can be defined with a labeled exploded supergraph\footnote{
     The exploded supergraph in an IDE problem is defined in the same way as in an IFDS problem. The only difference is that the $\mathbf0$ fact is denoted as $\Lambda$~\cite{reps1995precise,sagiv1996precise}.
@@ -161,7 +161,7 @@ Sets of types are ordered by the superset relation, and this is lifted to maps f
 to sets of types, so the bottom element $\botcc$ maps every receiver to the set of all types,
 and the top element $\topcc$ maps every receiver to the empty set of types.
 During an actual execution, every receiver $r$ points to an object of some
-runtime type. Therefore, a data flow fact
+runtime type. Therefore, a data-flow fact
 is unreachable along any feasible path if its corresponding lattice element
 maps any receiver to the empty set of types.
 
@@ -256,7 +256,7 @@ the exploded supergraph.
 Along a $\mathbf0$-edge, the micro function is the identity. 
 All other functions can be described with $\varepsilon_S$.
 On a ``diagonal'' edge from $\mathbf0$ to a non-$\mathbf0$ fact that corresponds
-to some data flow fact becoming reachable, $\varepsilon_S(e)$ is applied to the initial
+to some data-flow fact becoming reachable, $\varepsilon_S(e)$ is applied to the initial
 map $\botcc$ that conservatively allows every receiver to point to an object of any type.
 On all other edges, $\varepsilon_S(e)$ is applied to the existing map before the edge.
 The is formalized in the following definition.
@@ -288,7 +288,7 @@ $\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code B\}]$.
 on the edge that passes the argument \code{v} to the parameter \code{s}.
 
 The composition of these micro functions results in the empty set as the possible
-types of the receiver \code{a}, indicating that this data flow path that would
+types of the receiver \code{a}, indicating that this data-flow path that would
 result in an information leak is actually infeasible.
 \end{example}
 
@@ -320,7 +320,7 @@ is converted to an IFDS result as follows:
 %\otodo{I don't understand this comment. What does it mean?}
 
 In the correlated-calls transformation lattice $\lcc$, a map that maps any receiver
-to the empty set of possible types means that the corresponding data flow path is
+to the empty set of possible types means that the corresponding data-flow path is
 infeasible. Therefore, a result $\rho=\resultIDE(\transCC _S(P))$ of the correlated-calls IDE analysis is
 converted to an IFDS result as follows:
 \begin{equation}\label{eq:transCcDef}

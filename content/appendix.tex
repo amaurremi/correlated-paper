@@ -606,7 +606,7 @@ The case where $e_{k+l+1}$ is an end-return edge is analogous to the previous ca
 We now show that a receiver will be only mapped to $\topcc$ if it is the receiver of a correlated call.
 
 \begin{lemma}\label{lem:ccrectop}
-   For an IFDS problem $P$, let $n\in N^*$ be a node, and $d\in D$ a dataflow fact such that there exists a realizable path $p\in\textsf{RP}(n,\,d)$. Let $T$ be the set of all types in the program.
+   For an IFDS problem $P$, let $n\in N^*$ be a node, and $d\in D$ a data-flow fact such that there exists a realizable path $p\in\textsf{RP}(n,\,d)$. Let $T$ be the set of all types in the program.
    If there exists a receiver $r\in R$ such that
   \[
     \ccedgefn{\{r\}}(p)(\topcc)(r)=\top_T\,,                       
@@ -650,7 +650,7 @@ Let $\tau_i=\tau(s_i,\,f_i)$.
 We will now show that if a receiver ever gets mapped to top, then it is a correlated-calls receiver.
 
 \begin{lemma}\label{lem:ccrectop}
-   For an IFDS problem $P$, let $n\in N^*$ be a node, and $d\in D$ a dataflow fact such there exists a realizable path $p\in\textsf{RP}(n,\,d)$.
+   For an IFDS problem $P$, let $n\in N^*$ be a node, and $d\in D$ a data-flow fact such there exists a realizable path $p\in\textsf{RP}(n,\,d)$.
    Then, if there exists a receiver $r\in R$, such that
   \[
     \resultIDE\left(\transCC_{\{r\}}(P)\right)(n)(d)(r)=\top_T\,,
