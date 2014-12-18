@@ -1,7 +1,6 @@
 
   \commentout{
-\otodo{The following definitions are very general, and not related to the transformation.
-    Can we move them somewhere earlier?}
+%\otodo{The following definitions are very general, and not related to the transformation. Can we move them somewhere earlier?}
 \paragraph{Edge Functions}\label{sec:ef}
 
 Let $\mathcal F$ be the set of methods in a program with a signature $s_\mathcal F$.
@@ -35,7 +34,7 @@ If there is a supergraph path from a method call with signature $s_\mathcal F$ t
   }
 
 \commentout{
-\otodo{incorporate into previous section}
+%\otodo{incorporate into previous section}
 \subsection{Defining IFDS and IDE Problems}
 %In Section~\ref{sec:bg}, we defined what IFDS and IDE problems are, their applications, and their constraints. In this section, we describe how to create instances of IFDS and IDE problems.
 
@@ -559,15 +558,13 @@ Finally, we showed in Lemma~\ref{lem:onlycorrrec} that a correlated-call transfo
 %This is the general idea of the correlated-calls analysis. The analysis involves a transformation from IFDS to IDE problems. To implement an IDE problem, it is necessary to define a representation of lattice elements and micro functions. An efficient representation of those data structures for the correlated-calls analysis is presented in the next section.
 
 \subsection{Efficiency}
-\commentout{
-\otodo{Sagiv et al. define a notion of an ``efficient'' implementation of micro-functions.
-    If the micro-functions are ``efficient'', then the asymptotic complexity bounds proven by
-    Sagiv hold. Our implementation is ``efficient'' if we assume that the number of correlated
-    receivers is a constant independent of the size of the program. That seems a stretch. If
-    it's linear in the size of the program, then we would need to add a factor to their complexity
-    bounds. Their bound is $O(ED^3)$, while ours would be $O(ED^3R)$. But then we can't directly use their complexity proof; we would have to adapt it.
-    I'm leaning towards leaving out any mention of ``efficient'' implementation.}
-}
+%\otodo{Sagiv et al. define a notion of an ``efficient'' implementation of micro-functions.
+%    If the micro-functions are ``efficient'', then the asymptotic complexity bounds proven by
+%    Sagiv hold. Our implementation is ``efficient'' if we assume that the number of correlated
+%    receivers is a constant independent of the size of the program. That seems a stretch. If
+%    it's linear in the size of the program, then we would need to add a factor to their complexity
+%    bounds. Their bound is $O(ED^3)$, while ours would be $O(ED^3R)$. But then we can't directly use their complexity proof; we would have to adapt it.
+%    I'm leaning towards leaving out any mention of ``efficient'' implementation.}
 
 Both the IFDS and IDE algorithms have been proven
 to run in $O(ED^3)$ time~\cite{reps1995precise,sagiv1996precise},
