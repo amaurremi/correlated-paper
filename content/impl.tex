@@ -316,17 +316,20 @@ Therefore, a result $\rho=\resultIDE(\transEq(P))$ of the equivalence IDE analys
 is converted to an IFDS result as follows:
 \begin{equation}\label{eq:transEqDef}
   \backEq(\rho) = \lambda n.\{d\mid\rho(n)(d)\ne\top\}.
-\end{equation}\mtodo{Another change was that Ondrej defined $\backEq$ as $\lambda n.\{d\mid\rho(n)(d)=\top\}$
-and that he defined $\backEq$ related to the equivalence transformation.}
-\otodo{I don't understand this comment. What does it mean?}
+\end{equation}
+%\mtodo{Another change was that Ondrej defined $\backEq$ as $\lambda n.\{d\mid\rho(n)(d)=\top\}$
+%and that he defined $\backEq$ related to the equivalence transformation.}
+%\otodo{I don't understand this comment. What does it mean?}
 
 In the correlated-calls transformation lattice $\lcc$, a map that maps any receiver
 to the empty set of possible types means that the corresponding data flow path is
 infeasible. Therefore, a result $\rho=\resultIDE(\transCC _S(P))$ of the correlated-calls IDE analysis is
 converted to an IFDS result as follows:
 \begin{equation}\label{eq:transCcDef}
-  \backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)\neq\top_T\}.
+    \backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)(r)\neq\top_T\}.
 \end{equation}
+\otodo{In Equation (5), I changed $\rho(n)(d)$ to $\rho(n)(d)(r)$, because I think
+    the original was incorrect. Marianna, please check that this correction is correct.}
 
 \commentout{
 
@@ -506,26 +509,6 @@ of the denoted functions:
      =\lambda m.\lambda r.\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)$.
 \end{restatable}%\mtodo{I added the definition of the meet of two functions.}
 
-\subsection{Efficiency}
-\otodo{Sagiv et al. define a notion of an ``efficient'' implementation of micro-functions.
-    If the micro-functions are ``efficient'', then the asymptotic complexity bounds proven by
-    Sagiv hold. Our implementation is ``efficient'' if we assume that the number of correlated
-    receivers is a constant independent of the size of the program. That seems a stretch. If
-    it's linear in the size of the program, then we would need to add a factor to their complexity
-    bounds. Their bound is $O(ED^3)$, while ours would be $O(ED^3R)$. But then we can't directly use their complexity proof; we would have to adapt it.
-    I'm leaning towards leaving out any mention of ``efficient'' implementation.}
-As defined in~Sagiv et al.~\cite{sagiv1996precise}, a representation of micro functions is efficient if the following conditions hold:
-\begin{enumerate}
-	\item There is a representation for the identity and top functions.
-  \item The representation is closed under the meet and composition operations.
-  \item The micro functions form a finite-height lattice.
-  \item The apply, meet, composition, and equality-check operations can be computed in constant time.
-  \item There is a constant bound on the storage space for a micro function representation.
-\end{enumerate}
-\begin{restatable}{lemma}{efficient}\label{lem:efficient}
-  The correlated-call representation of a micro function is efficient.
-\end{restatable}
-
 \subsection{Theoretical Results}
 
 In the following lemma we show that our analysis is sound, i.e. that the result of an IDE problem obtained through a correlated-calls transformation removes only facts that occur on infeasible paths. 
@@ -575,6 +558,46 @@ We have also shown in Lemma~\ref{lem:subsetifds} that for an IFDS problem $P$, t
 Finally, we showed in Lemma~\ref{lem:onlycorrrec} that a correlated-call transformation to IDE that considers only correlated-call receivers $\rcc$ achieves the same result that is obtained when considering all receivers $R$.
 
 %This is the general idea of the correlated-calls analysis. The analysis involves a transformation from IFDS to IDE problems. To implement an IDE problem, it is necessary to define a representation of lattice elements and micro functions. An efficient representation of those data structures for the correlated-calls analysis is presented in the next section.
+
+\subsection{Efficiency}
+\commentout{
+\otodo{Sagiv et al. define a notion of an ``efficient'' implementation of micro-functions.
+    If the micro-functions are ``efficient'', then the asymptotic complexity bounds proven by
+    Sagiv hold. Our implementation is ``efficient'' if we assume that the number of correlated
+    receivers is a constant independent of the size of the program. That seems a stretch. If
+    it's linear in the size of the program, then we would need to add a factor to their complexity
+    bounds. Their bound is $O(ED^3)$, while ours would be $O(ED^3R)$. But then we can't directly use their complexity proof; we would have to adapt it.
+    I'm leaning towards leaving out any mention of ``efficient'' implementation.}
+}
+
+Both the IFDS and IDE algorithms have been proven
+to run in $O(ED^3)$ time~\cite{reps1995precise,sagiv1996precise},
+where $E$ is the number of edges in the (non-exploded) supergraph, and $D$ is the size
+of the set of facts.
+The complexity proof for the IDE algorithm requires the implementation of the micro-functions
+to be \textit{efficient} according to the following criteria:
+\begin{enumerate}
+	\item There is a representation for the identity and top functions.
+  \item The representation is closed under the meet and composition operations.
+  \item The micro functions form a finite-height lattice.
+  \item The apply, meet, composition, and equality-check operations can be computed in constant time.
+  \item There is a constant bound on the storage space for a micro function representation.
+\end{enumerate}
+We prove that the micro-functions for the correlated-call analysis satisfy these
+criteria if we consider the number of correlated-call receivers $R$ and the
+number of run-time types $T$ constant
+(i.e. the operations on micro-functions are allowed to use time that is $O(RT)$,
+but constant with respect to $E$ and $D$).
+
+\begin{restatable}{lemma}{efficient}\label{lem:efficient}
+  The correlated-call representation of a micro function is efficient if the number of
+  correlated-call receivers $R$ and the number of run-time types $T$ are considered constant.
+\end{restatable}
+
+From this lemma, we conclude that the correlated-calls analysis runs in time
+$O(ED^3RT)$. In other words, the asymptotic cost of the added precision of
+the correlated-calls analysis is increased by a factor of $O(RT)$ compared
+to the original IFDS analysis.
 
 \subsection{Implementation of the Correlated-Calls Analysis}
 The correlated-calls analysis was implemented in the Scala programming language~\cite{odersky2004overview}. 
