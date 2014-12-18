@@ -590,12 +590,12 @@ but constant with respect to $E$ and $D$).
 
 \begin{restatable}{lemma}{efficient}\label{lem:efficient}
   The correlated-call representation of a micro function is efficient if the number of
-  correlated-call receivers $R$ and the number of run-time types $T$ are considered constant.
+  correlated-call receivers $\rcc$ and the number of run-time types $T$ are considered constant.
 \end{restatable}
 
 From this lemma, we conclude that the correlated-calls analysis runs in time
-$O(ED^3RT)$. In other words, the asymptotic cost of the added precision of
-the correlated-calls analysis is increased by a factor of $O(RT)$ compared
+$O(ED^3\rcc T)$. In other words, the asymptotic cost of the added precision of
+the correlated-calls analysis is increased by a factor of $O(\rcc T)$ compared
 to the original IFDS analysis.
 
 \subsection{Implementation of the Correlated-Calls Analysis}
