@@ -165,7 +165,7 @@ shared by both collections and iterators over them.
 }
 The \code{toArray} method of this trait
 creates an array and copies the contents of the collection or iterator into it:
-\inputMinted{scala}{collectionsExample.scala}
+\inputMintedNoLNs{scala}{collectionsExample.scala}
 %\otodo{Marianna, can you figure out how to get LaTeX to syntax-highlight this?} 
 When \code{this} refers to an iterator rather than a collection, the call to \code{this.size}
 extracts all elements of the iterator to count them.
@@ -182,12 +182,14 @@ One could design an IFDS analysis to detect this kind of bug.
 
 However, the implementation of \code{TraversableOnce.toArray} is actually correct because the above
 code is guarded with a test:
-\inputMinted{scala}{isTraversable.scala}
+\inputMintedNoLNs{scala}{isTraversable.scala}
+\commentout{
 \ftodo{
   It is confusing that this code fragment is labeled with line number 19 although it presumably
   occurs in the code before the previously discussed two lines. I think it is better to show
   all of the code at once, in a figure, and include at least the headers of all the methods mentioned
   here.
+}
 }
 When the \code{isTraversableAgain} method returns false, as it does for
 an iterator, the \code{toArray} method uses a different
