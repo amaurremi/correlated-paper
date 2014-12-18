@@ -158,7 +158,7 @@ call sites $C^\Subset$. We also see that, on average,  each correlated-call rece
 \subsection{An Example from the Scala Collections Library}
 The Scala collections library contains the trait \code{TraversableOnce} that is
 shared by both collections and iterators over them. 
-\ftodo{
+\commentout\ftodo{
   I think it would be helpful to show a little more of the code of the trait here,
   such as the trait declaration and the signature of the toArray method containing the
   correlated calls. You can abbreviate everything else with ...
@@ -169,13 +169,13 @@ creates an array and copies the contents of the collection or iterator into it:
 %\otodo{Marianna, can you figure out how to get LaTeX to syntax-highlight this?} 
 When \code{this} refers to an iterator rather than a collection, the call to \code{this.size}
 extracts all elements of the iterator to count them.
-\ftodo{
+\commentout\ftodo{
   Would it make sense to show the code for the size method, and refer to the line numbers
   of that method in the above sentence?  
 }
  At the call to \code{copyToArray},
 the iterator is already empty, so nothing is copied to the newly created array.
-\ftodo{
+\commentout\ftodo{
 Would it make sense to show the code for copyToArray here?
 }
 One could design an IFDS analysis to detect this kind of bug.
@@ -203,7 +203,7 @@ true, then call \code{size} and \code{copyToArray} on an iterator. Our correlate
 calls analysis could determine that this path is infeasible because it calls the
 collection version of \code{isTraversableAgain} but the iterator versions of
 \code{size} and \code{copyToArray}.
-\ftodo{Would it be helpful to create a diagram of the relevant fragments of the supergraph,
+\commentout\ftodo{Would it be helpful to create a diagram of the relevant fragments of the supergraph,
 with the infeasible path in bold?} 
 
 \commentout{
@@ -219,3 +219,12 @@ def toArray[B >: A : ClassTag]: Array[B] = {
 }
 
 }
+
+The relevant code from \textsf{TraversableOnce} and other related traits is shown
+in Figure~\ref{fig:traversableonce}.
+
+\begin{figure}
+\inputMinted{scala}{TraversableOnce.scala}
+\caption{Relevant code from \textsf{TraversableOnce} and related traits.}
+\label{fig:traversableonce}
+\end{figure}
