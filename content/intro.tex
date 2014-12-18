@@ -16,7 +16,7 @@ of control in concrete executions of a program, it may contain \textit{infeasibl
 paths that cannot occur at runtime. The precision of a data-flow analysis algorithm
 depends critically on its ability to detect and disregard such infeasible paths.
 The popular \textit{Interprocedural Finite Distributive Subset} (IFDS) algorithm 
-by  Reps, Horwitz, and Sagiv \cite{reps1995precise} is a general data-flow analysis
+by  Reps, Horwitz, and Sagiv~\cite{reps1995precise} is a general data-flow analysis
 algorithm for computing solutions to standard finite distributive data-flow problems such 
 as reaching definitions, available expressions, and taint analysis.
 A distinguishing 
@@ -35,7 +35,7 @@ methods are dynamically dispatched on the same receiver object.
 In such cases, if the
 method calls are polymorphic (i.e., if they dispatch to different method definitions 
 depending on the type of the receiver expression at run time), then their dispatch 
-behaviours will be correlated. A recent paper \cite{DBLP:journals/scp/Tip15} identified
+behaviours will be correlated. A recent paper~\cite{DBLP:journals/scp/Tip15} identified
 this problem but did not present a concrete solution or algorithm, and we are not aware 
 of any existing dataflow analysis that is capable of avoiding infeasible paths that arise 
 in the presence of correlated method calls.

@@ -104,7 +104,7 @@ Symmetrically, we can also establish that $\forall r.I'(r) \subseteq I(r)$ by ap
     \[
       \rcc\mapsto2^T=\{(r,\,t)\,|\,r\in \rcc,\,t\in 2^T\}=\lcc_\rcc
     \]        
-    also forms a finite-height lattice \cite{nielson1999principles}. 
+    also forms a finite-height lattice~\cite{nielson1999principles}. 
     
     Furthermore, $\lcc_\rcc$ is a finite set. 
     Every element of $\lcc_\rcc$ can be applied to $|\rcc|$ receivers, where each receiver is mapped to a set of types. There are $|\rcc|\cdot2^{|T|}$ different possibilities to form those mappings, so
@@ -116,36 +116,6 @@ Symmetrically, we can also establish that $\forall r.I'(r) \subseteq I(r)$ by ap
     \item The space bound is $O(\rcc\times T)$.\qedhere
   \end{enumerate}
 \end{proof}
-
-\commentout{
-\begin{proof}[\textbf{Proof of Lemma~\ref{lem:efficient}}]
-  \begin{enumerate}
-    \item The identity function is represented as
-      \[
-        \denote{\id}=\{(r,\,\langle \bot_T,\,\top_T\rangle)\,|\,r\in \rcc\}\,;
-      \]
-      the top function is represented as
-      \[
-        \denote{\lambda m\,.\,\topcc}=\{(r,\,\langle \top_T,\,\top_T\rangle)\,|\,r\in \rcc\}\,.
-      \]
-    \item Equations~\eqref{eq:compclosed} and~\eqref{eq:meetclosed} show that the representation of micro functions is closed under composition and meet.
-    \item To show that our representation for micro functions forms a lattice with finite height, let us first show that $\lcc_\rcc:\,\rcc\to2^T$ forms a lattice. Since $T$ is a finite set, $(2^T,\,\subseteq)$ is a finite-height lattice. $\rcc$ is a finite set. Hence, the mapping
-    \[
-      \rcc\mapsto2^T=\{(r,\,t)\,|\,r\in \rcc,\,t\in 2^T\}=\lcc_\rcc
-    \]        
-    also forms a finite-height lattice \cite{nielson1999principles}. 
-    
-    Furthermore, $\lcc_\rcc$ is a finite set. 
-    Every element of $\lcc_\rcc$ can be applied to $|\rcc|$ receivers, where each receiver is mapped to a set of types. There are $|\rcc|\cdot2^{|T|}$ different possibilities to form those mappings, so
-    \[
-      |\lcc_\rcc|=|\rcc|\cdot2^{|T|}.
-    \]
-    Therefore, $\lcc_\rcc\mapsto \lcc_\rcc$ also forms a finite-height lattice.
-    \item All operations can be computed in $O(\rcc\times T)$ time. Note that the $\rcc$ and $T$ sets are an input to the correlated-calls analysis, and the time it takes to compute the meet or composition of micro functions is independent of the representation of the specific operand micro functions.
-    \item The space bound is $O(\rcc\times T)$.
-  \end{enumerate}
-\end{proof}
-}
 
 \subsection*{Soundness and Precision}
 
