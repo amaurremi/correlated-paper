@@ -47,8 +47,8 @@ to dispatch to $f$: $\tau(s,f) = \{t\mid \textsf{lookup}(s,t)=f\}$.
 \commentout{
 \begin{example}
   Consider the program in Listing~\ref{list:examplejava}. The supergraph corresponding to that program is shown in Figure~\ref{fig:examplesupergraph}.
-  \otodo{Can we merge the examples from Figures 1 and 2 into a single example program?}
-\otodo{I think we can remove the supergraph Figure 3.}
+  %\otodo{Can we merge the examples from Figures 1 and 2 into a single example program?}
+%\otodo{I think we can remove the supergraph Figure 3.}
 \begin{figure}
   \centering
   \begin{minipage}{\textwidth}
@@ -185,9 +185,7 @@ a node $n$ is denoted $\ivp(n)$.
     \right]
   \]
   is $\{\}$, which indicates that $p_1$ is valid. Every prefix of $p_1$ is also a valid path.
-  
-\mtodo{The figure that we deleted was constructed so that there would be a realizable and a non-realizable path. Now that we deleted that figure, let's delete this example as well.}  
-  
+    
 However, the graph also contains an interprocedurally invalid path
   \[
     p_2=\left[\highlight{\textsf{call}_\texttt{f}}{lightsalmonpink},\,
@@ -643,7 +641,8 @@ supergraph. More specifically, the input generally provides a function
 $f: N^* \times D \times N^* \to 2^D$. Given a (non-exploded) supergraph edge $n \to n'$ and a dataflow fact $d$,
 $f(n,d,n')$ returns the set of all $d'$ such that the exploded supergraph contains the edge $(n,d) \to (n',d')$.
 For convenience, the function $f$ can be split up into separate functions that handle the cases when
-the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.\mtodo{Do we leave the start-to-return edge out as a special case of intraprocedural edge?}
+the $n\to n'$ is an intraprocedural edge, a call-to-start edge, or an end-to-return edge.
+%\mtodo{Do we leave the start-to-return edge out as a special case of intraprocedural edge?}
 }
 
 %We presented an overview of the IFDS analysis. IFDS problems are transformed into IDE problems by the correlated-calls analysis. The IDE framework is described in the next section.
@@ -945,7 +944,6 @@ The algorithm first computes the lattice elements $l_{n,\,d}$ that correspond to
   \textsf{Env}_n=\left\{(d,\,l_{n,\,d})\ |\ (n,\,d)\in N^\#\right\}\,.
 \end{equation}
 
-\mtodo{I think the rest of this section will not make sense to anyone who does not already understand it. Should I try to replace it with one paragraph that tries to give an intuitive understanding of what the IDE algorithm is doing?}
 The overall idea behind computing the lattice elements $l_{n,\,d}$ is the following. For each interprocedurally realizable path
 \[
   p=\left[(\startmain,\,\mathbf0),\,(n_1,\,d_1),\,\dots,\,(n_k,\,d_k)\right]
@@ -971,9 +969,7 @@ This is a general outline of the IDE analysis. We use the IDE framework to impro
 The next section describes how this is done.
 }
 
-\commentout{
-\ftodo{Would it make sense to discuss an example of an IDE problem here?  Perhaps we can do this
-  without using much space by referring to an existing figure elsewhere in the paper?}
-  \otodo{See Example 4 on the previous page.}
-  \otodo{Now done in Example 5.}
-}
+%\ftodo{Would it make sense to discuss an example of an IDE problem here?  Perhaps we can do this
+%  without using much space by referring to an existing figure elsewhere in the paper?}
+%  \otodo{See Example 4 on the previous page.}
+%  \otodo{Now done in Example 5.}
