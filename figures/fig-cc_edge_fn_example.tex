@@ -81,10 +81,10 @@
     \node [n] (end_a_foo_z) [left=\nd of end_a_foo_p] {};
 %A.foo method edges
     \path[->, ultra thick](st_a_foo_z) edge (return_secret_z); 
-    \path[->](return_secret_z) edge node[arrowtext,near start,above right=0.4cm and -.15cm,rotate=-60]{$\lambda m.\botcc$} (end_a_foo_z); 
+    \path[->](return_secret_z) edge node[arrowtext,near start,above right=0.4cm and -.1cm,rotate=-60]{$\lambda m.\botcc$} (end_a_foo_z); 
     \path[->,dashed, ultra thick](call_foo_z) edge [out=38,in=238]  (st_a_foo_z);
     \path[->,dashed](end_a_foo_z) edge [out=200,in=43] (return_foo_z);
-    \path[->,dashed, ultra thick](end_a_foo_p) edge  [out=200,in=43] node[arrowtext,below,rotate=30]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$} (return_foo_v);
+    \path[->,dashed, ultra thick](end_a_foo_p) edge  [out=200,in=43,] node[arrowtext,rotate=28,below=.1cm]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$} (return_foo_v);
     \path[->](st_a_foo_p) edge (return_secret_p); 
     \path[->](return_secret_p) edge (end_a_foo_p);
     \path[->, ultra thick](return_secret_z) edge (end_a_foo_p);
@@ -102,7 +102,7 @@
     \path[->,dashed](call_bar_z) edge [out=20,in=229] (st_a_bar_z);
     \path[->,dashed](end_a_bar_z) edge [out=220,in=35] (return_bar_z);
     \path[->](st_a_bar_s) edge (end_a_bar_s);
-    \path[->,dashed](call_bar_v) edge [out=20,in=230] node[arrowtext,near end,above left=-.1cm and -.15cm,rotate=36]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$} (st_a_bar_s);
+    \path[->,dashed](call_bar_v) edge [out=20,in=230] node[arrowtext,near end,above left=-.1cm and -.15cm,rotate=34]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt A\}]$} (st_a_bar_s);
 
 
 %B.foo method nodes
