@@ -107,9 +107,9 @@ How often do correlated calls occur in practice? To assess the benefit of the co
 Our goal was to obtain an upper bound on the number of redundant IFDS-result nodes that could be potentially removed by our analysis. The results are shown in Table~\ref{tab:dacapostat}.
 
 In the table, the number of all call sites in a program is denoted as $C$. 
-Polymorphic call sites are denoted as $C_P$, and correlated call sites as $C^\Subset$. 
+Polymorphic call sites are denoted as $C_P$, and correlated call sites as $C^\Subset$. The~number of classes~$T$ and the number of lines of code are shown in the last two columns.
 The first four columns indicate the overall number of various call sites and correlated-call receivers in a program. 
-The last three columns indicate the ratio of polymorphic to all call sites, the ratio of correlated to polymorphic call sites, and the ratio of correlated call sites to correlated-call receivers.
+The next three columns indicate the ratio of polymorphic to all call sites, the ratio of correlated to polymorphic call sites, and the ratio of correlated call sites to correlated-call receivers.
 In this context, we deem a call site to be polymorphic if its statically computed call graph
 contains edges from the call site to multiple target methods.
 We deem a call site to be a correlated call site if it is polymorphic and there is
