@@ -11,6 +11,5 @@
 *.cb2
 *.tdo
 *.dvi
-*/main.pdf
-*.cls
+*/main.pdF
 
