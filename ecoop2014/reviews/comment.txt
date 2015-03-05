@@ -1,0 +1,15 @@
+omment
+   Paper #25: Precise Data Flow Analysis in the Presence of Correlated
+              Method Calls
+---------------------------------------------------------------------------
+Summary of the PC discussion:
+
+Pros:
++ The paper addresses an interesting problem in program analysis, which can potentially achieve more precise analysis results.
++ The presentation is good. Motivating example and the theory fit nicely.
+
+Cons:
+- The paper presents no results on efficiency or precision, even though the authors claim the algorithm is implemented.
+- Without experimental results, the usefulness of the algorithm cannot be determined. Neither runtime data nor space requirements for the analysis is provided.
+- The coverage of the related work may be extended (e.g. comparison with object-sensitivity).
+

@@ -1,0 +1,79 @@
+OOP 2015 Review #25D
+                     Updated 10 Feb 2015 1:49:36pm EST
+---------------------------------------------------------------------------
+   Paper #25: Precise Data Flow Analysis in the Presence of Correlated
+              Method Calls
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Weak reject
+                 Reviewer expertise: 4. Expert
+
+                         ===== Paper summary =====
+
+This paper presents a general framework to enhance an IFDS dataflow framework
+to rule out infeasible paths due to correlated dynamic dispatch invocations.
+The paper presents a clever insight that we can maintain a mapping from receiver object to type in an enviornment, and then apply the IDE framework with this environment mapping to rule out the infeasible paths.   Furthermore, the running time is still polynomial.
+
+The paper presents a clear theoretical description of the new framework,
+but no empirical results.
+
+                      ===== Comments for author =====
+
+Points In Favor:
++ Well-written with clear notation.  Excellent presentation.
++ Clever observation that IDE can be used to enhance an IFDS framework to filter for correlated calls, without sacrificing polynomial execution time bounds.
++ Addresses interesting problem in program analysis, and presents a somewhat
+surprising theoretical result.
+
+Points Against:
+- No empirical argument that performance is acceptable or precision significantly improves in practice.
+
+
+I enjoyed reading this paper - I think it presents a clever
+insight on how to exploit environments in IDE to rule out certain infeasible
+paths due to common patterns of dynamic dispatch in object-oriented languages.
+
+I think the result is surprising and non-obvious.  Normally, reasoning about
+dynamic dispatch is handled through variants of alias analysis, which
+usually leads to non-distributive transfer functions in flow-sensitive analysis.
+However, this paper shows that by considering the set of receivers and
+set of types as a finite set, one can maintain distributivity and still
+incorporate flow-sensitive type-based alias reasoning.
+
+This is a pretty useful observation, since it allows an enhanced IFDS analysis to still run in polynomial time via IDE.  The paper claims the analysis is
+still O(ED^3) because it considers the sets R and T to be of constant time.
+As a matter of taste, I would not make such a claim, since R and T likely
+scale with program size.   So I would claim the running time to be closer
+to {program size}^{fifth power} than cubic.  This is still polynomial, so
+the result is still interesting.
+
+I did not verify the formal proofs which were included in supplementary
+material, but I believe intuitively that the formal claims are correct.
+
+While I like the theoretical contribution of this paper, the lack of
+empirical results is an obvious weakness.   Though the algorithm is
+implemented, the paper presents no results on efficiency or precision.
+There is no doubt that the paper would be much stronger with a well-designed
+empirical evaluation.
+
+In particular, the reader is left wondering
+a) What is the slowdown compared to a vanilla IFDS solution using a tuned
+solver?  b) What is the increase in precision for typical clients?
+
+On efficiency, I'm particularly concerned about the space cost in
+representing the environments.   On precision, Table 1 indicates that the
+potential for improvement is probably low.
+
+So the biggest weakness of this paper is that it is unclear whether this
+algorithm is an important advance in practice, or just an interesting
+theoretical result.
+
+Concerning whether to accept the paper or not: I think the theoretical
+contribution is strong enough, but clearly the paper would be much stronger
+with an empirical evaluation.   Even if the empirical evaluation reveals
+negative results on efficiency and precision, the paper would be stronger.
+
+I'm inclined to reject the paper in its current form and
+encourage the authors to resubmit a stronger paper when the empirical
+results are available.
+

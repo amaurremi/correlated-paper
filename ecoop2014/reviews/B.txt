@@ -1,0 +1,51 @@
+OOP 2015 Review #25B
+                     Updated 31 Jan 2015 3:07:08pm EST
+---------------------------------------------------------------------------
+   Paper #25: Precise Data Flow Analysis in the Presence of Correlated
+              Method Calls
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Weak reject
+                 Reviewer expertise: 2. Some familiarity
+
+                         ===== Paper summary =====
+
+In this paper, the authors describe an problem in data-flow analyses
+where infeasible paths may arise which involve overridden or
+overriding implementations of other methods on the same object.  That
+is, the authors argue that method calls should be correlated so that
+paths calling multiple methods on the same (abstract) object during
+data-flow analysis only involve implementations that can be found
+together in particular concrete objects.  The authors describe how to
+translate problems using the IFDS algorithm, used by analysis
+frameworks such as WALA, into the IDE algorithm, which extends IFDS to
+work on environments, in such a way that paths that do not involve
+correlated methods are discarded.  The authors show their analysis
+sound, in that it only removes such infeasible paths, and also analyze
+its efficiency.
+
+                      ===== Comments for author =====
+
+The main problem I have with this paper is it's not clear whether or
+not the related work is a reasonable coverage of the work in this
+area. For example, it feels like the work of avoiding infeasible paths
+for correlated method calls is related to the idea of
+object-sensitivity proposed in "Parameterized Object Sensitivity for
+Points-to Analysis for Java " by Milanova et al.
+(Trans. Softw. Eng. Methodol. 14(1), 2005), and used later in other
+papers like "Strictly Declarative Specification of Sophisticated
+Points-to Analyses" by Bravenboer and Smaragdakis (OOPSLA '09).
+
+Wouldn't being sensitive to the objects on which a method is being run
+by necessity mean you would catch correlated method calls?  Would that
+sensitivity only be intraprocedural (in that you'd only catch calls
+within the method on this, e.g.), and this paper avoids that?  If so,
+it seems worthwhile to compare the approaches and make that explicit.
+If not, and those approaches also handle the same issue, then this
+paper seems to become a paper of how to implement one such analysis on
+WALA, not using the built in IFDS algorithm, but using a hand-built
+implementation of the IDE algorithm. This then makes you work seem
+less useful for other people who use WALA without handrolling their
+own IDE algorithms, unless your IDE implementation is planned for
+inclusion into that framework.
+

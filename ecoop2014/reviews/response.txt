@@ -1,0 +1,56 @@
+esponse by Marianna Rapoport <mrapoport@uwaterloo.ca>
+   Paper #25: Precise Data Flow Analysis in the Presence of Correlated
+              Method Calls
+---------------------------------------------------------------------------
+Reviewers C and D correctly point out that our primary contributions are
+theoretical: the transformation of an IFDS problem to an IDE problem
+that provides more precise results for the original IFDS problem, and
+the proofs that the result of this approach is both sound and fully
+eliminates flow along infeasible paths due to correlated calls.
+
+Reviewers B and C ask about object sensitivity. Object-sensitive
+points-to analysis is orthogonal to our work because it analyzes the
+flow of data (pointers), while we analyze control flow paths instead.
+Also, object-sensitive points-to analysis is flow-insensitive, while
+IFDS/IDE are flow-sensitive, and our transformation only makes sense
+in a flow-sensitive setting (since a flow-insensitive analysis already
+introduces many more infeasible control flow paths).
+
+It would be possible to simulate the effect of our correlated calls
+transformation in the following way inspired by object-sensitive
+points-to analysis: we could re-analyze each method in a number
+of contexts. There would be a separate context for every possible
+assignment of concrete types to all of the pointers in the method that
+are used as receivers at a call site. The number of such contexts for
+each method would be O(R^T), where R is the number of receiver pointers
+in the method and T is the number of possible concrete types that could
+be assigned to a receiver pointer. Our approach computes equally precise
+analysis results but avoids this exponential cost.
+
+Reviewer C says it would be of interest to know how many calls share the
+same base variable on average. The average number of polymorphic calls per
+receiver is included in Table 1, and is equal to 3. The frequency of
+ situations where more than two polymorphic calls are invoked on the same
+receiver, compared to all calls in the program, is reflected by the number
+of correlated calls over polymorphic calls, which is 39%, and number of
+polymorphic calls over all calls, which is 3%.
+
+Reviewer B asks about the inclusion of our IDE implementation in WALA.
+We have been in discussion about this with the key WALA developers since
+the summer, and we have already begun the process of contributing our
+IDE implementation (and correlated calls transformation) to WALA so that
+it will be available to all WALA users.
+
+We agree with reviewer D that the asymptotic complexity is O(ED^3RT) and will present it more explicitly in the final version.
+
+Reviewer A asks why we do not just use IDE directly. The IFDS and
+IDE algorithms solve two distinct classes of problems. Our approach
+is aimed at IFDS problems rather than IDE problems. Given an IFDS
+problem, our approach results in an IFDS solution that is more precise
+than if the same IFDS problem had been solved directly with the IFDS
+algorithm. As future work, we could look at adapting our approach to IDE
+problems: we could take an initial IDE problem, convert it to a larger
+and more complex IDE problem, so that the solution of the larger IDE
+problem generates a more precise solution to the original IDE problem by
+removing infeasible paths due to correlated calls.
+

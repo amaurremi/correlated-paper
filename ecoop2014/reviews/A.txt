@@ -1,0 +1,19 @@
+OOP 2015 Review #25A
+                     Updated 30 Jan 2015 9:15:09am EST
+---------------------------------------------------------------------------
+   Paper #25: Precise Data Flow Analysis in the Presence of Correlated
+              Method Calls
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Weak accept
+                 Reviewer expertise: 2. Some familiarity
+
+                         ===== Paper summary =====
+
+This presents a method to avoid infeasible pathes arised in object-oriented programs because of correlated method calls. In Section 2, an example is given to show how the precision of data flow are affected by correlated method calls. Section 3 gives introductions on the Interprocedural Finite Distributive Subset framework and the Interprocedural Distributive Environment framework. Section 4 propose the method for correlated calls analysis. The authors propose an transformation method to transform an IFDS problem to a corresponding IDE problem. Then the IDE framework is applied to the resulting IDE problem. Another method is proposed to transform the IDE results into an IFDS result. The authors proved
+that the transofrmation is sound, and the approach in this paper can get more precise results.
+
+                      ===== Comments for author =====
+
+This paper avoid propagating data flow facts along infeasible paths due to correlated polymorphic method calls by transforming IFDS problems into IDE problems. This approach can be used to get more precise analysis results. However, the authors does not address the quesion that why people do not use the IDE framework directly, because IDE is an extension of IFDS.
+

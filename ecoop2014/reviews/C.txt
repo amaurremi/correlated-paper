@@ -1,0 +1,60 @@
+OOP 2015 Review #25C
+                     Updated 3 Feb 2015 2:16:38am EST
+---------------------------------------------------------------------------
+   Paper #25: Precise Data Flow Analysis in the Presence of Correlated
+              Method Calls
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Weak reject
+                 Reviewer expertise: 3. Knowledgeable
+
+                         ===== Paper summary =====
+
+The paper presents an inter-procedural data-flow analysis for correlated method calls that eliminates infeasible paths caused by correlated method calls. Correlated method calls are subsequent polymorphic method invocations with the same base object. The configurations of the actual called methods for subsequent correlated polymorphic method calls are limited, and a standard data-flow analysis would introduce a multitude of infeasible paths.
+
+The inter-procedural data-flow analysis is based on a standard IFDS/IDE framework invented by T. Reps and colleagues in a sequence of papers in the 90s. The authors' paper goes in great depth to introduce the background and describe how the data-flow analysis is constructed. However, no experimental results are given beside a minor quantitative statistics and no impact on a client such as taint analysis is presented.
+
+                      ===== Comments for author =====
+
+Strength
+- The paper gives a nice introduction to IFDS/IDE for an audience which is not familiar to the work of the 90s. The presentation of the paper is cohesive; motivating example and the theory fit nicely.
+- Standard properties for the dataflow-analysis necessary for IFDS/IDE are shown.
+
+Weakness
+- The introduced paper does not provide experimental results of the introduced data-flow analysis for correlated method calls. Neither runtime data nor space requirements for the analysis is provided for a standard set of benchmarks (although the authors claim that they have implemented in WALA).
+- The usefulness of data-flow analysis (i.e., eliminating infeasible paths caused by correlated method calls) has not been shown for an application such as a taint analysis.
+
+More comments:
+
+Pg. 1, Abstract, ".. designed in a way that enables us to ignore data flow along infeasible paths." Reword.
+
+Pg. 2, "we are not aware of any existing data-flow analysis that is capable ...": although only related but it might be worthwhile to investigate how object-sensitivity of context-sensitivity points-to analyses relate to correlated method calls.
+
+Pg. 3, "can be used to improve " ----> "improves"
+
+Pg. 3, "can improve" ----> "improve"
+
+Pg. 5, "Informally speaking, " remove (several occurrences)
+
+Pg. 5, "The IFDS algorithm was careful designed to avoid ...": Reword; that is not accurate, you introduce an instance of IDE/IFDS framework.
+
+Pg. 6, Table 1, the quantitative analysis is insufficient. It only reports on occurrence of C vs Cp vs Ccc. Correlated calls share the same base variable and hence it would be over interest to know how many calls share the same base variable on average etc.
+
+Pg. 7, "are instructions, and which" ----> "are instructions, which"
+
+Pg. 9, "A path thorough the control-flow supergraph" ----> "A path in the control ..."
+
+Pg. 9, "every subset need only have a greatest lower bound" Reword.
+
+Pg. 10, "which can be visualized with the following graph" ----> "is depicted by the following graph:"
+
+Pg. 12, "This means that at that node, s is considered secret". Reword.
+
+Pg. 13, "in the same way as " ----> "in the same fashion as"
+
+Pg. 15, Definition 1, write the cases as bulletin list.
+
+Pg. 19, "In other words," Reword.
+
+Pg. 19, Section 4.7, experimental evaluation of the data-flow analysis is missing.
+
