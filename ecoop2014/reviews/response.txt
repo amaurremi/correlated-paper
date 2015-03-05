@@ -1,4 +1,5 @@
-esponse by Marianna Rapoport <mrapoport@uwaterloo.ca>
+===========================================================================
+          Response by Marianna Rapoport <mrapoport@uwaterloo.ca>
    Paper #25: Precise Data Flow Analysis in the Presence of Correlated
               Method Calls
 ---------------------------------------------------------------------------
