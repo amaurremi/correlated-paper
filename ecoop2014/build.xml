@@ -1,0 +1,42 @@
+<project name="correlated-paper" default="build" basedir=".">
+<!-- ANT script to create PDF file from LaTeX sources -->
+
+	<target name="clean">
+		<property name="mainfile" value="main" />
+		<property name="destdir" value="." />
+		<property name="texloc" value="/usr/texbin/"/>
+		<property name="bibtex.repo" value="."/> 
+			
+		<delete failonerror="true">
+			<fileset dir="${destdir}">
+				<include name="*.log"/>
+				<include name="*.dvi"/>
+				<include name="*.aux"/>
+				<include name="*.ps"/>
+				<include name="*.bbl"/>
+				<include name="*.blg"/>
+				<include name="${mainfile}.pdf"/>
+				<include name="*.toc"/>
+			</fileset>
+		</delete>
+	</target>
+	
+
+	<target name="build" depends="clean" description="Build PDF" >
+		<sequential>
+			<exec executable="${texloc}pdflatex" failonerror="false">
+				<arg line="${mainfile}"/>
+			</exec>
+			<exec executable="${texloc}bibtex" failonerror="false">
+				<arg line="${mainfile}"/>
+			</exec>
+			<exec executable="${texloc}pdflatex" failonerror="false">
+				<arg line="${mainfile}"/>
+			</exec> 
+			<exec executable="${texloc}pdflatex" failonerror="false">
+				<arg line="${mainfile}"/>
+			</exec>
+		
+		</sequential>
+	</target>
+</project>

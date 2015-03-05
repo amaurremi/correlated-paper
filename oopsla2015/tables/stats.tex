@@ -1,0 +1,23 @@
+\begin{table}
+\caption{Frequencies of correlated-call occurrences in the Dacapo benchmarks}\label{tab:dacapostat}
+\centering
+
+\begin{tabular}{@{}lrrrrrrrrr@{}}
+\toprule
+\multicolumn{1}{l}{\textbf{Benchmark}} & \multicolumn{1}{c}{$C$} & \multicolumn{1}{c}{$C_P$} & \multicolumn{1}{c}{$C^\Subset$} & \multicolumn{1}{c}{$|\rcc|$} & \multicolumn{1}{c}{$\frac{C_P}{C}$} & \multicolumn{1}{c}{$\frac{C^\Subset}{C_P}$} & \multicolumn{1}{c}{$\frac{C^\Subset}{|\rcc|}$} & \multicolumn{1}{c}{$T$} & \multicolumn{1}{c}{LOC}    \\ \midrule
+\textbf{antlr}                         & 11,557                  & 494                       & \ 342                             & 66                           & \ 4\%                                 & \ 69\%                                        & 5                                              & \ 411   & \ 33,356 \\
+\textbf{bloat}                         & 24,000                  & \ 1,087                     & 398                             & 101                          & 4\%                                 & 37\%                                        & 4                                              & 600   & 24,846 \\
+\textbf{chart}                         & 25,849                  & 685                       & 213                             & 67                           & 3\%                                 & 31\%                                        & 3                                              & 856   & 49,408 \\
+\textbf{eclipse}                       & 5,958                   & 78                        & 17                              & 6                            & 1\%                                 & 22\%                                        & 3                                              & 313   & 18,636 \\
+\textbf{fop}                           & 7,944                   & 97                        & 17                              & 6                            & 1\%                                 & 18\%                                        & 3                                              & 398   & 44,875 \\
+\textbf{hsqldb}                        & 7,860                   & 185                       & 25                              & 8                            & 2\%                                 & 14\%                                        & 3                                              & 429   & 47,116 \\
+\textbf{jython}                        & 18,369                  & 613                       & 125                             & 52                           & 3\%                                 & 20\%                                        & 2                                              & 574   & 36,741 \\
+\textbf{luindex}                       & 8,840                   & 110                       & 24                              & 9                            & 1\%                                 & 22\%                                        & 2                                              & 397   & 19,345 \\
+\textbf{lusearch}                      & 9,408                   & 258                       & 63                              & 23                           & 3\%                                 & 2\%                                         & 2                                              & 460   & 19,442 \\
+\textbf{pmd}                           & 15,636                  & 174                       & 34                              & 12                           & 1\%                                 & 20\%                                        & 2                                              & 606   & 20,690 \\
+\textbf{xalan}                         & 6,706                   & 82                        & 17                              & 6                            & 1\%                                 & 21\%                                        & 2                                              & 337   & 39,268 \\
+\rowcolor[HTML]{EFEFEF} 
+\textbf{Geom. mean}                    & \ 10,931                  & 309                       & 119                             & 38                           & 3\%                                 & 39\%                                        & 3                                              & 469   & 30,061 \\ \bottomrule
+\end{tabular}
+
+\end{table}
