@@ -1,0 +1,114 @@
+\makeatletter
+\setlength{\parskip}{0pt}
+
+\setlength\headsep   {12\p@}
+
+\setlength\footnotesep{0\p@}
+\setlength\textfloatsep{0mm\@plus 1\p@ \@minus 1\p@}
+\setlength\intextsep   {0mm\@plus 1\p@ \@minus 1\p@}
+
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+                       {-4\p@ \@plus 0\p@ \@minus 0\p@}%
+                       {4\p@ \@plus 0\p@ \@minus 0\p@}%
+                       {\normalfont\large\bfseries\boldmath
+                        \rightskip=\z@ \@plus 8em\pretolerance=10000 }}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                       {-2\p@ \@plus 0\p@ \@minus 0\p@}%
+                       {2\p@ \@plus 0\p@ \@minus 1\p@}%
+                       {\normalfont\normalsize\bfseries\boldmath
+                        \rightskip=\z@ \@plus 8em\pretolerance=10000 }}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                       {-2\p@ \@plus 0\p@ \@minus 0\p@}%
+                       {-0.5em \@plus -0.22em \@minus -0.1em}%
+                       {\normalfont\normalsize\bfseries\boldmath}}
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+                       {-8\p@ \@plus -2\p@ \@minus -2\p@}%
+                       {-0.5em \@plus -0.22em \@minus -0.1em}%
+                       {\normalfont\normalsize\itshape}}
+
+\def\@spthm#1#2#3#4{\topsep 0\p@ \@plus0\p@ \@minus0\p@
+\refstepcounter{#1}%
+\@ifnextchar[{\@spythm{#1}{#2}{#3}{#4}}{\@spxthm{#1}{#2}{#3}{#4}}}
+
+\setlength  \labelsep  {.1em}
+\def\@listI{\leftmargin\leftmargini
+            \parsep 0\p@ \@plus1\p@ \@minus\p@
+            \topsep 0\p@ \@plus1\p@ \@minus0\p@
+            \itemsep0\p@}
+\let\@listi\@listI
+\@listi
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep    0\p@ \@plus2\p@ \@minus\p@}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep    0\p@ \@plus\p@\@minus\p@
+              \parsep    \z@
+              \partopsep \p@ \@plus\z@ \@minus\p@}
+
+\setlength\arraycolsep{1.0\p@}
+\setlength\tabcolsep{1.0\p@}
+
+\setlength\abovecaptionskip{0\p@}%
+\setlength\belowcaptionskip{0\p@}%
+
+\renewenvironment{table}
+               {\setlength\abovecaptionskip{0\p@}%
+                \setlength\belowcaptionskip{0\p@}%
+                \@float{table}}
+               {\end@float}
+\renewenvironment{table*}
+               {\setlength\abovecaptionskip{0\p@}%
+                \setlength\belowcaptionskip{0\p@}%
+                \@dblfloat{table}}
+               {\end@dblfloat}
+
+
+\def\@maketitle{\newpage
+ \markboth{}{}%
+ \def\lastand{\ifnum\value{@inst}=2\relax
+                 \unskip{} \andname\
+              \else
+                 \unskip \lastandname\
+              \fi}%
+ \def\and{\stepcounter{@auth}\relax
+          \ifnum\value{@auth}=\value{@inst}%
+             \lastand
+          \else
+             \unskip,
+          \fi}%
+ \begin{center}%
+ {\Large \bfseries\boldmath
+  \pretolerance=10000
+  \@title \par}\vskip .4cm
+\if!\@subtitle!\else {\large \bfseries\boldmath
+  \vskip -.65cm
+  \pretolerance=10000
+  \@subtitle \par}\vskip .8cm\fi
+ \setbox0=\vbox{\setcounter{@auth}{1}\def\and{\stepcounter{@auth}}%
+ \def\thanks##1{}\@author}%
+ \global\value{@inst}=\value{@auth}%
+ \global\value{auco}=\value{@auth}%
+ \setcounter{@auth}{1}%
+{\lineskip .5em
+\noindent\ignorespaces
+\@author\vskip.15cm}
+ {\small\institutename}\vskip-.35cm
+ \end{center}%
+ }
+
+
+\renewenvironment{abstract}{%
+      \list{}{\advance\topsep by0.20cm\relax\small
+      \leftmargin=1cm
+      \labelwidth=\z@
+      \listparindent=\z@
+      \itemindent\listparindent
+      \rightmargin\leftmargin}\item[\hskip\labelsep
+                                    \bfseries\abstractname]}
+    {\endlist}
+
+\makeatother
+
