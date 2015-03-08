@@ -570,30 +570,33 @@ Both the IFDS and IDE algorithms have been proven
 to run in $O(ED^3)$ time~\cite{reps1995precise,sagiv1996precise},
 where $E$ is the number of edges in the (non-exploded) supergraph, and $D$ is the size
 of the set of facts.
-The complexity proof for the IDE algorithm requires the implementation of the micro-functions
+The IDE algorithm may evaluate micro-functions up to $O(ED^3)$ times,
+so this running time must be multiplied by the cost of evaluating a
+micro-function. We show that the micro-functions in the correlated-calls
+IDE analysis can be evaluated in time $O(\rcc T)$, where $\rcc$ is the number
+of correlated-call receivers $\rcc$ and the $T$ is the number of run-time
+types. Therefore, the overall worst-case cost of the correlated-calls IDE analysis
+is $O(ED^3\rcc T)$.
+
+Specifically, the complexity proof for the IDE algorithm requires the implementation of the micro-functions
 to be \textit{efficient} according to the following criteria:
 \begin{enumerate}
 	\item There is a representation for the identity and top functions.
   \item The representation is closed under the meet and composition operations.
   \item The micro functions form a finite-height lattice.
-  \item The apply, meet, composition, and equality-check operations can be computed in constant time.
+  \item The apply, meet, composition, and equality-check operations can be computed in constant time (independent of $E$ and $D$).
   \item There is a constant bound on the storage space for a micro function representation.
 \end{enumerate}
-We prove that the micro-functions for the correlated-call analysis satisfy these
-criteria if we consider the number of correlated-call receivers $R$ and the
-number of run-time types $T$ constant
-(i.e., the operations on micro-functions are allowed to use time that is $O(RT)$,
-but constant with respect to $E$ and $D$).
-
+We prove these conditions with the following lemma:
 \begin{restatable}{lemma}{efficient}\label{lem:efficient}
-  The correlated-call representation of a micro function is efficient if the number of
-  correlated-call receivers $\rcc$ and the number of run-time types $T$ are considered constant.
+  The correlated-call representation of a micro function is efficient and the required operations
+  on micro-functions can be computed in time $O(\rcc T)$.
 \end{restatable}
 
-From this lemma, we conclude that the correlated-calls analysis runs in time
-$O(ED^3\rcc T)$. In other words, the asymptotic cost of the added precision of
-the correlated-calls analysis is increased by a factor of $O(\rcc T)$ compared
-to the original IFDS analysis.
+%From this lemma, we conclude that the correlated-calls analysis runs in time
+%$O(ED^3\rcc T)$. In other words, the asymptotic cost of the added precision of
+%the correlated-calls analysis is increased by a factor of $O(\rcc T)$ compared
+%to the original IFDS analysis.
 
 \subsection{Implementation of the Correlated-Calls Analysis}
 The correlated-calls analysis was implemented in the Scala programming language~\cite{odersky2004overview}. 
