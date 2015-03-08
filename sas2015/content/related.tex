@@ -81,3 +81,25 @@ The differences between this method of tracking correlated calls and our analysi
   \item \textit{Different handling of correlated calls}. Extracting code that contains correlated calls into separate methods would not prevent infeasible paths. Instead, our analysis uses IDE flow functions to detect and eliminate infeasible paths caused by correlated calls.
 \end{itemize}
 }
+
+Our approach superficially resembles, but is orthogonal, to context
+sensitivity, including such variations as object sensitivity~\cite{DBLP:conf/issta/MilanovaRR02,DBLP:journals/tosem/MilanovaRR05}.
+Context-sensitive
+points-to analysis is orthogonal to our work because it analyzes the
+flow of data (pointers), while we analyze control flow paths instead.
+Also, object-sensitive points-to analysis is flow-insensitive, while
+the IFDS and IDE algorithms are flow-sensitive, and our transformation only makes sense
+in a flow-sensitive setting (since a flow-insensitive analysis already
+introduces many more infeasible control flow paths).
+
+It would be possible to simulate the effect of our correlated calls
+transformation in the following way inspired by context-sensitivity:
+we could re-analyze each method in a number
+of contexts. There would be a separate context for every possible
+assignment of concrete types to all of the pointers in the method that
+are used as receivers at a call site. The number of such contexts for
+each method would be $O(R^T)$, where $R$ is the number of receiver pointers
+in the method and $T$ is the number of possible concrete types that could
+be assigned to a receiver pointer. Our approach computes equally precise
+analysis results but avoids this exponential cost.
+
