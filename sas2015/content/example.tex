@@ -15,21 +15,29 @@ taint analysis algorithms have been formulated as IFDS problems.
 Figure~\ref{list:ccexample} shows a small Java program that we will use to illustrate
 how our technique improves the precision of a simple taint analysis. The program
 declares a class \code{A} with a subclass \code{B},  where \code{A} defines methods 
-\code{foo()} and \code{bar()} that are overridden in \code{B}.  In order to keep the 
-example small and self-contained, it is assumed  that secret values are created by 
-an unspecified function \code{secret()}, which is called in method \code{A.foo()} on 
-line~\ref{line:Afoo}. Furthermore, it is assumed that any write to the standard output 
+\code{foo()} and \code{bar()} that are overridden in \code{B}.  
+%In order to keep the example small and self-contained, 
+It is assumed  that secret values are created by 
+an unspecified function \code{secret()}, which is called in method \code{A.foo()}%
+%  on line~\ref{line:Afoo}
+. Furthermore, it is assumed that any write to the standard output 
 stream via calls \code{System.out.println()} such as the one in method \code{B.bar()} 
-on line~\ref{line:Bbar} is a security-sensitive operation. Depending on the number of 
+%on line~\ref{line:Bbar} 
+is a security-sensitive operation. Depending on the number of 
 arguments passed to the program, the \code{main()} method of the example program creates 
-either an \code{A}-object or a \code{B}-object on line~\ref{line:createObject}. The 
-program then calls \code{foo()} on this object on line~\ref{line:callfoo}, which is 
-followed by a call to \code{bar()} on the same object on line~\ref{line:callbar}.  
+either an \code{A}-object or a \code{B}-object%
+%on line~\ref{line:createObject}
+. The 
+program then calls \code{foo()} on this object
+on line~\ref{line:callfoo}, which is 
+followed by a call to \code{bar()} on the same object%
+%on line~\ref{line:callbar}
+.  
  
 The specific question that we would like to answer for the example program of
 Figure~\ref{list:ccexample} is the following: Is it possible for the untrusted value 
-that is read on line~\ref{line:Afoo} to flow to the print statement on line~\ref{line:Bbar}? 
-%
+that is read on line~\ref{line:Afoo} to flow to the print statement% %on line~\ref{line:Bbar}
+?
 To determine whether such a flow of tainted data is possible, consider the control-flow
 supergraph for the example program that is shown in Figure~\ref{fig:examplesupergraph}.
  The nodes in this graph correspond to statements, method entry points (start nodes) and 
