@@ -1,0 +1,35 @@
+\centering
+    \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
+\begin{tikzpicture}[>=stealth,on grid, auto]
+    \node [n,label=$\mathbf{0}$] (zero){};
+    \node [n] (zero_) [below=\edge of zero] {};
+    \node [n,label=$u$] (u) [right=\nd of zero] {};
+    \node [n] (u_) [below=\edge of u] {};
+    \node [n,label=$v$] (v) [right=\nd of u] {};
+    \node [n] (v_) [below=\edge of v] {};
+    \node [n,label=$w$] (w) [right=\nd of v] {};
+    \node [n] (w_) [below=\edge of w] {};
+    \node [n] (zero__) [below=\edge of zero_] {};
+    \node [n] (u__) [below=\edge of u_] {};
+    \node [n] (v__) [below=\edge of v_] {};
+    \node [n] (w__) [below=\edge of w_] {};
+
+    \path[->](zero) edge node[left] {$R_f$} (zero_);
+    \path[->](zero) edge (u_);
+    \path[->](w) edge (w_);
+    \path[->](zero_) edge node[left] {$R_g$} (zero__);
+    \path[->](u_) edge (u__);
+    \path[->](v_) edge (v__);
+    
+    \node [n,label=$\mathbf{0}$] (zeroC) [below = 1.5\edge of zero__] {};
+    \node [n] (zeroC_) [below=\edge of zeroC] {};
+    \node [n,label=$u$] (uC) [right=\nd of zeroC] {};
+    \node [n] (uC_) [below=\edge of uC] {};
+    \node [n,label=$v$] (vC) [right=\nd of uC] {};
+    \node [n] (vC_) [below=\edge of vC] {};
+    \node [n,label=$w$] (wC) [right=\nd of vC] {};
+    \node [n] (wC_) [below=\edge of wC] {};
+
+    \path[->](zeroC) edge node[left] {$R_g\circ R_f$} (zeroC_);
+    \path[->](zeroC) edge (uC_);
+  \end{tikzpicture}
