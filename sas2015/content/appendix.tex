@@ -1,15 +1,29 @@
-\section{TraversableOnce Trait from Scala Standard Library}
+\section*{Appendix}
+In this appendix we present the proofs to the Lemmas introduced in Section~\ref{sec:cca}, the table illustrating frequencies of correlated calls from Section~\ref{sec:occur}, and the code discussed in Section~\ref{sec:collex}.
 
-In this appendix we present the proofs to the Lemmas introduced in Section~\ref{sec:cca}, the table illustrating frequencies of correlated calls from Section~\ref{}, and the code discussed in Section~\ref{sec:collex}.
+\subsection*{Correlated Calls Occurrences}
+Table~\ref{tab:dacapostat} shows how often correlated calls occur in practice. The number of all call sites in a program is denoted as $C$. 
+Polymorphic call sites are denoted as $C_P$, and correlated call sites as $C^\Subset$. The~number of classes~$T$ and the number of lines of code are shown in the last two columns.
+The first four columns indicate the overall number of various call sites and correlated-call receivers in a program. 
+The next three columns indicate the ratio of polymorphic to all call sites, the ratio of correlated to polymorphic call sites, and the ratio of correlated call sites to correlated-call receivers.
+In this context, we deem a call site to be polymorphic if its statically computed call graph
+contains edges from the call site to multiple target methods.
+We deem a call site to be a correlated call site if it is polymorphic and there is
+at least one other polymorphic call site on the same receiver.
+\input{tables/stats}
+
+\subsection*{\code{TraversableOnce} Trait from Scala Standard Library}
+Figure~\ref{fig:traversableonce} presents the code from Scala's \code{TraversableOnce} trait discussed in Section~ref{sec:collex}.
+
 \begin{figure}
 \inputMinted{scala}{TraversableOnce.scala}
 \caption{Relevant code from \textsf{TraversableOnce} and related traits.}
 \label{fig:traversableonce}
 \end{figure}
 
-\section{Proofs}
+\subsection*{Proofs}
 
-\subsection*{Representation of Micro Functions}
+\subsubsection*{Representation of Micro Functions}
 We start by presenting the proofs to the lemmas about the representation of micro functions.
 
 \equalEq*
@@ -125,7 +139,7 @@ Symmetrically, we can also establish that $\forall r.I'(r) \subseteq I(r)$ by ap
   \end{enumerate}
 \end{proof}
 
-\subsection*{Soundness and Precision}
+\subsubsection*{Soundness and Precision}
 
 In this part of the Appendix we prove the Lemmas of Soundness and Precision of the correlated-calls analysis.
 
@@ -380,7 +394,7 @@ According to~\eqref{eq:ideresult}, we can rewrite~\eqref{eq:transCcDef} as
   Hence, we have shown that if $d\in\backCC(\resultIDE(\transCC R(P)))(n)$, then $d\in\resultIFDS(P)(n)$.
 \end{proof}
 
-\subsection*{Correlated-Call Receivers}
+\subsubsection*{Correlated-Call Receivers}
 We will now present the proof for Lemma~\ref{lem:onlycorrrec} which shows that in a correlated-calls analysis, it is enough to consider only correlated-call receivers~$\rcc$.
 
 In this section, we will denote the set of realizable paths corresponding to a valid path $p$ and a fact $d$ as $\textsf{RP}(p,\,d)$.
@@ -705,20 +719,3 @@ Since, according to Lemma~\ref{lem:ccrectop}, $\resultIDE(\transCC_{\{r\}}(P))(n
     \qedhere
   \end{align*}
 \end{proof}
-
-\begin{figure}
-\inputMinted{scala}{TraversableOnce.scala}
-\caption{Relevant code from \textsf{TraversableOnce} and related traits.}
-\label{fig:traversableonce}
-\end{figure}
-
-\subsection{Correlated Calls Occurrences}
-Table~\ref{tab:dacapostat} shows how often correlated calls occur in practice. The number of all call sites in a program is denoted as $C$. 
-Polymorphic call sites are denoted as $C_P$, and correlated call sites as $C^\Subset$. The~number of classes~$T$ and the number of lines of code are shown in the last two columns.
-The first four columns indicate the overall number of various call sites and correlated-call receivers in a program. 
-The next three columns indicate the ratio of polymorphic to all call sites, the ratio of correlated to polymorphic call sites, and the ratio of correlated call sites to correlated-call receivers.
-In this context, we deem a call site to be polymorphic if its statically computed call graph
-contains edges from the call site to multiple target methods.
-We deem a call site to be a correlated call site if it is polymorphic and there is
-at least one other polymorphic call site on the same receiver.
-\input{tables/stats}

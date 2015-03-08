@@ -294,8 +294,10 @@ result in an information leak is actually infeasible.
 
 %After we have shown the definitions for the meet and composition operations, we will show in Example~\ref{ex:cc} how the correlated-calls analysis uses the presented micro functions to detect infeasible paths.
 
-Finally, the correlated-calls transformation is defined as\\
-    $\transCC_S((G^\#))=\left(G^\#,\,\lcc_S,\,\ccedgefn S\right)$.
+Finally, the correlated-calls transformation is defined as
+    \begin{equation}
+      \transCC_S((G^\#))=\left(G^\#,\,\lcc_S,\,\ccedgefn S\right).
+    \end{equation}
 
 %Then, for an edge $e$, the correlated-call micro functions can be defined as $\ccedgefn R$ and a correlated-calls transformation is defined as $\transCC_R$.
 
@@ -467,44 +469,44 @@ sets $I(r)$ and $U(r)$ for all receivers $r$. The following lemma shows that thi
 implementation of comparison corresponds to equality of the represented micro-functions:
 \begin{restatable}{lemma}{equalEq}
 \label{lem:equalEq}
-    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,\\
-    $
+    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
+    \begin{equation}
         \forall r\,.\,I(r) = I'(r) \land U(r) = U'(r)
         \iff
         \denote{\setpair{I}{U}} = \denote{\setpair{I'}{U'}}.
-    $
+    \end{equation}
 \end{restatable}
 The proofs of all of the lemmas and theorems in the paper are provided in the supplemental
 material submitted with the paper.
 
-The composition of two micro-function representations is defined as follows:
-$\setpair{I}{U} \circ \setpair{I'}{U'} = \setpair{\lambda r\,.\,(I(r) \cap I'(r))\cup U(r)}{\lambda r\,.\,(I(r)\cap U'(r))\cup U(r)}$.
 The following lemma shows that this implementation corresponds to the composition
-of the denoted functions:
+of the denoted functions.
 \begin{restatable}{lemma}{equalComp}\label{lem:equalComp}
     For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
     \[
         \denote{\setpair{I}{U} \circ \setpair{I'}{U'}}
         = 
-        \denote{\setpair{I}{U}} \circ \denote{\setpair{I'}{U'}}.
+        \denote{\setpair{I}{U}} \circ \denote{\setpair{I'}{U'}},
     \]
+    where the composition of two micro-function representations is defined as follows:
+$$\setpair{I}{U} \circ \setpair{I'}{U'} = \setpair{\lambda r\,.\,(I(r) \cap I'(r))\cup U(r)}{\lambda r\,.\,(I(r)\cap U'(r))\cup U(r)}.$$
 \end{restatable}
 
-The meet of two micro-function representations is defined as follows:
-$\setpair{I}{U} \sqcap \setpair{I'}{U'} = \setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}$.
 The following lemma shows that this implementation corresponds to the meet
 of the denoted functions:
 \begin{restatable}{lemma}{equalMeet}\label{lem:equalMeet}
 \label{lem:equalMeet}
     Let $\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}
      =\lambda m.\lambda r.\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)$.
-    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,\\
-    $
+    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
+    \begin{equation}
         \denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}
         = 
         \denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}},
-    $.
-\end{restatable}%\mtodo{I added the definition of the meet of two functions.}
+    \end{equation}
+    where the meet of two micro-function representations is defined as follows:
+$$\setpair{I}{U} \sqcap \setpair{I'}{U'} = \setpair{\lambda r\,.\,I(r) \cup I'(r)}{\lambda r\,.\,U(r) \cup U'(r)}.$$
+\end{restatable}
 
 \subsection{Theoretical Results}
 
@@ -522,12 +524,12 @@ In the following lemma we show that our analysis is sound, i.e. that the result 
 We next show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.
 
 \begin{restatable}[Precision]{lemma}{precision}\label{lem:subsetifds}
-    For an IFDS problem $P$ and all ${n\in N^*}$,\\
-    $
+    For an IFDS problem $P$ and all ${n\in N^*}$,
+    \begin{equation}
       \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
       \subseteq
       \resultIFDS(P)(n)\,.
-    $
+    \end{equation}
 \end{restatable}
 
 \subsection{Correlated-Call Receivers}\label{sec:ccreceivers}
@@ -543,11 +545,11 @@ We will denote the set of correlated-call receivers as $\rcc$.
 We will describe a ``reduced'' correlated-calls transformation in which we only consider receivers from $\rcc$ and ignore other receivers of $R$. We will show that IDE problems obtained through ordinary and reduced correlated-calls transformations yield the same results.
 In other words, we show that if a correlated-calls analysis considers only correlated-call receivers, no precision is lost.
 
-Let $P$ be an IFDS problemm.
 \begin{restatable}{lemma}{onlycorrrec}\label{lem:onlycorrrec}
-  $
+Let $P$ be an IFDS problem. Then  
+  \begin{equation}
     \backCC\left(\resultIDE\left(\transCC_\rcc(P)\right)\right)=\backCC(\resultIDE\left(\transCC_R(P)\right))\,.
-  $
+  \end{equation}
 \end{restatable}
 
 To summarize, Lemma~\ref{lem:sound} shows that the result of a correlated-calls analysis is sound since it overapproximates the data flow of all possible concrete execution paths.

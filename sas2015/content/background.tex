@@ -95,16 +95,13 @@ R_f=\{(\mathbf0,\,\mathbf0)\}\cup
       \{(\mathbf0,\,d_j)\,|\,d_j\in f(\varnothing)\}\cup
       \{(d_i,\,d_j)\,|\,d_j\in f(\{d_i\}) \setminus f(\varnothing)\}.
 \]
-\begin{floatingfigure}[lrp]{2.5cm}
-\input{figures/ex1minigraph} 
-\end{floatingfigure}
 \begin{example}\label{ex:flowfun}
 Given $D=\{u,\,v,\,w\}$ and $f(S) = S\setminus\{v\} \cup \{u\}$,
     the representation
  relation 
   $
     R_f=\{(\mathbf0,\,\mathbf0),\,(\mathbf0,\,u),\,(w,\,w)\}
-$, which is depicted on the graph below.
+$, which is depicted in Figure~\ref{fig:minigraph1}.
 \end{example}
 
 The representation relation decomposes a flow function into functions
@@ -118,15 +115,14 @@ functions: $R_{f\sqcap f'} = R_f \cup R_{f'}$. The composition of two functions 
 computed by combining their representation graphs, merging the range nodes of the
 first function with the corresponding domain nodes of the second function, and finding
 paths in the resulting graph.
-\begin{wrapfigure}{l}{3.5cm}
   \input{figures/ex2minigraph}
-\end{wrapfigure}
+
 \begin{example}
     If $g(S)=S\setminus\{w\}$ and $f(S) = S\setminus\{v\} \cup \{u\}$, then
     $
     R_g\circ R_f=\{(\mathbf0,\,\mathbf0),\,(\mathbf0,\,u)\},
     $
-  as illustrated in the graphs below.
+  as illustrated in Figure~\ref{fig:minigraph2}.
 \end{example}
 
 Composition of two distributive
