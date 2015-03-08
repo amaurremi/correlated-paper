@@ -13,19 +13,9 @@ $n_2$ may execute immediately after $n_1$. A CFG has a distinguished \textit{sta
 Following the presentation of Reps~et~al.~\cite{reps1995precise,sagiv1996precise}, we follow every
 call instruction with a no-op instruction, so that every \textit{call node} is immediately
 followed by a \textit{return node} in the CFG.
-%\end{mdelete}
-%and edges represent transfer of control between the instructions during an execution of the program. 
-%A control-flow graph has a unique start node, $\startmain$, which is the node corresponding to the program entrypoint.
-%An \textit{intraprocedural} path is a path in a control-flow graph whose nodes are in the same procedure. By contrast, an \textit{interprocedural path} is one that contains nodes from different procedures. 
 The \textit{control-flow supergraph} of a program contains the CFGs of all of the procedures as
 subgraphs. In addition, for each call instruction $c$, the supergraph contains a \textit{call-to-start} edge to the start node of every procedure that
 may be called from $c$, and an \textit{end-to-return} edge from the end node of the procedure back to the call instruction.
-%\otodo{do we really need to extra "return nodes" that the IFDS/IDE papers add?}
-%is a control-flow graph
-%in which each procedure $p$ is augmented with an additional \textit{start node} \textsf{start}$_p$ and \textit{end node} \textsf{end}$_p$, and for each call $c_q$ to a procedure $q$, there is a \textit{call node} \textsf{call}$_{c_q}$ and subsequent \textit{return node} \textsf{return}$_{c_q}$.
-
-%A control-flow supergraph allows us to model the control flow in interprocedural paths.
- %The flow from the caller to the callee is represented using an edge \[(\textsf{call}_{c_q},\,\textsf{start}_q)\,.\] The control flow from the callee back to the caller goes through an edge \[(\textsf{end}_q,\,\textsf{return}_{c_q})\,.\]
 
 A call site is \textit{monomorphic} if it always calls the same procedure. In an object-oriented language, 
 a call site $r.m(\ldots)$ can dynamically dispatch to multiple methods depending on the runtime
@@ -40,11 +30,6 @@ that may be viewed as the inverse
 of $\textsf{lookup}$: given a signature $s$ and a specific invoked procedure
 $f$, $\tau(s,f)$ gives the set of all runtime types of $r$ that cause $r.m(\ldots)$
 to dispatch to $f$: $\tau(s,f) = \{t\mid \textsf{lookup}(s,t)=f\}$.
-
-%\otodo{do we ever use $\src$ and $\target$?}
-%We denote the source and end nodes of a graph edge $e$ as $\src e$ and $\target e$.
-
-%A \textit{flow-sensitive} data-flow analysis is one that takes the order of program instructions into account.
 
 A path in the control-flow supergraph is \textit{valid} if it follows the usual stack-based calling 
 discipline: every end-to-return edge on the path returns
@@ -68,7 +53,6 @@ For any map $m$,  $m(k)$ is the value paired with the key $k$ in $m$. We denote 
 The IFDS framework~\cite{reps1995precise} is a precise and efficient algorithm for data-flow analysis
 %. IFDS was developed in 1995 by T.\,Reps, S.\,Horwitz, and M.\,Sagiv at the University of Wisconsin and
 that has been used to solve a variety of data-flow analysis problems~\cite{bodden2013spl,naeem2008typestate,DBLP:conf/birthday/KreikerRRSWY13,tripp2009taj}.
-%\mtodo{ The four references take away space in the References section. Remove some of them?  }
 The IFDS framework is an instance of the \textit{functional approach} to data-flow analysis~\cite{pnueli1981two}
 because it constructs summaries of the effects of called procedures.
 The IFDS framework is applicable to \textit{interprocedural} data-flow problems whose domain is \textit{subsets} of a \textit{finite} set $D$,
