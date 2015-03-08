@@ -56,8 +56,9 @@ edges
  
 An IFDS-based data-flow analysis propagates data-flow facts along the edges
 of a control flow supergraph such as the one in Figure~\ref{fig:examplesupergraph}. The
-IFDS algorithm was carefully designed to avoid infeasible paths that may arise in the
-presence of multiple calls to the same method. However, in this example all methods are
+IFDS algorithm already avoids flow along infeasible paths from one call site, through a target method,
+and returning to a different call site of the target method.
+However, in this example all methods are
 called in exactly one place, so IFDS is unable to eliminate data flow along any of the
 paths shown in the figure. As a result, IFDS-based taint analysis algorithms such as
 \cite{DBLP:conf/issta/GuarnieriPTDTB11,DBLP:conf/pldi/ArztRFBBKTOM14} would report 
