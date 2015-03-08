@@ -1,4 +1,5 @@
-\begin{figure}[h!]%
+%\begin{figure}[h!]%
+\vspace{2cm}
   \centering
     \tikzstyle{supergraph}=[
       fill=greyblue,
@@ -33,12 +34,12 @@
 \scalebox{.8}{
 % main method nodes
     \node [supergraph] (st_main) {\textsf{start}$_{\texttt{main}}$};
-    \node [supergraph] (asgn_a) [below = \dist of st_main.south east, anchor=east] {\texttt{a = args==null\,?}\\\texttt{new\,A()\,:\,new\,B()}};
-    \node [supergraph] (call_foo) [below = \dist of asgn_a.south east, anchor=east] {\textsf{call}$_\texttt{foo}$};
-    \node [supergraph] (return_foo) [below = \dist of call_foo.south east,anchor=east] {\textsf{return}$_\texttt{foo}$\\\texttt{v = a.foo()}};
-    \node [supergraph] (call_bar) [below = \dist of return_foo.south east, anchor=east] {\textsf{call}$_\texttt{bar}$};
-    \node [supergraph] (return_bar) [below = \dist of call_bar.south east, anchor=east] {\textsf{return}$_\texttt{bar}$};
-    \node [supergraph] (end_main) [below = \dist of return_bar.south east, anchor=east] {\textsf{end}$_{\texttt{main}}$};
+    \node [supergraph] (asgn_a) [below = \distt of st_main.south east, anchor=east] {\texttt{a = args==null\,?}\\\texttt{new\,A()\,:\,new\,B()}};
+    \node [supergraph] (call_foo) [below = \distt of asgn_a.south east, anchor=east] {\textsf{call}$_\texttt{foo}$};
+    \node [supergraph] (return_foo) [below = \distt of call_foo.south east,anchor=east] {\textsf{return}$_\texttt{foo}$\\\texttt{v = a.foo()}};
+    \node [supergraph] (call_bar) [below = \distt of return_foo.south east, anchor=east] {\textsf{call}$_\texttt{bar}$};
+    \node [supergraph] (return_bar) [below = \distt of call_bar.south east, anchor=east] {\textsf{return}$_\texttt{bar}$};
+    \node [supergraph] (end_main) [below = \distt of return_bar.south east, anchor=east] {\textsf{end}$_{\texttt{main}}$};
     
     \node [n,label=$\mathbf0$] (st_main_z) [right=\nd of st_main.east] {};
     \node [n,label=\texttt{v}] (st_main_v) [right=\nd of st_main_z] {};
@@ -69,9 +70,9 @@
     \path[->](return_bar_v) edge (end_main_v);  
     
 %A.foo method nodes
-    \node [supergraph_y] (st_a_foo) [right = 6*\dist of st_main] {\textsf{start}$_{\texttt{A.foo}}$};
-    \node [supergraph_y] (return_secret) [below = \dist of st_a_foo.south west, anchor=west] {\texttt{return secret()}};
-    \node [supergraph_y] (end_a_foo) [below = \dist of return_secret.south west,anchor = west] {\textsf{end}$_\texttt{A.foo}$};
+    \node [supergraph_y] (st_a_foo) [right = 6*\disth of st_main] {\textsf{start}$_{\texttt{A.foo}}$};
+    \node [supergraph_y] (return_secret) [below = \distt of st_a_foo.south west, anchor=west] {\texttt{return secret()}};
+    \node [supergraph_y] (end_a_foo) [below = \distt of return_secret.south west,anchor = west] {\textsf{end}$_\texttt{A.foo}$};
     
     \node [n,label=$r$] (st_a_foo_p) [left=\nd of st_a_foo.west] {};
     \node [n] (return_secret_p) [left=\nd of return_secret.west] {};
@@ -90,8 +91,8 @@
     \path[->, ultra thick](return_secret_z) edge (end_a_foo_p);
     
 %A.bar method nodes
-    \node [supergraph_y] (st_a_bar) [right = 6*\dist of st_a_foo] {\textsf{start}$_{\texttt{A.bar}}$};
-    \node [supergraph_y] (end_a_bar) [below = \dist of st_a_bar.south west,anchor = west] {\textsf{end}$_\texttt{A.bar}$};
+    \node [supergraph_y] (st_a_bar) [right = 6*\disth of st_a_foo] {\textsf{start}$_{\texttt{A.bar}}$};
+    \node [supergraph_y] (end_a_bar) [below = \distt of st_a_bar.south west,anchor = west] {\textsf{end}$_\texttt{A.bar}$};
     
     \node [n,label=\texttt{s}] (st_a_bar_s) [left=\nd of st_a_bar.west] {};
     \node [n,label=$\mathbf0$] (st_a_bar_z) [left=\nd of st_a_bar_s] {};
@@ -106,9 +107,9 @@
 
 
 %B.foo method nodes
-    \node [supergraph_f] (st_b_foo) [right = 6*\dist of call_bar] {\textsf{start}$_{\texttt{B.foo}}$};
-    \node [supergraph_f] (return_not_secret) [below = \dist of st_b_foo.south west, anchor=west] {\texttt{return "not secret"}};
-    \node [supergraph_f] (end_b_foo) [below = \dist of return_not_secret.south west,anchor = west] {\textsf{end}$_\texttt{B.foo}$};
+    \node [supergraph_f] (st_b_foo) [right = 6*\disth of call_bar] {\textsf{start}$_{\texttt{B.foo}}$};
+    \node [supergraph_f] (return_not_secret) [below = \distt of st_b_foo.south west, anchor=west] {\texttt{return "not secret"}};
+    \node [supergraph_f] (end_b_foo) [below = \distt of return_not_secret.south west,anchor = west] {\textsf{end}$_\texttt{B.foo}$};
     
     \node [n,label=$\mathbf0$] (st_b_foo_z) [left=\nd of st_b_foo.west] {};
     \node [n] (return_not_secret_z) [left=\nd of return_not_secret.west] {};
@@ -121,9 +122,9 @@
     \path[->,dashed](end_b_foo_z) edge [out=145,in=-65,color=lightsalmonpink] (return_foo_z);
     
 %B.bar method nodes
-    \node [supergraph_f] (st_b_bar) [right = 6*\dist of st_b_foo] {\textsf{start}$_{\texttt{B.bar}}$};
-    \node [supergraph_f] (print) [below = \dist of st_b_bar.south west,anchor = west] {\texttt{print(s)}};
-    \node [supergraph_f] (end_b_bar) [below = \dist of print.south west,anchor = west] {\textsf{end}$_\texttt{B.bar}$};
+    \node [supergraph_f] (st_b_bar) [right = 6*\disth of st_b_foo] {\textsf{start}$_{\texttt{B.bar}}$};
+    \node [supergraph_f] (print) [below = \distt of st_b_bar.south west,anchor = west] {\texttt{print(s)}};
+    \node [supergraph_f] (end_b_bar) [below = \distt of print.south west,anchor = west] {\textsf{end}$_\texttt{B.bar}$};
     
     \node [n,label=\texttt{s}] (st_b_bar_s) [left=\nd of st_b_bar.west] {};
     \node [n] (print_s) [left=\nd of print.west] {};
@@ -138,9 +139,10 @@
     \path[->](print_s) edge (end_b_bar_s);
     \path[->,dashed](call_bar_z) edge [out=40,in=140,color=lightsalmonpink] (st_b_bar_z);
     \path[->,dashed, ultra thick](call_bar_v) edge [out=20,in=160,color=lightsalmonpink] node[arrowtext,above right=-.4cm and .4cm,rotate=-10]{$\lambda m.m[\texttt a\to m(\texttt a)\cap\{\texttt B\}]$} (st_b_bar_s);
-    \path[->,dashed](end_b_bar_z) edge [out=210,in=-40,color=lightsalmonpink] (return_bar_z);    
+    \path[->,dashed](end_b_bar_z) edge [out=190,in=-40,color=lightsalmonpink] (return_bar_z);    
 }
 \end{tikzpicture}
+\vspace{-27mm}
 \caption[An example program demonstrating correlated-call edge functions on the $\mathbf0$-node path for Listing~\ref{list:ccexample}]{An example program demonstrating correlated-call edge functions on the $\mathbf0$-node path for Listing~\ref{list:ccexample}. All non-labeled edges are implicitly labeled with identity functions $\id$. The variable $r$ denotes the return value of the \texttt{A.foo} method.}%
   \label{fig:cc_edgefn_example}%  
-  \end{figure}
+%  \end{figure}

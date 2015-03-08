@@ -38,10 +38,11 @@ depending on the type of the receiver expression at run time), then their dispat
 behaviours will be correlated. A recent paper~\cite{DBLP:journals/scp/Tip15} identified
 this problem but did not present a concrete solution or algorithm, and we are not aware 
 of any existing data-flow analysis that is capable of avoiding infeasible paths that arise 
-in the presence of correlated method calls (see Section~\ref{sec:Related} for a discussion
-of related work).
+in the presence of correlated method calls.
+% (see Section~\ref{sec:Related} for a discussion
+%of related work).
 
-\input{figures/fig-transformation}
+%\input{figures/fig-transformation}
 
 The approach taken in our work is to transform a standard IFDS problem into an
 IDE problem that precisely accounts for infeasible paths due to correlated calls. 
@@ -59,14 +60,14 @@ IDE Problem'' from the original IFDS problem and show
 that the solution to this problem, when converted to an IFDS result, is more precise
 than the original IFDS result.
 We also show that the correlated-calls analysis is sound, i.e., that it never considers concrete execution paths as infeasible.
-This is illustrated schematically
-in Figure~\ref{fig:transformations}%
-\footnote{ 
-  The labels %$\resultIDE$, $\resultIFDS$, $\backEq$, $\backCC$, $\transEq$, and $\transCC$
-  on edges in 
-  Figure~\ref{fig:transformations} reflect a number of mappings and projections 
-  that will be defined in Section~\ref{sec:cca} and that can be ignored here.
-}.
+%This is illustrated schematically
+%in Figure~\ref{fig:transformations}%
+%\footnote{ 
+%  The labels %$\resultIDE$, $\resultIFDS$, $\backEq$, $\backCC$, $\transEq$, and $\transCC$
+%  on edges in 
+%  Figure~\ref{fig:transformations} reflect a number of mappings and %projections 
+%  that will be defined in Section~\ref{sec:cca} and that can be %ignored here.
+%}.
 
 We implemented the correlated-calls transformation and the IDE algorithm in Scala,
 on top of the WALA framework for static analysis of JVM bytecode~\cite{fink2012wala}.

@@ -467,12 +467,12 @@ sets $I(r)$ and $U(r)$ for all receivers $r$. The following lemma shows that thi
 implementation of comparison corresponds to equality of the represented micro-functions:
 \begin{restatable}{lemma}{equalEq}
 \label{lem:equalEq}
-    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
-    \[
+    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,\\
+    $
         \forall r\,.\,I(r) = I'(r) \land U(r) = U'(r)
         \iff
         \denote{\setpair{I}{U}} = \denote{\setpair{I'}{U'}}.
-    \] 
+    $
 \end{restatable}
 The proofs of all of the lemmas and theorems in the paper are provided in the supplemental
 material submitted with the paper.
@@ -496,15 +496,14 @@ The following lemma shows that this implementation corresponds to the meet
 of the denoted functions:
 \begin{restatable}{lemma}{equalMeet}\label{lem:equalMeet}
 \label{lem:equalMeet}
-    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
-    \[
+    Let $\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}
+     =\lambda m.\lambda r.\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)$.
+    For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,\\
+    $
         \denote{\setpair{I}{U} \sqcap \setpair{I'}{U'}}
         = 
         \denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}},
-    \]
-    where
-    $\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}
-     =\lambda m.\lambda r.\denote{\setpair{I}{U}}(m)(r)\cup\denote{\setpair{I'}{U'}}(m)(r)$.
+    $.
 \end{restatable}%\mtodo{I added the definition of the meet of two functions.}
 
 \subsection{Theoretical Results}
@@ -515,20 +514,20 @@ In the following lemma we show that our analysis is sound, i.e. that the result 
   Let $p=[\startmain,\,\dots,\,n]$ be a concrete execution path, and let $d\in D$.
   If $d\in M_F(p)(\varnothing),$
   then
-  \begin{equation}
+  $
     d\in \backCC\left(\resultIDE(\transCC_R(P))\right)(n)\,.
-  \end{equation}
+  $
 \end{restatable}
 
 We next show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.
 
 \begin{restatable}[Precision]{lemma}{precision}\label{lem:subsetifds}
-    For an IFDS problem $P$ and all ${n\in N^*}$,
-    \begin{equation}\label{eq:correct}
+    For an IFDS problem $P$ and all ${n\in N^*}$,\\
+    $
       \backCC\left(\resultIDE(\transCC_R(P))\right)(n)
       \subseteq
       \resultIFDS(P)(n)\,.
-    \end{equation}
+    $
 \end{restatable}
 
 \subsection{Correlated-Call Receivers}\label{sec:ccreceivers}
@@ -544,11 +543,11 @@ We will denote the set of correlated-call receivers as $\rcc$.
 We will describe a ``reduced'' correlated-calls transformation in which we only consider receivers from $\rcc$ and ignore other receivers of $R$. We will show that IDE problems obtained through ordinary and reduced correlated-calls transformations yield the same results.
 In other words, we show that if a correlated-calls analysis considers only correlated-call receivers, no precision is lost.
 
+Let $P$ be an IFDS problemm.
 \begin{restatable}{lemma}{onlycorrrec}\label{lem:onlycorrrec}
-  Let $P$ be an IFDS problem. Then
-  \begin{equation}
+  $
     \backCC\left(\resultIDE\left(\transCC_\rcc(P)\right)\right)=\backCC(\resultIDE\left(\transCC_R(P)\right))\,.
-  \end{equation}
+  $
 \end{restatable}
 
 To summarize, Lemma~\ref{lem:sound} shows that the result of a correlated-calls analysis is sound since it overapproximates the data flow of all possible concrete execution paths.

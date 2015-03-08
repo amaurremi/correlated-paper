@@ -1,5 +1,6 @@
 \section{TraversableOnce Trait from Scala Standard Library}
 
+In this appendix we present the proofs to the Lemmas introduced in Section~\ref{sec:cca}, the table illustrating frequencies of correlated calls from Section~\ref{}, and the code discussed in Section~\ref{sec:collex}.
 \begin{figure}
 \inputMinted{scala}{TraversableOnce.scala}
 \caption{Relevant code from \textsf{TraversableOnce} and related traits.}
@@ -7,7 +8,6 @@
 \end{figure}
 
 \section{Proofs}
-In this appendix we present the proofs to the Lemmas introduced in Section~\ref{sec:cca}.
 
 \subsection*{Representation of Micro Functions}
 We start by presenting the proofs to the lemmas about the representation of micro functions.
@@ -705,3 +705,20 @@ Since, according to Lemma~\ref{lem:ccrectop}, $\resultIDE(\transCC_{\{r\}}(P))(n
     \qedhere
   \end{align*}
 \end{proof}
+
+\begin{figure}
+\inputMinted{scala}{TraversableOnce.scala}
+\caption{Relevant code from \textsf{TraversableOnce} and related traits.}
+\label{fig:traversableonce}
+\end{figure}
+
+\subsection{Correlated Calls Occurrences}
+Table~\ref{tab:dacapostat} shows how often correlated calls occur in practice. The number of all call sites in a program is denoted as $C$. 
+Polymorphic call sites are denoted as $C_P$, and correlated call sites as $C^\Subset$. The~number of classes~$T$ and the number of lines of code are shown in the last two columns.
+The first four columns indicate the overall number of various call sites and correlated-call receivers in a program. 
+The next three columns indicate the ratio of polymorphic to all call sites, the ratio of correlated to polymorphic call sites, and the ratio of correlated call sites to correlated-call receivers.
+In this context, we deem a call site to be polymorphic if its statically computed call graph
+contains edges from the call site to multiple target methods.
+We deem a call site to be a correlated call site if it is polymorphic and there is
+at least one other polymorphic call site on the same receiver.
+\input{tables/stats}

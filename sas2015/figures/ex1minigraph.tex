@@ -1,0 +1,17 @@
+\vspace{-2mm}
+\hspace{-8mm}
+\tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
+\begin{tikzpicture}[>=stealth,on grid, auto]
+    \node [n,label=$\mathbf{0}$] (zero){};
+    \node [n,] (zero_) [below=\edge of zero] {};
+    \node [n,label=$u$] (u) [right=\nd of zero] {};
+    \node [n,] (u_) [below=\edge of u] {};
+    \node [n,label=$v$] (v) [right=\nd of u] {};
+    \node [n,] (v_) [below=\edge of v] {};
+    \node [n,label=$w$] (w) [right=\nd of v] {};
+    \node [n,] (w_) [below=\edge of w] {};
+    \path[->](zero) edge node [left] {$R_f$} (zero_);
+    \path[->](zero) edge (u_);
+    \path[->](w) edge (w_);
+  \end{tikzpicture}
+\vspace{-2mm}
