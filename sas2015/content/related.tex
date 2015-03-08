@@ -56,13 +56,15 @@ The idea of using correlated calls to remove infeasible paths in data-flow analy
 
 Sridharan et~al.'s improvements to the precision of pointer analysis
 for Ja\-va\-Script programs~\cite{DBLP:conf/ecoop/SridharanDCST12} also
-eliminate infeasible paths. However, instead of infeasible paths
+eliminate infeasible paths. Instead of infeasible paths
 between dynamically dispatched method calls, their approach eliminates
-infeasible paths between reads and writes of different properties
-(the JavaScript analogue of fields) of an object. Unlike in more static languages,
-property names in JavaScript are first class values (strings). When a loop indexed by
-property names updates the properties of objects, the loop body is extracted into a function
-and analyzed context sensitively with a separate context for each property name.
+infeasible paths between reads and writes of different members
+%(the JavaScript analogue of fields) 
+of an object. 
+%Unlike in more static languages,
+%property names in JavaScript are first class values (strings). When a loop indexed by
+%property names updates the properties of objects, the loop body is extracted into a function
+%and analyzed context sensitively with a separate context for each property name.
 The approach differs from ours in that it targets points-to analysis rather
 than IFDS analyses, in that it targets infeasible paths due to different
 property names rather than different dynamically dispatched methods,
