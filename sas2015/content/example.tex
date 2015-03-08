@@ -125,7 +125,7 @@ call sites $C^\Subset$. We also see that, on average,  each correlated-call rece
 
  
   
-\subsection{An Example from the Scala Collections Library}
+\subsection{An Example from the Scala Collections Library}\label{sec:collex}
 The Scala collections library contains the trait \code{TraversableOnce} that is
 shared by both collections and iterators over them. 
 %\ftodo{
@@ -188,9 +188,3 @@ def toArray[B >: A : ClassTag]: Array[B] = {
 
 The relevant code from \textsf{TraversableOnce} and other related traits is shown
 in Figure~\ref{fig:traversableonce} in the Appendix.
-
-\begin{figure}
-\inputMinted{scala}{TraversableOnce.scala}
-\caption{Relevant code from \textsf{TraversableOnce} and related traits.}
-\label{fig:traversableonce}
-\end{figure}
