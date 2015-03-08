@@ -300,40 +300,16 @@ R_f=\{(\mathbf0,\,\mathbf0)\}\cup
       \{(\mathbf0,\,d_j)\,|\,d_j\in f(\varnothing)\}\cup
       \{(d_i,\,d_j)\,|\,d_j\in f(\{d_i\}) \setminus f(\varnothing)\}.
 \]
-%Each pair $(d_i,\,d_j)\in R_f$ corresponds to an edge $((n_1,\,d_i),\,(n_2,\,d_j))$ in the exploded supergraph.
-
-\commentout{
-Note that $R_f$ constructs pairs of data-flow facts so that
-\begin{itemize}
-  \item there is always an edge $(\mathbf0,\,\mathbf0)$ corresponding to the CFG edge;
-  \item if there is an edge $(\mathbf0,\,d_j)$, then there is no other edge leading to $d_j$; in particular, there is never an edge $(d_i,\,\mathbf0)$ where $d_i\ne\mathbf0$.
-\end{itemize}
-}
-
+\begin{floatingfigure}[lrp]{3.5cm}
+\input{figures/ex1minigraph} 
+\end{floatingfigure}
 \begin{example}\label{ex:flowfun}
-    Given $D=\{u,\,v,\,w\}$ and $f(S) = S\setminus\{v\} \cup \{u\}$,
-    the representation relation 
-  %The representation relation $R_f$ for a set of data-flow facts 
-  %and data-flow function $f=\lambda S\,.\,S\setminus\{v\}\cup\{u\}$ looks as follows:
+Given $D=\{u,\,v,\,w\}$ and $f(S) = S\setminus\{v\} \cup \{u\}$,
+    the representation
+ relation 
   $
     R_f=\{(\mathbf0,\,\mathbf0),\,(\mathbf0,\,u),\,(w,\,w)\}
-$, which is depicted by the following graph:
-   \begin{center}
-    \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
-\begin{tikzpicture}[>=stealth,on grid, auto]
-    \node [n,label=$\mathbf{0}$] (zero){};
-    \node [n,] (zero_) [below=\edge of zero] {};
-    \node [n,label=$u$] (u) [right=\nd of zero] {};
-    \node [n,] (u_) [below=\edge of u] {};
-    \node [n,label=$v$] (v) [right=\nd of u] {};
-    \node [n,] (v_) [below=\edge of v] {};
-    \node [n,label=$w$] (w) [right=\nd of v] {};
-    \node [n,] (w_) [below=\edge of w] {};
-    \path[->](zero) edge (zero_);
-    \path[->](zero) edge (u_);
-    \path[->](w) edge (w_);
-  \end{tikzpicture}
-  \end{center}
+$, which is depicted on the graph below.
 \end{example}
 
 The representation relation decomposes a flow function into functions
@@ -374,43 +350,10 @@ The representation relation distributes over composition and meet:
     $
     R_g\circ R_f=\{(\mathbf0,\,\mathbf0),\,(\mathbf0,\,u)\},
     $
-  as illustrated in the following graph:
-    \begin{center}
-    \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
-\begin{tikzpicture}[>=stealth,on grid, auto]
-    \node [n,label=$\mathbf{0}$] (zero){};
-    \node [n] (zero_) [below=\edge of zero] {};
-    \node [n,label=$u$] (u) [right=\nd of zero] {};
-    \node [n] (u_) [below=\edge of u] {};
-    \node [n,label=$v$] (v) [right=\nd of u] {};
-    \node [n] (v_) [below=\edge of v] {};
-    \node [n,label=$w$] (w) [right=\nd of v] {};
-    \node [n] (w_) [below=\edge of w] {};
-    \node [n] (zero__) [below=\edge of zero_] {};
-    \node [n] (u__) [below=\edge of u_] {};
-    \node [n] (v__) [below=\edge of v_] {};
-    \node [n] (w__) [below=\edge of w_] {};
-
-    \path[->](zero) edge node[left] {$R_f$} (zero_);
-    \path[->](zero) edge (u_);
-    \path[->](w) edge (w_);
-    \path[->](zero_) edge node[left] {$R_g$} (zero__);
-    \path[->](u_) edge (u__);
-    \path[->](v_) edge (v__);
-    
-    \node [n,label=$\mathbf{0}$] (zeroC) [below right= .5\edge and 3.5\dist of w] {};
-    \node [n] (zeroC_) [below=\edge of zeroC] {};
-    \node [n,label=$u$] (uC) [right=\nd of zeroC] {};
-    \node [n] (uC_) [below=\edge of uC] {};
-    \node [n,label=$v$] (vC) [right=\nd of uC] {};
-    \node [n] (vC_) [below=\edge of vC] {};
-    \node [n,label=$w$] (wC) [right=\nd of vC] {};
-    \node [n] (wC_) [below=\edge of wC] {};
-
-    \path[->](zeroC) edge node[left] {$R_g\circ R_f$} (zeroC_);
-    \path[->](zeroC) edge (uC_);
-  \end{tikzpicture}
-  \end{center}
+  as illustrated in the graphs below.
+\begin{floatingfigure}[lrp]{3.5cm}
+  \input{figures/ex2minigraph}
+\end{floatingfigure}
 \end{example}
 
 Composition of two distributive
@@ -451,7 +394,6 @@ In this way, the IFDS algorithm reduces the input data-flow problem to a graph-r
 \end{example}}
 }
 
-\input{figures/fig-cc_edge_fn_example}
 %\mtodo{In Figure~\ref{fig:cc_edgefn_example}, should we say that $\psi$ corresponds to the function's return value?}
 \begin{example}
   The exploded supergraph for Listing~\ref{list:ccexample} is shown in Figure~\ref{fig:cc_edgefn_example}.

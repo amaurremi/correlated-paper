@@ -1,14 +1,11 @@
 \begin{figure}
-  \centering
-  
-  \begin{minipage}{\textwidth}
+  \begin{minipage}{.5\textwidth}
     \inputMinted{java}{ccexample.java}
-  \end{minipage}
-    \vspace*{-4mm}
-  \caption{Example program containing correlated calls}
+%    \vspace*{-4mm}
+    \caption{Example program containing\\ correlated calls}
   \label{list:ccexample}
-   
-   \begin{minipage}{\textwidth}
+  \end{minipage}
+   \begin{minipage}{.5\textwidth}
     \tikzstyle{supergraph}=[
       fill=greyblue,
       rounded corners,
@@ -37,7 +34,7 @@
     \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
     \tikzstyle{arrowtext}=[font=\tiny,color=black,above]
     
-\hspace*{-10pt}
+\hspace*{-20pt}
 \begin{tikzpicture}
 \scalebox{.8}{
 % main method nodes
@@ -92,29 +89,36 @@
   \path[->] (print) edge (end_b_bar);
   
 %interprocedural edges
-  \path[->,dashed,ultra thick] (call_foo) edge[out=20,in=190] (st_a_foo);
+  \path[->,dashed,ultra thick] (call_foo) edge[out=-5,in=198] (st_a_foo);
   \path[->,dashed] (call_foo) edge[color=lightsalmonpink,out=-20,in=135] (st_b_foo);
   \path[->,dashed] (call_bar) edge[out=25,in=220] (st_a_bar);
   \path[->,dashed,ultra thick] (call_bar) edge[color=lightsalmonpink,out=18,in=160] (st_b_bar);
   \path[->,dashed,ultra thick] (end_a_foo) edge[out=220,in=15] (return_foo);
-  \path[->,dashed] (end_b_foo) edge[color=lightsalmonpink,out=160,in=-60] (return_foo);
+  \path[->,dashed] (end_b_foo) edge[color=lightsalmonpink,out=180,in=-50] (return_foo);
   \path[->,dashed] (end_a_bar) edge[out=210,in=40] (return_bar);
-  \path[->,dashed,ultra thick] (end_b_bar) edge[color=lightsalmonpink,out=200,in=-40] (return_bar);
+  \path[->,dashed,ultra thick] (end_b_bar) edge[color=lightsalmonpink,out=190,in=-40] (return_bar);
     
 %arrow description
     \node [description] (intra_arrow_left) [above left = 2*\dist and 3.5*\dist of st_a_bar] {};
     \node [description] (intra_arrow_right) [right = \dist of intra_arrow_left] {};
     \node [description] (inter_arrow_left) [below = .5*\dist of intra_arrow_left] {};
     \node [description] (inter_arrow_right) [below = .5*\dist of intra_arrow_right] {};
-    \path[->](intra_arrow_left) edge node[right = .5*\dist]{intraprocedural edge} (intra_arrow_right);
-    \path[dashed,->](inter_arrow_left) edge node[right = .5*\dist]{interprocedural edge} (inter_arrow_right); 
+
+%    \path[->](intra_arrow_left) edge node[right = .5*\dist]{intraprocedural edge} (intra_arrow_right);
+%    \path[dashed,->](inter_arrow_left) edge node[right = .5*\dist]{interprocedural edge} (inter_arrow_right); 
 }
 \end{tikzpicture}
-   \end{minipage}
-   \vspace*{-25mm}
+\vspace*{-18mm}
   \caption{
     Control flow supergraph for the example program of Figure~\ref{list:ccexample}.
+    Dashed lines depict interprocedural edges.
     An infeasible path is shown in bold. 
   }%
   \label{fig:examplesupergraph}%
+\end{minipage}
+
+
+\begin{minipage}{\textwidth}
+\input{figures/fig-cc_edge_fn_example}
+\end{minipage}
 \end{figure} 

@@ -9,9 +9,9 @@ to ``sinks'', which are typically security-sensitive
 operations such as calls to 
 a database. In previous research~\cite{DBLP:conf/issta/GuarnieriPTDTB11,DBLP:conf/pldi/ArztRFBBKTOM14}, 
 taint analysis algorithms have been formulated as IFDS problems.     
-  
+
 \input{figures/fig-examplesupergraph}
-  
+
 Figure~\ref{list:ccexample} shows a small Java program that we will use to illustrate
 how our technique improves the precision of a simple taint analysis. The program
 declares a class \code{A} with a subclass \code{B},  where \code{A} defines methods 
@@ -187,7 +187,7 @@ def toArray[B >: A : ClassTag]: Array[B] = {
 }
 
 The relevant code from \textsf{TraversableOnce} and other related traits is shown
-in Figure~\ref{fig:traversableonce}.
+in Figure~\ref{fig:traversableonce} in the Appendix.
 
 \begin{figure}
 \inputMinted{scala}{TraversableOnce.scala}

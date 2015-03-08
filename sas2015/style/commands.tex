@@ -1,6 +1,8 @@
 % brackets for denotations
 \newcommand{\denote}[1]{\left\llbracket#1\right\rrbracket}
 
+\renewcommand{\textfraction}{0.05} 
+
 %\renewcommand{\theFancyVerbLine}{\sffamily \textcolor[rgb]{0.5,0.5,0.5}{\scriptsize \oldstylenums{\arabic{FancyVerbLine}}}}
 
 \newcommand{\inputMinted}[2]{\lstinputlisting[language=#1]{code/#2}}
@@ -16,10 +18,16 @@
 \counterwithout{footnote}{chapter}
 
 \newlength{\dist}
-\setlength{\dist}{1cm}
+\setlength{\dist}{.6cm}
+
+\newlength{\distt}
+\setlength{\distt}{1cm}
+
+\newlength{\disth}
+\setlength{\disth}{1cm}
 
 \newlength{\edge}
-\setlength{\edge}{1.1cm}
+\setlength{\edge}{.7cm}
 
 \newlength{\longedge}
 \setlength{\longedge}{1.7cm}
