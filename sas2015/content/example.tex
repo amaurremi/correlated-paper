@@ -2,7 +2,7 @@
   \label{sec:MotivatingExample}
   
 In this section, we illustrate our approach using a small motivating example that
-shows how our technique can be used to improve the precision of taint analysis.
+shows how our technique improves the precision of taint analysis.
 A taint analysis is a specialized data-flow analysis for computing how string values
 may flow from ``sources'', which are typically statements that read untrusted input, 
 to ``sinks'', which are typically security-sensitive
@@ -13,7 +13,7 @@ taint analysis algorithms have been formulated as IFDS problems.
 \input{figures/fig-examplesupergraph}
   
 Figure~\ref{list:ccexample} shows a small Java program that we will use to illustrate
-how our technique can improve the precision of a simple taint analysis. The program
+how our technique improves the precision of a simple taint analysis. The program
 declares a class \code{A} with a subclass \code{B},  where \code{A} defines methods 
 \code{foo()} and \code{bar()} that are overridden in \code{B}.  In order to keep the 
 example small and self-contained, it is assumed  that secret values are created by 
@@ -54,7 +54,7 @@ edges
   from the nodes labeled $\highlight{\code{end}_\code{A.bar}}{bisque}$ and $\highlight{\code{end}_\code{B.bar}}{lightsalmonpink}$ 
   to the node labeled  $\highlight{\code{return}_\code{bar}}{greyblue}$. 
  
-Informally speaking, an IFDS-based data-flow analysis propagates data-flow facts along the edges
+An IFDS-based data-flow analysis propagates data-flow facts along the edges
 of a control flow supergraph such as the one in Figure~\ref{fig:examplesupergraph}. The
 IFDS algorithm was carefully designed to avoid infeasible paths that may arise in the
 presence of multiple calls to the same method. However, in this example all methods are
@@ -81,7 +81,7 @@ are infeasible.
 The main contribution of this paper is an algorithm for transforming an IFDS problem 
 into an IDE problem that expresses the feasibility of paths
 in light of correlated calls.
-Informally speaking, our approach associates with each edge in an
+Our approach associates with each edge in an
 interprocedural CFG a function that records the types of 
 variables that are used as the receiver of correlated method calls. Paths that 
 are composed of edges in which the same receiver expression has different types

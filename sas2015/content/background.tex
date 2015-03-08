@@ -8,7 +8,7 @@ This section defines basic terminology and presents the IFDS and IDE algorithms.
 \subsection{Terminology and Notation}
 %We will start by introducing several concepts used by the IFDS and IDE analyses.
 %\begin{mdelete}\mtodo{We already say (but less precisely) what a CFG is in the introduction.}
-The \textit{control-flow graph} of a procedure is a directed graph whose nodes are instructions, and which contains an edge from $n_1$ to $n_2$ whenever
+The \textit{control-flow graph} of a procedure is a directed graph whose nodes are instructions, which contains an edge from $n_1$ to $n_2$ whenever
 $n_2$ may execute immediately after $n_1$. A CFG has a distinguished \textit{start node} \textsf{start}$_p$ and \textit{end node} \textsf{end}$_p$.
 Following the presentation of Reps~et~al.~\cite{reps1995precise,sagiv1996precise}, we follow every
 call instruction with a no-op instruction, so that every \textit{call node} is immediately
@@ -157,7 +157,7 @@ to dispatch to $f$: $\tau(s,f) = \{t\mid \textsf{lookup}(s,t)=f\}$.
 
 %A \textit{flow-sensitive} data-flow analysis is one that takes the order of program instructions into account.
 
-A path through the control-flow supergraph is \textit{valid} if it follows the usual stack-based calling 
+A path in the control-flow supergraph is \textit{valid} if it follows the usual stack-based calling 
 discipline: every end-to-return edge on the path returns
 to the site of the most recent call that has not yet been matched by a return. 
 %\ftodo{Can we explain/define the notion of the ``most recent unmatched call'' more precisely?}
@@ -213,7 +213,7 @@ A \textit{lattice}%
 Since all of the (semi)lattices discussed in this paper are required to be complete, we omit the
 \textit{complete} qualifier.}
 is a partially ordered set $(S,\sqsubseteq)$ in which every subset has a least upper bound, called \textit{join} or $\sqcup$, and a greatest lower bound, called \textit{meet} or $\sqcap$.
-A \textit{meet semilattice} is a partially ordered set in which every subset need only have a greatest lower bound.
+A \textit{meet semilattice} is a partially ordered set in which every subset only has a greatest lower bound.
 The symbols $\bot$ and $\top$ are used to denote the greatest lower bound of $S$ and of the empty set, respectively.
 
 
@@ -240,7 +240,7 @@ The IFDS framework is an instance of the \textit{functional approach} to data-fl
 because it constructs summaries of the effects of called procedures.
 \commentout{The IFDS analysis is a version of the classic \textit{functional approach} to data-flow analysis proposed by M.\,Sharir and A.\,Pnueli~\cite{pnueli1981two}.}
 \commentout{In other data-flow algorithms not based on the functional approach, the result of the analysis at the entry of a procedure ``merges'' the incoming data obtained from all callers of the procedure. As a consequence, there is one global data-flow result computed at the end of the procedure. Context-sensitivity, however, allows an analysis to compute the data-flow result for a given procedure as a \textit{function} of the data-flow value at the start of the procedure. 
-In other words, the analysis result for a procedure varies depending on where the procedure was called from. This significantly improves the precision of a data-flow analysis, which is why context-sensitivity is an important advantage of IFDS over classic data-flow algorithms.}
+The analysis result for a procedure varies depending on where the procedure was called from. This significantly improves the precision of a data-flow analysis, which is why context-sensitivity is an important advantage of IFDS over classic data-flow algorithms.}
 The IFDS framework is applicable to \textit{interprocedural} data-flow problems whose domain is \textit{subsets} of a \textit{finite} set $D$,
 and whose data-flow functions are \textit{distributive}.
 A function $f$ is distributive if 
@@ -317,7 +317,7 @@ Note that $R_f$ constructs pairs of data-flow facts so that
   %and data-flow function $f=\lambda S\,.\,S\setminus\{v\}\cup\{u\}$ looks as follows:
   $
     R_f=\{(\mathbf0,\,\mathbf0),\,(\mathbf0,\,u),\,(w,\,w)\}
-$, which can be visualized with the following graph:
+$, which is depicted by the following graph:
    \begin{center}
     \tikzstyle{n}=[fill=black,circle,inner sep=1.5pt]
 \begin{tikzpicture}[>=stealth,on grid, auto]
@@ -457,7 +457,7 @@ In this way, the IFDS algorithm reduces the input data-flow problem to a graph-r
   The exploded supergraph for Listing~\ref{list:ccexample} is shown in Figure~\ref{fig:cc_edgefn_example}.
   The labels on the edges will be explained in Section~\ref{sec:bgide}
   We can see that there is a realizable path, highlighted in bold,
-  from the start node of the exploded graph to the variable \verb's' at~the~node~$\textsf{print(s)}$ in the \verb'B.bar' method. This means that at that node, \verb's' is considered secret.
+  from the start node of the exploded graph to the variable \verb's' at~the~node~$\textsf{print(s)}$ in the \verb'B.bar' method. This means that \verb's' is considered secret at that node.
 
 \commentout{  
     \begin{figure}%
@@ -909,7 +909,7 @@ both $t_1$ and $t_2$, the micro-function for that edge in $t_1 \sqcap t_2$ is th
 micro-functions for that same edge in $t_1$ and in $t_2$.
 
 The composition of two environment transformers can be computed by combining their pointwise
-representation graphs in the same way as IFDS representation relations, and 
+representation graphs in the same fashion as IFDS representation relations, and 
 computing the composition of the micro-functions appearing along each path in the resulting graph.
 
 The IDE algorithm operates on the same exploded supergraph as the IFDS algorithm
