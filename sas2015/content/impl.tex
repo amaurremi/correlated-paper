@@ -653,7 +653,8 @@ implementation does satisfy the criteria:
 %the correlated-calls analysis is increased by a factor of $O(\rcc T)$ compared
 %to the original IFDS analysis.
 
-\subsection{Implementation of the Correlated-Calls Analysis}
+%\subsection{Implementation of the Correlated-Calls Analysis}
+\section{Evaluation}
 We implemented the correlated-calls analysis in Scala~\cite{odersky2004overview}. 
 Our implementation analyzed Java bytecode from input programs written
 in Java.
@@ -669,6 +670,8 @@ We will submit our implementation to the artifact evaluation committee, and we a
 We tested the implementation of the correlated-calls analysis using an IFDS taint-analysis implementation as a client analysis. We converted the IFDS taint analysis into an IDE problem with an implementation of $\transCC_\rcc$.
 
 We extensively tested the correlated-calls analysis to ensure that in the absence of correlated calls in an input program, the analysis produced the same results as an IFDS-equivalent analysis, and in the presence of correlated calls, the result was more precise.
+
+The average running time for small programs such as in Figure~\ref{list:ccexample} is ???~seconds. On the SPECjvm98 benchmarks, the average running time is ???~seconds. So far we were only able to find a practical benefit from the correlated-calls analysis for programs in which correlated calls were ``artificially'' introduced in control-flow paths relevant to the specific client analysis. We are still working on identifying in which client IFDS problems, in combination with which benchmarks, we would encounter a precision improvement.
 
 \commentout{
 The artifact of our implementation can be used to solve any IFDS problem. In the presence of correlated calls, the result of the correlated-calls analysis can be more precise than the result obtained with an IFDS solver.
