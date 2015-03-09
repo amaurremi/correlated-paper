@@ -1,6 +1,6 @@
-%\begin{figure}[h!]%
-\vspace{2cm}
+\begin{figure}[h]%
   \centering
+  \begin{minipage}{\textwidth}
     \tikzstyle{supergraph}=[
       fill=greyblue,
       rounded corners,
@@ -142,7 +142,8 @@
     \path[->,dashed](end_b_bar_z) edge [out=190,in=-40,color=lightsalmonpink] (return_bar_z);    
 }
 \end{tikzpicture}
-\vspace{-17mm}
+\vspace*{-27mm}
 \caption[An example program demonstrating correlated-call edge functions on the $\mathbf0$-node path for Listing~\ref{list:ccexample}]{An example program demonstrating correlated-call edge functions on the $\mathbf0$-node path for Listing~\ref{list:ccexample}. All non-labeled edges are implicitly labeled with identity functions $\id$. The variable $r$ denotes the return value of the \texttt{A.foo} method.}%
   \label{fig:cc_edgefn_example}%  
-%  \end{figure}
+\end{minipage}
+\end{figure} 

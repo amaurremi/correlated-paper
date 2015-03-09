@@ -39,6 +39,7 @@ on line~\ref{line:callfoo}, which is
 followed by a call to \code{bar()} on the same object%
 %on line~\ref{line:callbar}
 .  
+
  
 %The specific question that we would like to answer for the example program of
 %Figure~\ref{list:ccexample} is the following:
@@ -69,6 +70,9 @@ $\highlight{\code{start}_\code{A.bar()}}{bisque}$ and $\highlight{\code{start}_\
 edges
   from the nodes labeled $\highlight{\code{end}_\code{A.bar}}{bisque}$ and $\highlight{\code{end}_\code{B.bar}}{lightsalmonpink}$ 
   to the node labeled  $\highlight{\code{return}_\code{bar}}{greyblue}$. 
+
+ 
+\input{figures/fig-cc_edge_fn_example} 
  
 An IFDS analysis propagates data-flow facts along the edges
 of a control flow supergraph such as the one in Figure~\ref{fig:examplesupergraph}. The
