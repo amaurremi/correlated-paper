@@ -56,9 +56,9 @@ flow of control from a callee back to a caller (edges from end-nodes to return-n
 
 In our example, the control flow within each method is straightforward and
 all interesting issues arise from interprocedural control flow. In particular,
-since the variable \code{a} may point to either an \code{A}-object or a \code{B}-object, 
+since  \code{a} may point to either an \code{A}-object or a \code{B}-object, 
 the call on line~\ref{line:callfoo} may dispatch to either \code{A.foo()} or to \code{B.foo()},
-and this is reflected by edges  
+as is reflected by edges  
   from the node labeled $\highlight{\code{call}_\code{foo}}{greyblue}$ to the nodes labeled
   $\highlight{\code{start}_\code{A.foo()}}{bisque}$ and $\highlight{\code{start}_\code{B.foo()}}{lightsalmonpink}$
 and by edges
