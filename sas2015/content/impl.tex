@@ -169,7 +169,7 @@ to sets of types, so the bottom element $\botcc$ maps every receiver to the set 
 and the top element $\topcc$ maps every receiver to the empty set of types.
 During an actual execution, every receiver $r$ points to an object of some
 runtime type. Therefore, a data-flow fact
-is unreachable along any feasible path if its corresponding lattice element
+is unreachable along a given path if its corresponding lattice element
 maps any receiver to the empty set of types.
 
 \commentout{
@@ -294,10 +294,10 @@ On the end-return edge from \code{A.foo} to \code{main}, the set of types of \co
 %Similarly,
 On the call-start edge from \code{main} to \code{B.bar}, the possible types
 of \code{a} are further restricted by the micro-function
-$\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code B\}]$.
+$\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code B\}]$
 on the edge that passes the argument \code{v} to the parameter \code{s}.
 The composition of these micro functions results in the empty set as the possible
-types \code{a}, indicating that this
+types of \code{a}, indicating that this
 %data-flow
 path 
 %that would
@@ -339,7 +339,7 @@ is $N^* \to (D \to L)$.
 In the equivalence transformation lattice $L^\equiv$, $\bot$ means reachable
 and $\top$ means unreachable.
 Therefore, an IDE solution $\rho$ computed using $\transEq$ is converted to
-and IFDS solution as:
+an IFDS solution as:
   $\backEq(\rho) = \lambda n.\{d\mid\rho(n)(d)\ne\top\}$.
 %a result $\rho=\resultIDE(\transEq(P))$ of the equivalence IDE analysis
 %is converted to an IFDS result as follows:
@@ -644,7 +644,7 @@ implementation does satisfy the criteria:
 %\end{enumerate}
 %We prove these conditions with the following lemma:
 \begin{restatable}{lemma}{efficient}\label{lem:efficient}
-  The correlated-call representation of a micro function is efficient and the required operations
+  The correlated-call representation of a micro function is efficient according to the IDE criteria and the required operations
   on micro-functions can be computed in time $O(\rcc T)$.
 \end{restatable}
 
@@ -656,16 +656,16 @@ implementation does satisfy the criteria:
 %\subsection{Implementation of the Correlated-Calls Analysis}
 \section{Evaluation}
 We implemented the correlated-calls analysis in Scala~\cite{odersky2004overview}. 
-Our implementation analyzed Java bytecode from input programs written
+Our implementation analyzed Java bytecode compiled from input programs written
 in Java.
 %The input programs that we analyzed were written in Java. Our implementation analyzed the
 %corresponding Java bytecode.
 We used WALA~\cite{fink2012wala}
 to retrieve information about an input program, such as its control-flow supergraph and the set of receivers and their types.
-Since WALA does contain an implementation of the IDE algorithm,
+Since WALA does not contain an implementation of the IDE algorithm,
 we implemented it from scratch.
 %currently only contains an implementation of IFDS, we implemented IDE from scratch.
-We will submit our implementation to the artifact evaluation committee, and we are working on contributing it officially to WALA. % Instead of using WALA's IFDS implementation, to run an IFDS problem, we converted it to an IDE problem and used our own IDE solver.
+We will submit our implementation to the artifact evaluation committee, and we are working on integrating it and contributing it officially to WALA. % Instead of using WALA's IFDS implementation, to run an IFDS problem, we converted it to an IDE problem and used our own IDE solver.
 
 We tested the implementation of the correlated-calls analysis using an IFDS taint-analysis implementation as a client analysis. We converted the IFDS taint analysis into an IDE problem with an implementation of $\transCC_\rcc$.
 
