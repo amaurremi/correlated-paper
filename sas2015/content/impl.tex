@@ -94,7 +94,7 @@ where each edge of the exploded supergraph corresponds to a micro function.
 
 
 \section{Correlated Calls Analysis}\label{sec:cca}
-The correlated-calls analysis is defined as a transformation from an arbitrary IFDS problem to a corresponding IDE problem. The solution of this IDE problem can be converted to a solution of the original IFDS problem. The converted IFDS result can be more precise than the original IFDS result because it avoids infeasible paths corresponding to correlated calls.
+%The correlated-calls analysis is a transformation from an arbitrary IFDS problem to a corresponding IDE problem. The solution of this IDE problem can be converted to a solution of the original IFDS problem. The converted IFDS result can be more precise than the original IFDS result because it avoids infeasible paths corresponding to correlated calls.
 
 %In this section, we first discuss what is necessary to define IFDS and IDE problems. Next we describe how to convert any IFDS problem into an equivalent IDE problem, and, given a solution to the generated IDE problem, how to obtain the result of the original IFDS problem. We then show how to transform an IFDS problem into an IDE problem using the correlated-calls transformation, and how to convert the solution to the latter IDE problem into a more precise IFDS result.
 
@@ -103,14 +103,19 @@ The correlated-calls analysis is defined as a transformation from an arbitrary I
 %The correlated-call analysis transforms an existing IFDS problem into a special kind of IDE problem. We described what is necessary to define IFDS and IDE problems independently.
 
 %Let $P=(G^\#)$ be an IFDS problem and $Q=(G^\#,\,\edgefn)$ an IDE problem obtained by a conversion from $P$.
-Let $G^\#$ be the exploded supergraph of an IFDS problem. A \emph{transformation}
+Let $G^\#$ be the exploded supergraph of an arbitrary IFDS problem. A \emph{transformation}
 $\mathcal T:\ (G^\#)\to (G^\#,\,L,\,\edgefn)$
-converts it into an equivalent IDE problem. We consider two transformations:
-\begin{itemize}
-    \item an \textit{equivalence transformation} $\transEq$ (pronounced ``t-equiv'') that generates IDE problems with the same precision as the original IFDS problem, and
-    \item a \textit{correlated-calls transformation} $\transCC$ (pronounced ``t-c-c'') that generates IDE problems that exclude infeasible paths.
-\end{itemize}
+converts the IFDS problem into an IDE problem.
+We consider two IFDS-to-IDE transformations: an \textit{equivalence transformation} $\transEq$ (pronounced ``t-equiv'') and
+a \textit{correlated-calls transformation} $\transCC$ (pronounced ``t-c-c'').
 Both transformations keep the exploded supergraph $G^\#$ the same, and only generate different edge functions.
+The solution of the IDE problem
+can be mapped back to an IFDS solution.
+If the equivalence transformation was used, then this solution is identical to the
+solution that would be computed by the IFDS algorithm for the original IFDS problem.
+If the correlated-calls transformation was used, then this solution is more precise
+because it excludes flow along infeasible paths due to correlated calls.
+
 %In each case we also show how to convert the result of the generated IDE problem to a result of the original IFDS problem.
 
 %An overview of the transformations is shown in Figure~\ref{fig:transformations}.
@@ -139,8 +144,10 @@ $d$, the micro function returns $\bot$
 to make
 the fact $d$ reachable. All other micro-functions are the identity function.
 %\mtodo{``the identity function'' or is it okay ot just say ``the identity''?}.
+\commentout{
 The equivalence transformation is thus defined as:
   $\transEq((G^\#))=(G^\#,\,L^\equiv,\,\mathsf{EdgeFn}^\equiv)$.
+}
 
 %Thus, in $\transEq$, all non-diagonal edges in the original IFDS problem are mapped to identity functions.
 
@@ -254,10 +261,12 @@ In the above definition, the purpose of the set $S$ is to limit the set of consi
 We can now define $\edgefn$, which assigns a micro-function to each edge in
 the exploded supergraph. 
 Along a $\mathbf0$-edge, the micro function is the identity. 
-All other functions can be described with $\varepsilon_S$.
+%All other functions can be described with $\varepsilon_S$.
 On a ``diagonal'' edge from $\mathbf0$ to a non-$\mathbf0$ fact that corresponds
-to some data-flow fact becoming reachable, $\varepsilon_S(e)$ is applied to the initial
-map $\botcc$ that conservatively allows every receiver to point to an object of any type.
+to some data-flow fact becoming reachable, $\varepsilon_S(e)$ is applied to
+%the initial map
+$\botcc$ that maps every receiver to an object of every possible type.
+%conservatively allows every receiver to point to an object of any type.
 On all other edges, $\varepsilon_S(e)$ is applied to the existing map before the edge.
 The is formalized in the following definition.
 \begin{definition}\label{def:edgefn}
@@ -276,58 +285,81 @@ For each edge $e = (n_1,d_1) \to (n_2,d_2)$, $\ccedgefn S(e)$ is defined as foll
 
 \begin{example}
   Consider the program from Figure~\ref{list:ccexample}, whose exploded supergraph appeared in Figure~\ref{fig:cc_edgefn_example}.
-
+%
   Returning a secret value in method \code{A.foo} creates a ``diagonal'' edge from the $\mathbf0$-fact to the method's return value $r$. 
-  The diagonal edge is labeled with the micro function $\lambda m\,.\,\botcc$. Thus, at the end node of the method, every receiver is mapped to the set of all types~$\bot_T$.
-  
-On the end-return edge from \code{A.foo} to \code{main}, the set of types for the receiver \code{a} is restricted by the micro function $\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code A\}]$ on the edge corresponding to the assignment of the return value $r$ to \code v.
-
-Similarly, on the call-start edge from \code{main} to \code{B.bar}, the possible types
-of the receiver \code{a} are further restricted by the micro-function
+  The diagonal edge is labeled with $\lambda m\,.\,\botcc$, so every receiver is mapped to the set of all types~$\bot_T$.
+%  
+On the end-return edge from \code{A.foo} to \code{main}, the set of types of \code{a} is restricted by the micro function $\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code A\}]$ corresponding to the assignment of the return value $r$ to \code v.
+%
+%Similarly,
+On the call-start edge from \code{main} to \code{B.bar}, the possible types
+of \code{a} are further restricted by the micro-function
 $\lambda m\,.\,m[\code a\to m(\code a)\cap\{\code B\}]$.
 on the edge that passes the argument \code{v} to the parameter \code{s}.
-
 The composition of these micro functions results in the empty set as the possible
-types of the receiver \code{a}, indicating that this data-flow path that would
-result in an information leak is actually infeasible.
+types \code{a}, indicating that this
+%data-flow
+path 
+%that would
+%result in an information leak 
+is 
+%actually
+infeasible.
 \end{example}
 
 %After we have shown the definitions for the meet and composition operations, we will show in Example~\ref{ex:cc} how the correlated-calls analysis uses the presented micro functions to detect infeasible paths.
 
+\commentout{
 Finally, the correlated-calls transformation is defined as
     \begin{equation}
       \transCC_S((G^\#))=\left(G^\#,\,\lcc_S,\,\ccedgefn S\right).
     \end{equation}
+}
 
 %Then, for an edge $e$, the correlated-call micro functions can be defined as $\ccedgefn R$ and a correlated-calls transformation is defined as $\transCC_R$.
 
 \subsection{Converting IDE Results to IFDS Results}\label{sec:ideToIfds}
 
-For each program point $n$, the result of an IFDS analysis gives
-a set of facts $d$ that may be reached at $n$. The result of an IDE analysis
-pairs each such fact~$d$ with a lattice element $\ell$. Formally,
-for an IFDS problem $P$, the result $\resultIFDS$ has type
-$N^* \to D$.
-Similarly, for an IDE problem $Q$, the result $\resultIDE(Q)$
-has type $N \to (D \to L)$.
+An IFDS solution $\resultIFDS$ has type $N^* \to D$: it maps each program point $n$
+to a set of facts $d$ that may be reached at $n$.
+\otodo{This seems wrong: Why is it $N^*$ for IFDS and $N$ for IDE? And shouldn't
+    it be $N \to 2^D$, since you get a set of $d$'s?}
+An IDE solution $\resultIDE$
+pairs each such fact~$d$ with a lattice element $\ell$, so its type
+is $N \to (D \to L)$.
 
-Recall that in the equivalence transformation lattice $L^\equiv$, $\bot$ means reachable
+%For each program point $n$, the result of an IFDS analysis gives
+%a set of facts $d$ that may be reached at $n$. The result of an IDE analysis
+%pairs each such fact~$d$ with a lattice element $\ell$. Formally,
+%for an IFDS problem $P$, the result $\resultIFDS$ has type
+%$N^* \to D$.
+%Similarly, for an IDE problem $Q$, the result $\resultIDE(Q)$
+%has type $N \to (D \to L)$.
+
+In the equivalence transformation lattice $L^\equiv$, $\bot$ means reachable
 and $\top$ means unreachable.
-Therefore, a result $\rho=\resultIDE(\transEq(P))$ of the equivalence IDE analysis
-is converted to an IFDS result as follows:
-\begin{equation}\label{eq:transEqDef}
-  \backEq(\rho) = \lambda n.\{d\mid\rho(n)(d)\ne\top\}.
-\end{equation}
-
+Therefore, an IDE solution $\rho$ computed using $\transEq$ is converted to
+and IFDS solution as:
+  $\backEq(\rho) = \lambda n.\{d\mid\rho(n)(d)\ne\top\}$.
+%a result $\rho=\resultIDE(\transEq(P))$ of the equivalence IDE analysis
+%is converted to an IFDS result as follows:
+%\begin{equation}\label{eq:transEqDef}
+  %\backEq(\rho) = \lambda n.\{d\mid\rho(n)(d)\ne\top\}.
+%\end{equation}
+%
 %\otodo{I don't understand this comment. What does it mean?}
-
+%
 In the correlated-calls transformation lattice $\lcc$, a map that maps any receiver
 to the empty set of possible types means that the corresponding data-flow path is
-infeasible. Therefore, a result $\rho=\resultIDE(\transCC _S(P))$ of the correlated-calls IDE analysis is
-converted to an IFDS result as follows:
-\begin{equation}\label{eq:transCcDef}
-    \backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)(r)\neq\top_T\}.
-\end{equation}
+infeasible. Therefore, an IDE solution $\rho$ computed using
+$\transCC_S$ is converted to an IFDS solution as:
+$\backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)(r)\neq\top_T\}$.
+
+%a result $\rho=\resultIDE(\transCC _S(P))$ of the correlated-calls IDE analysis is
+%converted to an IFDS result as follows:
+%\begin{equation}\label{eq:transCcDef}
+    %\backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)(r)\neq\top_T\}.
+%\end{equation}
 %\otodo{In Equation (5), I changed $\rho(n)(d)$ to $\rho(n)(d)(r)$, because I think
 %    the original was incorrect. Marianna, please check that this correction is correct.}
 
@@ -436,37 +468,42 @@ Then, for a set $S\subseteq R$, the~correlated-calls-conversion function from a~
 %\otodo{move material from following section here}
 
 Conceptually, micro-functions are functions from $L$ to $L$, where $L$
-is the IDE lattice, either $L^\equiv$ or $\lcc$ in our context. However,
-the IDE algorithm requires an efficient representation of micro-functions.
+is the IDE lattice, either $L^\equiv$ or $\lcc$ in our context. 
+The IDE algorithm requires an efficient representation of micro-functions.
 The chosen representation needs to support the basic micro-functions that
-we presented in Section~\ref{seq:transIfdsIde}. The representation must also
+we presented in Section~\ref{seq:transIfdsIde}, and it must
 support function application, comparison, and be closed under function composition
 and meet. We now propose such a representation for the correlated-calls micro-functions.
 
 The representation of a micro-function is a map from receivers to pairs of sets of
 types $I(r)$ and $U(r)$, where $U(r)$ is required to be a subset of $I(r)$. 
-Intuitively, the micro-function takes the existing set of possible types of the
-receiver $r$, intersects it with $I(r)$, then unions it with $U(r)$.
 We use the notation
 $\setpair{I}{U}$ to represent such a map, and $I(r)$ and $U(r)$ to look up the
-sets corresponding to a particular receiver $r$. We define the meaning $\denote{\setpair{I}{U}}$
-of a representation $\setpair{I}{U}$ as follows: $\denote{\setpair{I}{U}} = \lambda m\,.\,\lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.
-In words, the micro-function represented by $\setpair{I}{U}$ takes an existing map $m$
-from receivers to sets of types, and returns a map that maps each receiver $r$ to
-the set $m(r)$ given by the original map $m$ intersected with $I(r)$ and unioned
-with $U(r)$.
+sets corresponding to a particular receiver $r$.
+The micro-function takes the existing set of possible types of the
+receiver $r$, intersects it with $I(r)$, then unions it with $U(r)$:
+$\denote{\setpair{I}{U}} = \lambda m\,.\,\lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.
+
+%We define the meaning $\denote{\setpair{I}{U}}$
+%of a representation $\setpair{I}{U}$ as follows: 
+%In words, the micro-function represented by $\setpair{I}{U}$ takes an existing map $m$
+%from receivers to sets of types, and returns a map that maps each receiver $r$ to
+%the set $m(r)$ given by the original map $m$ intersected with $I(r)$ and unioned
+%with $U(r)$.
 
 All of the basic micro-functions defined in Definition~\ref{def:microfn} can be expressed
-in this representation.
+in this representation. The following lemmas show how function comparison, composition, and meet can be implemented using basic set operations
+on $I$ and $U$.
+The proofs of all of the lemmas and theorems are in the Appendix.
 
-The implementation of function application follows directly from the definition of
-the representation: $\setpair{I}{U}(m) = \lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.
+%The implementation of function application follows directly from the definition of
+%the representation: $\setpair{I}{U}(m) = \lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.
 %\mtodo{Should this be the denotation of $\setpair IU$?}
 %\otodo{No. It is an implementation of the apply operation.}
 
-To compare two micro-functions for equality, it suffices to compare the corresponding
-sets $I(r)$ and $U(r)$ for all receivers $r$. The following lemma shows that this
-implementation of comparison corresponds to equality of the represented micro-functions:
+%To compare two micro-functions for equality, it suffices to compare the corresponding
+%sets $I(r)$ and $U(r)$ for all receivers $r$. The following lemma shows that this
+%implementation of comparison corresponds to equality of the represented micro-functions:
 \begin{restatable}{lemma}{equalEq}
 \label{lem:equalEq}
     For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
@@ -476,10 +513,9 @@ implementation of comparison corresponds to equality of the represented micro-fu
         \denote{\setpair{I}{U}} = \denote{\setpair{I'}{U'}}.
     \end{equation}
 \end{restatable}
-The proofs of all of the lemmas and theorems are in the Appendix.
 
-The following lemma shows that this implementation corresponds to the composition
-of the denoted functions.
+%The following lemma shows that this implementation corresponds to the composition
+%of the denoted functions.
 \begin{restatable}{lemma}{equalComp}\label{lem:equalComp}
     For any pair of micro-function representations $\setpair{I}{U}$, $\setpair{I'}{U'}$,
     \[
@@ -491,8 +527,8 @@ of the denoted functions.
 $$\setpair{I}{U} \circ \setpair{I'}{U'} = \setpair{\lambda r\,.\,(I(r) \cap I'(r))\cup U(r)}{\lambda r\,.\,(I(r)\cap U'(r))\cup U(r)}.$$
 \end{restatable}
 
-The following lemma shows that this implementation corresponds to the meet
-of the denoted functions:
+%The following lemma shows that this implementation corresponds to the meet
+%of the denoted functions:
 \begin{restatable}{lemma}{equalMeet}\label{lem:equalMeet}
 \label{lem:equalMeet}
     Let $\denote{\setpair{I}{U}} \sqcap \denote{\setpair{I'}{U'}}
@@ -509,7 +545,10 @@ $$\setpair{I}{U} \sqcap \setpair{I'}{U'} = \setpair{\lambda r\,.\,I(r) \cup I'(r
 
 \subsection{Theoretical Results}
 
-In the following lemma we show that our analysis is sound, i.e. that the result of an IDE problem obtained through a correlated-calls transformation removes only facts that occur on infeasible paths. 
+The following lemma shows that our analysis is sound, i.e. 
+that the resulting IDE problem still considers all data-flow
+paths that are actually feasible.
+%that the result of an IDE problem obtained through a correlated-calls transformation removes only facts that occur on infeasible paths. 
 
 \begin{restatable}[Soundness]{lemma}{sound}\label{lem:sound}
   Let $p=[\startmain,\,\dots,\,n]$ be a concrete execution path, and let $d\in D$.
@@ -520,7 +559,7 @@ In the following lemma we show that our analysis is sound, i.e. that the result 
   $
 \end{restatable}
 
-We next show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.
+We also show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.
 
 \begin{restatable}[Precision]{lemma}{precision}\label{lem:subsetifds}
     For an IFDS problem $P$ and all ${n\in N^*}$,
@@ -535,14 +574,22 @@ We next show that the result of an IDE problem obtained through a correlated-cal
 We will now show that in a correlated-calls transformation, it is enough to consider only some of the receivers of set $R$.
 
 \begin{definition}
-Let $c_1$ and $c_2$ be two call sites on a receiver $r\in R$.
-  If both call sites are polymorphic, then we say that $r$ is a \textit{correlated-call receiver}.
+    If $r\in R$ is the receiver of at least two polymorphic
+    call sites, then we call $r$ a \textit{correlated-call receiver}, and we define $\rcc$ as the set of all
+  such receivers.
 \end{definition}
-In other words, a correlated-call receiver is a receiver that has at least two polymorphic call invocations.
-We will denote the set of correlated-call receivers as $\rcc$.
+%In other words, a correlated-call receiver is a receiver that has at least two polymorphic call invocations.
+%We will denote the set of correlated-call receivers as $\rcc$.
 
-We will describe a ``reduced'' correlated-calls transformation in which we only consider receivers from $\rcc$ and ignore other receivers of $R$. We will show that IDE problems obtained through ordinary and reduced correlated-calls transformations yield the same results.
-In other words, we show that if a correlated-calls analysis considers only correlated-call receivers, no precision is lost.
+We will show that it is sufficient for the correlated-calls
+micro-functions to be defined only on correlated-call receivers.
+%We will describe a ``reduced'' correlated-calls transformation in which we only consider receivers from $\rcc$ and ignore other receivers of $R$.
+Specifically, a ``reduced'' correlated-calls transformation that
+considers only correlated-call receivers in the micro-functions
+yields the same solution as the full correlated-calls transformation
+(i.e. no precision is lost).
+%We will show that IDE problems obtained through ordinary and reduced correlated-calls transformations yield the same results.
+%In other words, we show that if a correlated-calls analysis considers only correlated-call receivers, no precision is lost.
 
 \begin{restatable}{lemma}{onlycorrrec}\label{lem:onlycorrrec}
 Let $P$ be an IFDS problem. Then  
@@ -551,9 +598,11 @@ Let $P$ be an IFDS problem. Then
   \end{equation}
 \end{restatable}
 
+\commentout{
 To summarize, Lemma~\ref{lem:sound} shows that the result of a correlated-calls analysis is sound since it overapproximates the data flow of all possible concrete execution paths.
 We have also shown in Lemma~\ref{lem:subsetifds} that for an IFDS problem $P$, the correlated-calls analysis improves the precision of the original IFDS result $\resultIFDS(P)$, because the correlated-calls result $\resultIDE(\transCC(P))$ underapproximates an equivalence-IDE result $\resultIDE(\transEq(P))$.
 Finally, we showed in Lemma~\ref{lem:onlycorrrec} that a correlated-call transformation to IDE that considers only correlated-call receivers $\rcc$ achieves the same result that is obtained when considering all receivers $R$.
+}
 
 %This is the general idea of the correlated-calls analysis. The analysis involves a transformation from IFDS to IDE problems. To implement an IDE problem, it is necessary to define a representation of lattice elements and micro functions. An efficient representation of those data structures for the correlated-calls analysis is presented in the next section.
 
@@ -576,18 +625,24 @@ micro-function. We show that the micro-functions in the correlated-calls
 IDE analysis can be evaluated in time $O(\rcc T)$, where $\rcc$ is the number
 of correlated-call receivers $\rcc$ and the $T$ is the number of run-time
 types. Therefore, the overall worst-case cost of the correlated-calls IDE analysis
-is $O(ED^3\rcc T)$.
+is $O(ED^3\rcc T)$. Note that in practice, $\rcc$ is much smaller
+than $R$, so Lemma~\ref{lem:onlycorrrec} is significant for 
+performance.
 
-Specifically, the complexity proof for the IDE algorithm requires the implementation of the micro-functions
-to be \textit{efficient} according to the following criteria:
-\begin{enumerate}
-	\item There is a representation for the identity and top functions.
-  \item The representation is closed under the meet and composition operations.
-  \item The micro functions form a finite-height lattice.
-  \item The apply, meet, composition, and equality-check operations can be computed in constant time (independent of $E$ and $D$).
-  \item There is a constant bound on the storage space for a micro function representation.
-\end{enumerate}
-We prove these conditions with the following lemma:
+Specifically, the complexity proof for the IDE algorithm requires
+the implementation of the micro-functions to be \textit{efficient}
+according to a list of specific criteria. Our micro-function
+implementation does satisfy the criteria:
+
+\otodo{Give the list of criteria explicitly in the proof in the appendix.}
+%\begin{enumerate}
+	%\item There is a representation for the identity and top functions.
+  %\item The representation is closed under the meet and composition operations.
+  %\item The micro functions form a finite-height lattice.
+  %\item The apply, meet, composition, and equality-check operations can be computed in constant time (independent of $E$ and $D$).
+  %\item There is a constant bound on the storage space for a micro function representation.
+%\end{enumerate}
+%We prove these conditions with the following lemma:
 \begin{restatable}{lemma}{efficient}\label{lem:efficient}
   The correlated-call representation of a micro function is efficient and the required operations
   on micro-functions can be computed in time $O(\rcc T)$.
@@ -599,14 +654,22 @@ We prove these conditions with the following lemma:
 %to the original IFDS analysis.
 
 \subsection{Implementation of the Correlated-Calls Analysis}
-The correlated-calls analysis was implemented in the Scala programming language~\cite{odersky2004overview}. 
-The input programs that we analyzed were written in Java. Our implementation analyzed the
-corresponding Java bytecode.
-To retrieve information about an input program, such as its control-flow supergraph or the set of receivers and their types, we used the WALA framework~\cite{fink2012wala}.
-Since WALA currently only contains an implementation of IFDS, we implemented IDE from scratch. Instead of using WALA's IFDS implementation, to run an IFDS problem, we converted it to an IDE problem and used our own IDE solver.
+We implemented the correlated-calls analysis in Scala~\cite{odersky2004overview}. 
+Our implementation analyzed Java bytecode from input programs written
+in Java.
+%The input programs that we analyzed were written in Java. Our implementation analyzed the
+%corresponding Java bytecode.
+We used WALA~\cite{fink2012wala}
+to retrieve information about an input program, such as its control-flow supergraph and the set of receivers and their types.
+Since WALA does contain an implementation of the IDE algorithm,
+we implemented it from scratch.
+%currently only contains an implementation of IFDS, we implemented IDE from scratch.
+We will submit our implementation to the artifact evaluation committee, and we are working on contributing it officially to WALA. % Instead of using WALA's IFDS implementation, to run an IFDS problem, we converted it to an IDE problem and used our own IDE solver.
 
 We tested the implementation of the correlated-calls analysis using an IFDS taint-analysis implementation as a client analysis. We converted the IFDS taint analysis into an IDE problem with an implementation of $\transCC_\rcc$.
 
 We extensively tested the correlated-calls analysis to ensure that in the absence of correlated calls in an input program, the analysis produced the same results as an IFDS-equivalent analysis, and in the presence of correlated calls, the result was more precise.
 
+\commentout{
 The artifact of our implementation can be used to solve any IFDS problem. In the presence of correlated calls, the result of the correlated-calls analysis can be more precise than the result obtained with an IFDS solver.
+}
