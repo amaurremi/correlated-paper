@@ -121,7 +121,7 @@ typestate analysis, pointer analysis, and lightweight
 shape analysis.
 
 \subsection{Occurrences of Correlated Calls}\label{sec:occur}\vspace{-.5mm}
-How often do correlated calls occur in practice? To assess the benefit of the correlated-calls analysis, we counted the number of correlated calls that occur in programs of the Dacapo benchmarks~\cite{blackburn2006dacapo}, using the WALA framework for static analysis on Java bytecode~\cite{fink2012wala}.
+How often do correlated calls occur in practice? To assess the benefit of the correlated-calls analysis, we counted the number of correlated calls that occur in programs of the Dacapo benchmarks~\cite{blackburn2006dacapo}, using the WALA framework~\cite{fink2012wala}.
 Our goal was to obtain an upper bound on the number of redundant IFDS-result nodes that could be potentially removed by our analysis. The results are shown in Table~\ref{tab:dacapostat} in the Appendix.
 
 In these programs, on average, 3\% of all call sites $C$ are polymorphic call sites $C_P$.

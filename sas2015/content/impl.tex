@@ -476,8 +476,7 @@ implementation of comparison corresponds to equality of the represented micro-fu
         \denote{\setpair{I}{U}} = \denote{\setpair{I'}{U'}}.
     \end{equation}
 \end{restatable}
-The proofs of all of the lemmas and theorems in the paper are provided in the supplemental
-material submitted with the paper.
+The proofs of all of the lemmas and theorems are in the Appendix.
 
 The following lemma shows that this implementation corresponds to the composition
 of the denoted functions.
@@ -603,7 +602,7 @@ We prove these conditions with the following lemma:
 The correlated-calls analysis was implemented in the Scala programming language~\cite{odersky2004overview}. 
 The input programs that we analyzed were written in Java. Our implementation analyzed the
 corresponding Java bytecode.
-To retrieve information about an input program, such as its control-flow supergraph or the set of receivers and their types, we used the WALA framework for static analysis~\cite{fink2012wala}.
+To retrieve information about an input program, such as its control-flow supergraph or the set of receivers and their types, we used the WALA framework~\cite{fink2012wala}.
 Since WALA currently only contains an implementation of IFDS, we implemented IDE from scratch. Instead of using WALA's IFDS implementation, to run an IFDS problem, we converted it to an IDE problem and used our own IDE solver.
 
 We tested the implementation of the correlated-calls analysis using an IFDS taint-analysis implementation as a client analysis. We converted the IFDS taint analysis into an IDE problem with an implementation of $\transCC_\rcc$.
