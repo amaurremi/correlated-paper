@@ -320,13 +320,13 @@ Finally, the correlated-calls transformation is defined as
 
 \subsection{Converting IDE Results to IFDS Results}\label{sec:ideToIfds}
 
-An IFDS solution $\resultIFDS$ has type $N^* \to D$: it maps each program point $n$
+An IFDS solution $\resultIFDS$ has type $N^* \to 2^D$: it maps each program point $n$
 to a set of facts $d$ that may be reached at $n$.
 \otodo{This seems wrong: Why is it $N^*$ for IFDS and $N$ for IDE? And shouldn't
     it be $N \to 2^D$, since you get a set of $d$'s?}
 An IDE solution $\resultIDE$
 pairs each such fact~$d$ with a lattice element $\ell$, so its type
-is $N \to (D \to L)$.
+is $N^* \to (D \to L)$.
 
 %For each program point $n$, the result of an IFDS analysis gives
 %a set of facts $d$ that may be reached at $n$. The result of an IDE analysis

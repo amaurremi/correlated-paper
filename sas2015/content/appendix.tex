@@ -115,6 +115,18 @@ Symmetrically, we can also establish that $\forall r.I'(r) \subseteq I(r)$ by ap
 \end{align*}
 \end{proof}
 
+\subsubsection*{Efficiency}
+We will next introduce the complexity proof for the correlated-calls algorithm.
+To satisfy the complexity requirements of the IDE algorithm, we need to provide
+an implementation of the IDE lattice and micro-functions that satisfy the following
+list of criteria~\cite{sagiv1996precise}:
+\begin{enumerate}
+	\item There is a representation for the identity and top functions.
+  \item The representation is closed under the meet and composition operations.
+  \item The micro functions form a finite-height lattice.
+  \item The apply, meet, composition, and equality-check operations can be computed in constant time (independent of $E$ and $D$).
+  \item There is a constant bound on the storage space for a micro function representation.
+\end{enumerate}
 \efficient*
 \begin{proof}
 \leavevmode
