@@ -27,7 +27,7 @@ line~\ref{line:Afoo}.
 Any write to standard output 
 %via calls \code{System.out.println()} such as the one in method \code{B.bar()} 
 %on line~\ref{line:Bbar} 
-is assumed to be a sink (e.g. the call to \code{System.out.println()} in \code{B.bar()}).
+is assumed to be a sink (e.g., the call to \code{System.out.println()} in \code{B.bar()}).
 %a security-sensitive operation.
 Depending on the number of 
 arguments passed to the program, the \code{main()} method of the example program creates 
@@ -93,7 +93,7 @@ on \textit{the same object}. Thus the behaviours of the method calls
 are \textit{correlated}: if the call to \code{foo()} dispatches to \code{A.foo()},
 then the call to \code{bar()} must dispatch to \code{A.bar()}, and analogously
 for \code{B.foo()} and \code{B.bar()}.
-Consequently, paths such as the one highlighted in
+Consequently, paths such as the one shown in bold in
 Figure~\ref{fig:examplesupergraph} where the calls dispatch to
 \code{A.foo()} and \code{B.bar()}
 are infeasible.  
@@ -131,7 +131,8 @@ In these programs, on average, 3\% of all call sites $C$ are polymorphic call si
 %\mtodo{Should we explain in a footnote why the number of polymorphic call sites is so low?}
 %\otodo{We don't have an explanation.}
 Out of these polymorphic call sites, a significant fraction (39\%) are correlated 
-call sites $C^\Subset$. We also see that, on average,  each correlated-call receiver is involved in three correlated calls. 
+call sites $C^\Subset$. We also see that, on average,  each correlated-call receiver is involved in approximately
+three correlated calls. 
 
 \subsection{An Example from the Scala Collections Library}\label{sec:collex}
 The Scala collections library contains the trait \code{TraversableOnce} that is

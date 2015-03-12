@@ -19,7 +19,7 @@ of control in concrete executions of a program. It may contain \textit{infeasibl
 paths that cannot occur at runtime. The precision of a data-flow analysis algorithm
 depends on its ability to detect and disregard such infeasible paths.
 The \textit{Interprocedural Finite Distributive Subset} (IFDS) algorithm~\cite{reps1995precise}
-is one general data-flow analysis algorithm that 
+is a general data-flow analysis algorithm that 
 %by  Reps, Horwitz, and Sagiv
 %is a general data-flow analysis
 %algorithm
@@ -47,7 +47,7 @@ methods are dynamically dispatched on the same receiver object.
 %In such cases,
 If the
 method calls are polymorphic
-(i.e. the method invoked depends on the run-time type of the receiver),
+(i.e., the method invoked depends on the run-time type of the receiver),
 %(i.e., if they dispatch to different method definitions 
 %depending on the type of the receiver expression at run time),
 then their dispatch 
@@ -126,6 +126,8 @@ and sketches a proof of its correctness%
   Detailed proofs of our lemmas and theorems can be found in
   the appendix.
 }.
+%
+Our implementation is discussed in Section~\ref{sec:Evaluation}.
 %
 Related work is discussed in Section~\ref{sec:Related}.
 %
