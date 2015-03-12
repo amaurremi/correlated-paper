@@ -8,7 +8,7 @@ Their algorithm is based on computing \textit{summary functions} that return the
 IFDS has been used to encode a variety of data-flow problems such as typestate analysis%
 \commentout{(determining which operations can be performed on an object at a given program point)}~\cite{naeem2008typestate,DBLP:conf/pldi/ZhangMGNY14} and shape analysis%
 \commentout{(detecting errors and validating properties of programs at compile time)}%
-~\cite{DBLP:conf/birthday/KreikerRRSWY13}. IFDS has been broadly used~\cite{DBLP:conf/pldi/ArztRFBBKTOM14,tripp2009taj} and extended~\cite{DBLP:conf/sigsoft/LerchHBM14} to solve taint-analysis problems.
+~\cite{DBLP:conf/birthday/KreikerRRSWY13}. IFDS has been used~\cite{DBLP:conf/pldi/ArztRFBBKTOM14,tripp2009taj} and extended~\cite{DBLP:conf/sigsoft/LerchHBM14} to solve taint-analysis problems.
 
 %The IFDS algorithm is implemented in two popular static-analysis frameworks for Java bytecode, the T.J.~Watson Libraries for~Analysis (WALA)~\cite{fink2012wala} and Heros~\cite{bodden2012inter}.
 
@@ -21,13 +21,12 @@ Soot is a framework for program analysis and optimization on Java bytecode, deve
 Whereas one advantage of Soot's IFDS implementation (and other static analysis tools) is ease of use and extensibility, WALA's primary focus is efficiency. For example, WALA uses bit-vectors to represent some of the analysis data types, like local variables and parameters. Another difference is that WALA's intermediate representation of a program uses static single assignment (SSA) form~\cite{cytron1991efficiently}. SSA form is a representation of the program in which each variable has only one definition (assignment). SSA can make data-flow analysis simpler and more efficient~\cite{appel1998ssa}.
 }
 
-Several extensions of the IFDS algorithm have been proposed to improve its precision,
-efficiency, and expressiveness. Naeem and Lhot\'ak~\cite{naeem2010pei} propose
-four extensions: two to improve efficiency on certain kinds of IFDS problems,
-one to improve expressiveness to a wider range of IFDS problems, and one
-to improve precision when applying the IFDS algorithm to programs in SSA form.
-All of these extensions are orthogonal to and could be combined with the approach
-that we present in this paper. In contrast to these techniques, our approach targets
+Naeem and Lhot\'ak~\cite{naeem2010pei} proposed several extensions of IFDS.
+In particular, they propose several techniques for improving the algorithm's 
+efficiency, as well as a technique that improves expressiveness by extending
+applicability to a wider class of dataflow analysis problems. 
+These extensions are orthogonal to, and could be combined with the approach
+presented in this paper. Our work differs from theirs by targeting
 analysis precision, not efficiency or expressiveness.
 
 \commentout{
@@ -40,7 +39,7 @@ The fourth extension is targeted towards programs that are represented in SSA fo
 The extension makes the IFDS analysis on programs in SSA form as precise as on programs that are not represented in SSA form. In contrast, the correlated-calls analysis is applicable to programs in both SSA and non-SSA forms. Even if applied to a program in SSA form, our analysis and the extension improve the precision of IFDS in unrelated situations: the first analysis handles correlated calls, and the latter handles control-flow constructs. Thus, an IFDS analysis could benefit from both precision improvements independently.
 }
 
-Two other extensions target efficiency. Bodden et~al.~\cite{bodden2013spl} presents a framework
+Bodden et~al.~\cite{bodden2013spl} presents a framework
 for applying IFDS analyses to software product lines. Their approach enables the analysis of
 all possible products derived from a product line in a single analysis pass. Like our approach,
 their approach transforms IFDS problems to IDE problems. The micro-functions keep track
@@ -52,14 +51,14 @@ Rodriguez and Lhot\'ak evaluate a parallelized implementation of the IFDS algori
 The correlated-calls analysis improves the precision of a data-flow analysis by eliminating a special type of infeasible paths. This is similar to the idea of context-sensitive analysis: just as a context-sensitive analysis eliminates infeasible paths from the end of a procedure to the call sites that do not match the given procedure call, the correlated-calls analysis eliminates infeasible paths caused by correlated method calls.
 }
 
-The idea of using correlated calls to remove infeasible paths in data-flow analyses of object-oriented programs was introduced by Tip~\cite{DBLP:journals/scp/Tip15}. The possibility of using IDE to achieve this is mentioned, but not elaborated upon. Our work presents a concrete solution to the problem and an implementation of that solution.
+The idea of using correlated calls to remove infeasible paths in data-flow analyses of object-oriented programs 
+was introduced by Tip~\cite{DBLP:journals/scp/Tip15}. The possibility of using IDE to achieve this is mentioned, 
+but not elaborated upon. Our work is the first to present and implement a concrete solution.
 
-Sridharan et~al.'s improvements to the precision of pointer analysis
-for Ja\-va\-Script programs~\cite{DBLP:conf/ecoop/SridharanDCST12} also
-eliminate infeasible paths. Instead of infeasible paths
+Recent work on correlation tracking for JavaScript~\cite{DBLP:conf/ecoop/SridharanDCST12} 
+also eliminates infeasible paths. Instead of infeasible paths
 between dynamically dispatched method calls, their approach eliminates
 infeasible paths between reads and writes of different properties
-%(the JavaScript analogue of fields) 
 of an object. 
 %Unlike in more static languages,
 %property names in JavaScript are first class values (strings). When a loop indexed by
@@ -88,11 +87,11 @@ Our approach superficially resembles, but is orthogonal, to context
 sensitivity, including such variations as object sensitivity~\cite{DBLP:conf/issta/MilanovaRR02,DBLP:journals/tosem/MilanovaRR05}.
 Context-sensitive
 points-to analysis is orthogonal to our work because it analyzes the
-flow of data (pointers), while we analyze control flow paths instead.
+flow of data (pointers), whereas we analyze control flow paths.
 Also, object-sensitive points-to analysis is flow-insensitive, while
-the IFDS and IDE algorithms are flow-sensitive, and our transformation only makes sense
-in a flow-sensitive setting (since a flow-insensitive analysis already
-introduces many more infeasible control flow paths).
+IFDS and IDE are flow-sensitive analyses. Note that our transformation only makes sense
+in a flow-sensitive setting since a flow-insensitive analysis already
+introduces many infeasible control flow paths.
 
 It would be possible to simulate the effect of our correlated calls
 transformation in the following way inspired by context-sensitivity:
