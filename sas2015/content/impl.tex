@@ -654,21 +654,35 @@ implementation does satisfy the criteria:
 %to the original IFDS analysis.
 
 \subsection{Implementation of the Correlated-Calls Analysis}
+
 We implemented the correlated-calls analysis in Scala~\cite{odersky2004overview}. 
-Our implementation analyzed Java bytecode compiled from input programs written
+Our implementation analyzes JVM bytecode compiled from input programs written
 in Java.
-%The input programs that we analyzed were written in Java. Our implementation analyzed the
-%corresponding Java bytecode.
-We used WALA~\cite{fink2012wala}
-to retrieve information about an input program, such as its control-flow supergraph and the set of receivers and their types.
+%
+We use WALA~\cite{fink2012wala} to retrieve information about an input program, such 
+as its control-flow supergraph and the set of receivers and their types.
 Since WALA does not contain an implementation of the IDE algorithm,
 we implemented it from scratch.
-%currently only contains an implementation of IFDS, we implemented IDE from scratch.
-We will submit our implementation to the artifact evaluation committee, and we are working on integrating it and contributing it officially to WALA. % Instead of using WALA's IFDS implementation, to run an IFDS problem, we converted it to an IDE problem and used our own IDE solver.
+We will submit our implementation to the artifact evaluation committee, and are also 
+working on contributing our infrastructure to WALA. 
+ 
+We tested our correlated-calls analysis using an IFDS taint-analysis  
+as a client analysis. To this end, we converted the IFDS taint analysis into an IDE problem with an 
+implementation of $\transCC_\rcc$. We extensively tested the correlated-calls analysis to ensure that, in 
+the absence of correlated calls, the analysis produces the same results as an IFDS-equivalent analysis, and that 
+it produces more precise results in the presence of correlated calls as expected.
 
-We tested the implementation of the correlated-calls analysis using an IFDS taint-analysis implementation as a client analysis. We converted the IFDS taint analysis into an IDE problem with an implementation of $\transCC_\rcc$.
+To evaluate the practicality of our work, we applied two variants of the IFDS taint analysis
+to the SPEC JVM98 benchmarks: (i) an equivalent IDE taint analysis obtained using $\transEq$, and (ii)
+an IDE taint analysis obtained using   $\transCC_\rcc$ that avoids imprecision due to correlated method
+calls. Unfortunately, for the specific combination of this IFDS client analysis and these benchmark
+programs, the precise tracking of data flow in the presence of correlated calls does not impact precision. 
+However, the good news is that the running times of the two analyses are roughly the same, ranging from 
+a few seconds on the smaller SPEC programs to about two hours on \texttt{javac} in each cases (see the Appendix
+for more details on these results).  This suggests that the overhead of tracking correlated calls is manageable,
+and that our technique may be worthwhile in other scenarios.  
+ 
 
-We extensively tested the correlated-calls analysis to ensure that in the absence of correlated calls in an input program, the analysis produced the same results as an IFDS-equivalent analysis, and in the presence of correlated calls, the result was more precise.
 
 \commentout{
 The artifact of our implementation can be used to solve any IFDS problem. In the presence of correlated calls, the result of the correlated-calls analysis can be more precise than the result obtained with an IFDS solver.
