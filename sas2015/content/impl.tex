@@ -672,15 +672,18 @@ implementation of $\transCC_\rcc$. We extensively tested the correlated-calls an
 the absence of correlated calls, the analysis produces the same results as an IFDS-equivalent analysis, and that 
 it produces more precise results in the presence of correlated calls as expected.
 
-To evaluate the practicality of our work, we applied two variants of the IFDS taint analysis
+To evaluate the practicality of our approach, we applied two variants of the IFDS taint analysis
 to the SPEC JVM98 benchmarks: (i) an equivalent IDE taint analysis obtained using $\transEq$, and (ii)
 an IDE taint analysis obtained using   $\transCC_\rcc$ that avoids imprecision due to correlated method
-calls. Unfortunately, for the specific combination of this IFDS client analysis and these benchmark
-programs, the precise tracking of data flow in the presence of correlated calls does not impact precision. 
-However, the good news is that the running times of the two analyses are roughly the same, ranging from 
+calls. 
+The results suggest that the overhead of tracking correlated calls is very minor: the running times of the two analyses are roughly the same, ranging from 
 a few seconds on the smaller SPEC programs to about two hours on \texttt{javac} in each case (see the Appendix
-for more details on these results).  This suggests that the overhead of tracking correlated calls is manageable,
-and that our technique may be worthwhile in other scenarios.  
+for detailed results).
+%This suggests that the overhead of tracking correlated calls is manageable,
+%and that our technique may be worthwhile in other scenarios.  
+For the specific combination of this IFDS client analysis and these benchmark
+programs, tracking correlated calls did not impact precision. 
+
  
 
 
