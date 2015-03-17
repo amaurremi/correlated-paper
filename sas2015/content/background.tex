@@ -46,8 +46,8 @@ is a partially ordered set $(S,\sqsubseteq)$ in which every subset has a least u
 A \textit{meet semilattice} is a partially ordered set in which every subset only has a greatest lower bound.
 The symbols $\bot$ and $\top$ are used to denote the greatest lower bound of $S$ and of the empty set, respectively.
 
-In this paper, we denote a map $m$ as a set of pairs of keys and values, in which each key appears at most once.
-For any map $m$,  $m(k)$ is the value paired with the key $k$ in $m$. We denote by $m[x\to y]$ a map that maps $x$ to $y$, and every other key $k$ to $m(k)$.
+We denote a map $m$ as a set of pairs of keys and values, with each key appearing at most once.
+For a map $m$,  $m(k)$ is the value paired with the key $k$. We denote by $m[x\to y]$ a map that maps $x$ to $y$ and every other key $k$ to $m(k)$.
 
 \subsection{IFDS}\label{sec:bgifds}
 The IFDS framework~\cite{reps1995precise} is a precise and efficient algorithm for data-flow analysis
@@ -156,7 +156,7 @@ and where $n_0 \to n_1 \to \cdots \to n_m$ is a valid path).
 
 The IDE algorithm~\cite{sagiv1996precise} extends IFDS to
 \textit{interprocedural} \textit{distributive} \textit{environment}
-problems. An \textit{environment} problem is one whose data-flow
+problems. An IDE problem is one whose data-flow
 lattice is the lattice $\textsf{Env}(D,L)$ of maps from a finite set $D$ to a meet semilattice
 $L$ of finite height, ordered pointwise. Like IFDS, IDE requires the data-flow functions to be distributive.
 
@@ -220,7 +220,7 @@ equivalent to an edge with micro-function $\lambda l.\top$.
     specified by $e(v)$.
 \end{example}
 
-The meet of two environment transformers $t_1, t_2$ can be computed by taking the union of the edges
+The meet of two environment transformers $t_1, t_2$ is computed as the union of the edges
 in their pointwise representations. When the same edge appears in the pointwise representations of
 both $t_1$ and $t_2$, the micro-function for that edge in $t_1 \sqcap t_2$ is the meet of the
 micro-functions for that same edge in $t_1$ and in $t_2$.
@@ -230,8 +230,8 @@ representation graphs in the same fashion as IFDS representation relations, and
 computing the composition of the micro-functions appearing along each path in the resulting graph.
 
 The IDE algorithm operates on the same exploded supergraph as the IFDS algorithm
-(except that the edges are labelled with micro-functions). For each pair $(n,d)$ of
-node and fact, the algorithm computes a micro-function equal to the meet of the micro-functions
+(but its edges are labelled with micro-functions). For each pair $(n,d)$ of
+node and fact, IDE computes a micro-function equal to the meet of the micro-functions
 of all the realizable paths from the program entry point to the pair.
 
 In order to do this efficiently, the IDE algorithm requires a representation of micro-functions
