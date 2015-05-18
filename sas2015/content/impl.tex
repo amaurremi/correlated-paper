@@ -107,7 +107,7 @@ Let $G^\#$ be the exploded supergraph of an arbitrary IFDS problem. A \emph{tran
 $\mathcal T:\ (G^\#)\to (G^\#,\,L,\,\edgefn)$
 converts the IFDS problem into an IDE problem.
 We consider two IFDS-to-IDE transformations: an \textit{equivalence transformation} $\transEq$ (pronounced ``t-equiv'') and
-a \textit{correlated-calls transformation} $\transCC$ (pronounced ``t-c-c'').
+a \textit{correlated-calls transformation} $\transCC_S$ (pronounced ``t-c-c'') for a set of receivers $S$.
 Both transformations keep the exploded supergraph $G^\#$ the same, and only generate different edge functions.
 The solution of the IDE problem
 can be mapped back to an IFDS solution.
@@ -157,11 +157,11 @@ The equivalence transformation is thus defined as:
 %When converting the IDE result to an IFDS result, lattice elements will tell us whether to make the corresponding exploded nodes reachable. This is the idea of the correlated-calls analysis.
 
 %\paragraph{Lattice Elements}
-In the correlated-calls transformation, the 
+In the correlated-calls transformation $\transCC_R$, the 
 %Just like in the equivalence transformation $\transEq$, the exploded supergraph for $\transCC$ is the same as in the original IFDS problem. The 
 lattice elements are maps from receivers to sets of types:
     $\lcc=\left\{\,m:\ R\to2^T\right\}$,
-where $R$ is the set of receivers and $T$ is the set of all types.
+where $R$ is the set of considered receivers and $T$ is the set of all types.
 For each receiver~$r$, the map gives an overapproximation of the possible
 runtime types of $r$.
 Sets of types are ordered by the superset relation, and this is lifted to maps from receivers
@@ -233,10 +233,10 @@ of a supergraph edge $e$ is defined as:
                 to the call $r.c()$,
                 $v_1,\,\dots,\,v_k\in S$ are the local variables
                 in $f$,
-                and $r\in S$;}}\\
+                and $r\in S$;}}\\[5ex]
             m\left[r\to \bot_T\right],
             &\text{\parbox{75mm}{if $e = n_1 \to n_2$ and $n_1$ contains an assignment
-                    to $r\in S$;}}\\
+                    to $r\in S$;}}\\[2ex]
             m
                 &\text{otherwise.}
         \end{cases}
@@ -551,12 +551,12 @@ paths that are actually feasible.
 %that the result of an IDE problem obtained through a correlated-calls transformation removes only facts that occur on infeasible paths. 
 
 \begin{restatable}[Soundness]{lemma}{sound}\label{lem:sound}
-  Let $p=[\startmain,\,\dots,\,n]$ be a concrete execution path, and let $d\in D$.
+  Let $P$ be an IFDS problem and $p=[\startmain,\,\dots,\,n]$ a concrete execution path, and let $d\in D$.
   If $d\in M_F(p)(\varnothing),$
   then
-  $
+  $$
     d\in \backCC\left(\resultIDE(\transCC_R(P))\right)(n)\,.
-  $
+  $$
 \end{restatable}
 
 We also show that the result of an IDE problem obtained through a correlated-calls transformation is a subset of the original IFDS result.

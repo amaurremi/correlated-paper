@@ -7,8 +7,8 @@ class B extends A {
     return "not secret";
   } /*@\label{line:Bfoo}@*/
   void bar(String s) {
-    System.out.println(s); 
-  } /*@\label{line:Bbar}@*/
+    System.out.println(s); /*@\label{line:Bbar}@*/
+  } 
 }
 
 class Main {
