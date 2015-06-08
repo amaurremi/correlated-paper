@@ -675,11 +675,15 @@ it produces more precise results in the presence of correlated calls as expected
 To evaluate the practicality of our approach, we applied two variants of the IFDS taint analysis
 to the SPEC JVM98 benchmarks: (i) an equivalent IDE taint analysis obtained using $\transEq$, and (ii)
 an IDE taint analysis obtained using   $\transCC_\rcc$ that avoids imprecision due to correlated method
-calls. 
+calls.
+
+The running times $t_\Subset$ of the correlated-calls and $t_\equiv$ equivalence analyses are shown in Table~\ref{tab:runtimes}. In the table, $N^*_r$ is the number of reachable nodes in the control-flow supergraph, and $N^\#_r$ the number of reachable nodes in the exploded supergraph.
+\input{tables/runstats}
+
 The results suggest that the overhead of tracking correlated calls is acceptable. In particular, the correlated-calls analysis takes at most twice as long as the equivalence analysis.
 The absolute times range from 
-a few seconds on the smaller SPEC programs to about two hours on \texttt{javac} (see the Appendix
-for detailed results).
+a few seconds on the smaller SPEC programs to about two hours on \texttt{javac}.
+
 Our implementation is a research prototype and many opportunities for
 optimization remain.
 %This suggests that the overhead of tracking correlated calls is manageable,
