@@ -1,0 +1,21 @@
+----------------------- REVIEW 3 ---------------------
+PAPER: 22
+TITLE: Precise Data Flow Analysis in the Presence of Correlated Method Calls
+AUTHORS: Marianna Rapoport, Ondřej Lhoták and Frank Tip
+
+
+----------- REVIEW -----------
+This paper describes the relationship between the IFDS and IDE data-flow analysis algorithms and shows how to obtain an equivalent to IFDS within the IDE framework. The authors then use this transformation to show how correlated method calls can be made sensitive to their context within IDE and how this result can be transformed back into an improved IFDS result. The technique is implemented for the WALA framework and benchmarked using DeCapo.
+
+I found the prose of this paper to be mostly very clear excepting a few places where symbols seem overloaded or are not explained until well after their first use. The technique is well explained and a novel contribution to the literature. I would love to see a more detailed comparison to context sensitivity more broadly in related work, and some improvement to stumbling blocks I mention below.
+
+
+Specific notes:
++ "print statement on line 11." It is actually on line 10 now.
++ "the results apply dually when the meet is intersection" Meaning an underapproximating variant?
++ In 3.3 it is confusing to use both "m" and "e" as an environment
++ It should be much clearer, early in section 3.3, what "L" and "r" refer to. L is left fairly opaque for a whole page, and "r" is undefined that I can see. (I see now, "r" is defined 2 pages later...)
++ At the top of page 9, you are defining Top_ENV[dj -> l] in terms of itself?
++ 'm' is an environment and then a receiver variable? This overloading is needlessly confusing.
++ You mention Sharir and Pnueli but do not make any broader comparisons to general context sensitivity. E.g. could you compare this to the cartesian product algorithm, which is exponential, but tracks all correlations between callee's and agument values. Is this equivalent to a CPA for the receiver only?
+

@@ -1,0 +1,59 @@
+----------------------- REVIEW 2 ---------------------
+PAPER: 22
+TITLE: Precise Data Flow Analysis in the Presence of Correlated Method Calls
+AUTHORS: Marianna Rapoport, Ondřej Lhoták and Frank Tip
+
+
+----------- REVIEW -----------
+In this paper, the authors propose a technique for improving the
+precision of a program analysis of Java programs by tracking
+correlated method calls more precisely. The basic idea of the
+technique is to enhance the precision of a given interprocedural
+analysis such that each abstract state of the analysis additionally
+carries information about the dynamic types of receiver objects.
+Technically, this enhancement is formulated as a transformation of
+an analysis algorithm for an IFDS problem to that of the related
+IDE problem. The authors show the correctness of their transformation,
+present the compact representation of micro transfer functions
+of the transformed algorithm, and describe their experience with
+experimenting their prototype implementation against SPEC JVM98
+benchmarks.
+
+I think that this is a great paper in many aspects. The paper is
+based on a common programming pattern, the abundance of correlated
+method calls, that is not exploited systematically in the work
+on program analysis for Java programs. It presents a systematic
+approach for exploiting this pattern, which has solid theoretical
+and practical justifications. The paper is written very well---by
+reading the paper, I learned about IDE, which I always wanted to
+understand but couldn't. Also, their representation of the micro
+transfer functions is quite clever, and its similarity with
+recent work on modular program analyses indicates that there might
+be more things to be gained in this research direction; I will
+explain this similarity separately.
+
+* According to what I heard from Isil Dillig, she and her collaborators
+developed an information-flow analysis that can handle missing libraries.
+I heard that their results were reported in their APLAS'13 paper.
+One of the key ideas in their work is the observation that procedure
+summaries in this information-flow analysis are just bipartite graphs
+from input variables to output variables, and that we can express
+an unknown summary symbolically by considering a bipartite graph where
+all edges are labeled with unknown boolean symbols. If later we know
+that there might be a flow from an input variable x to an output variable y'
+in the summary, we will instantiate the boolean variable b for this edge
+to true. Otherwise, we will instantiate b to false. Interestingly, the boolean
+symbols in these edges do not stop the information-flow analysis of callers
+of this unknown library function, because any fixpoint computation of the
+information flow analysis can proceed even in the presence of such symbols.
+
+I am saying this because something similar might happen for the micro
+functions in the authors' work. Suppose that we have only two receiver
+variables r1 and r2. Then, a micro function on these two variables
+can be expressed with four unknown set variables: U1, I1, U2, I2.
+All the possible micro functions that can arise using these four set
+variables are finite, so the authors' IDE might still be able to compute
+analysis results even in the presence of these unknown symbols, which correspond
+to the presence of calls to libraries functions with missing definitions.
+Of course, here I am less concerned with efficiency.
+

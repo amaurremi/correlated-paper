@@ -1,0 +1,85 @@
+----------------------- REVIEW 1 ---------------------
+PAPER: 22
+TITLE: Precise Data Flow Analysis in the Presence of Correlated Method Calls
+AUTHORS: Marianna Rapoport, Ondřej Lhoták and Frank Tip
+
+
+----------- REVIEW -----------
+The paper presents with detail a technique to eliminate unfeasible paths due to
+correlated calls for the Interprocedural Finite Distributive Subset (IFDS)
+framework. These correlated calls appear in object oriented languages when a
+method invocation can use different implementations depending on the actual type
+of the object during execution. The proposed approach transforms an IFDS problem
+into an Interprocedural Distribute Environment (IDE) problem, that can be solved
+efficiently. The authors propose two different IFDS-to-IDE translations: the
+equivalent transformation, which does not produce any precision gain with
+respect to the original IFDS problem, and the correlated-calls transformation,
+whose solution can be more precise because it excludes flow along unfeasible paths
+due to correlated paths. The solution obtained for the transformed IDE problem
+can be translated back to a solution in the space of the IFDS framework. In
+addition to the formalization of both translations, the paper also contains
+theoretical results proving the soundness and precision of their translation, as
+well as results about the efficiency of the whole analysis.
+
+The paper is clear, well-structured and well-written. The authors do a good job
+motivating the paper and illustrating the importance of the correlated calls in
+a simple but engaging example of taint analysis. The figures are also very
+helpful. Although the paper addresses several complex technical notions they are
+adequately explained and it is easy to follow.
+
+I consider that the work is a good research paper, showing useful results in the
+field of data flow analysis. However I have some minor criticisms and comments
+about the paper, sorted by importance:
+
+* Page 14, Section 4.7:
+  I would recommend to move Table 2 from the Appendix to Section 4.7, as it is
+  very clear and reinforce the authors' efficiency arguments. However, I do not
+  see the point of comparing the analysis using t-equiv to the analysis using
+  t-c-c (this comment is related to the next one). As the analysis using t-equiv
+  is equivalent to the original IDFS problem, the authors should measure the runtime
+  of the original IFDS analysis. Is the t-equiv analysis faster than the
+  original IFDS taint analysis?
+
+  On the other hand, I really miss some numbers in Table 2 about the precision
+  gain. How many false positives are discarded in each program? The approach
+  is proven to be "strictly not less precise", but it is important to know
+  in some examples if the actual precision gain is worthwhile compared to the
+  increment in run time. I know that these results would be valid only for the
+  taint analysis example and the translation-based approach is more general, but
+  even so I think that this information would be interesting.
+
+
+* Section 4:
+  I cannot see the significance of the equivalence transformation t-equiv.
+  According to the paper "If the equivalence transformation was used, then this
+  solution is identical to the solution that would be computed by the IFDS
+  algorithm for the original IFDS problem." Why does a transformation from IFDS
+  to IDE that does not produce any precision gain could be interesting? The
+  authors should include a clear motivation of this translation, or remove it
+  otherwise.
+
+
+* Page 13, Section 4.4 and 4.5:
+  The statements of Lemma 4, Lemma 5 and Lemma 6 use some elements that are not
+  explained. For example Lemma 4 introduces an execution path "p" but it uses
+  also upper-case "P". I suppose that "P" is the related IFDS problem, but it
+  should be explicitly stated. The same for T_R^{cc}.
+
+
+* Page 11, Definition 1:
+  It is difficult to read the different conditions of the \epsilon_S
+  micro-function for the cases #3 and #4. There should be some space between
+  them.
+
+
+* Page 2:
+    "Section 4 presents the correlated-calls transformation, sketches a proof of
+    its correctness, 3 and discusses our implementation."
+  Section 4 does not sketch any proof of the theoretical results, they are only
+  stated there. The complete proofs are in the appendix.
+
+
+In summary, the paper provides and interesting and sound approach based on
+IFDS-to-IDE translation to improve the precision of data flow analysis, and
+presents it in a clear way. It is a good candidate to appear in the symposium.
+

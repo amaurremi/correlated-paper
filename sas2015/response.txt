@@ -1,0 +1,14 @@
+We thank the reviewers for their insightful and helpful comments. 
+
+Reviewer 1 asks two important questions: why we are comparing the correlated-calls (CC) analysis to the equivalence-IDE analysis, and why do we not compare the CC analysis to the IFDS analysis instead. 
+We will emphasize in the revised version that the equivalence analysis is there for two reasons: 
+i) to explain how a CC-IDE problem can be derived from an IDE problem that has the same meaning as the original IFDS problem; 
+ii) to provide a base line against which to compare the efficiency of the CC analysis. 
+We compare the efficiency of the CC-analysis against the equivalence-IDE analysis instead of the IFDS analysis because the time complexities of an IFDS and an equivalent IDE analysis are the same: an equivalent IDE analysis is just an IFDS analysis in which all edges are labeled with identity micro functions, and all operations on those functions are optimized to be constant-time. We will also add this clarification to Section 4.7. 
+
+Reviewer 1 mentions that in Table 2, it would be useful to include numbers to reflect the exact precision improvement of the correlated-calls analysis. As we discussed in Section 4.7, for the particular combination of taint analysis and the SPEC JVM’97 benchmarks, we did not observe a gain in precision. These numbers were presented to show that the running time of the analysis is reasonable. Reviewer 1 also suggests moving Table 2 to Section 4.7; we will do so if space permits. 
+
+Reviewer 2 points out interesting related work by Isil Dillig on data-flow analysis that handles missing libraries. We will read and address this work in the Related Work section. We will also revise that section to include a more detailed comparison to context sensitivity, as Reviewer 3 requests, in particular related to the Cartesian Product Algorithm. 
+
+Reviewer 1 and 3 made several insightful suggestions to improve the readability of the paper. We will address minor issues (clarifications, notation, and formatting) in the revised version.
+
