@@ -46,8 +46,12 @@
 \input{content/related}
 \input{content/concl}
 
+\vspace{1.2cm}
 \bibliographystyle{plain}
+\begingroup
+\let\clearpage\relax
 \bibliography{bib/ref}
+\endgroup
 
 \techreport{\newpage\input{content/appendix.tex}}
 \end{document}
