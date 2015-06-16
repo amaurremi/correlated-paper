@@ -496,7 +496,7 @@ $\denote{\setpair{I}{U}} = \lambda m\,.\,\lambda r\,.\,(m(r) \cap I(r)) \cup U(r
 All of the basic micro-functions defined in Definition~\ref{def:microfn} can be expressed
 in this representation. The following lemmas show how function comparison, composition, and meet can be implemented using basic set operations
 on $I$ and $U$.
-The proofs of all of the lemmas and theorems are in the Appendix.
+The proofs of all of the lemmas and theorems are in the \reportOrAppendix.
 
 %The implementation of function application follows directly from the definition of
 %the representation: $\setpair{I}{U}(m) = \lambda r\,.\,(m(r) \cap I(r)) \cup U(r)$.
@@ -676,16 +676,14 @@ it produces more precise results in the presence of correlated calls as expected
 
 To evaluate the practicality of our approach, we applied two variants of the IFDS taint analysis
 to the SPEC JVM98 benchmarks: 
-\begin{enumerate}[(i)]
-	\item an equivalent IDE taint analysis obtained using $\transEq$, and
-	\item an IDE taint analysis obtained using   $\transCC_\rcc$ that avoids imprecision due to correlated method
+(i) an equivalent IDE taint analysis obtained using $\transEq$, and
+(ii) an IDE taint analysis obtained using   $\transCC_\rcc$ that avoids imprecision due to correlated method
 calls.
-\end{enumerate}
+
 The equivalence analysis is there for two reasons: 
-\begin{enumerate}[(i)]
-	\item  to explain how a correlated-calls-IDE problem can be derived from an IDE problem that has the same meaning as the original IFDS problem; 
-	\item (ii) to provide a base line against which to compare the efficiency of the correlated-calls analysis.
-\end{enumerate}
+(i)  to explain how a correlated-calls-IDE problem can be derived from an IDE problem that has the same meaning as the original IFDS problem, and 
+(ii) to provide a base line against which to compare the efficiency of the correlated-calls analysis.
+
 We compare the efficiency of the correlated-calls analysis against the equivalence-IDE analysis instead of the IFDS analysis because the time complexities of an IFDS and an equivalent IDE analysis are the same: an equivalent IDE analysis is just an IFDS analysis in which all edges are labeled with identity micro functions, and all operations on those functions are optimized to be constant-time.
 
 The running times $t_\Subset$ of the correlated-calls and $t_\equiv$ equivalence analyses are shown in Table~\ref{tab:runtimes}. In the table, $N^*_r$ is the number of reachable nodes in the control-flow supergraph, and $N^\#_r$ the number of reachable nodes in the exploded supergraph.

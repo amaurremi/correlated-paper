@@ -2,7 +2,7 @@
 <!-- ANT script to create PDF file from LaTeX sources -->
 
 	<target name="clean">
-		<property name="mainfile" value="main" />
+		<property name="mainfile" value="paper" />
 		<property name="destdir" value="." />
 		<property name="texloc" value="/usr/texbin/"/>
 		<property name="bibtex.repo" value="."/> 
