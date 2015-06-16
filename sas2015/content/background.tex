@@ -190,7 +190,7 @@ with a \textit{micro-function}, which is a function from $L$ to $L$.
 Thanks to distributivity, every environment transformer 
 $t : \textsf{Env}(D,L) \to \textsf{Env}(D,L)$
 can be decomposed into its effect on $\top_{\textsf{Env}}$ and on a set of environments $\top_{\textsf{Env}}[d_i\to l]$
-that map every element to $\top$ except one ($d_i$):
+that map every element to $\top$ except one ($d_i$). Formally,
 \[
     t(m)(d_j) = \lambda l. t(\top_{\textsf{Env}})(d_j) \sqcap \bigsqcap_{d_i\in D} \lambda l. t(\top_{\textsf{Env}}[d_i\to l])(d_j).
 \]
@@ -209,10 +209,10 @@ equivalent to an edge with micro-function $\lambda l.\top$.
     micro-function. The micro-functions on the three edges from
     the node \verb+return secret()+ to the node $\texttt{end}_\texttt{A.foo}$
     together represent the environment transformer 
-    $\lambda e.e[r \to \lambda m.\bot \sqcap \lambda m.m]$.
+    $\lambda e.e[\texttt{ret} \to \lambda m.\bot \sqcap \lambda m.m]$.
 
     To eliminate infeasible paths due to correlated calls, we encode the taint
-    analysis using environments $\textsf{Env}(D,L)$, where $D$ is the set of
+    analysis using environments $e\in\textsf{Env}(D,L)$, where $D$ is the set of
     variables and $L$ is a map from receiver variables to sets of possible
     types. The interpretation of such an environment $e$ is that a given variable
     $v \in D$ may contain a secret value in an execution in which the runtime

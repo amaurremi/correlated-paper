@@ -352,8 +352,10 @@ an IFDS solution as:
 In the correlated-calls transformation lattice $\lcc$, a map that maps any receiver
 to the empty set of possible types means that the corresponding data-flow path is
 infeasible. Therefore, an IDE solution $\rho$ computed using
-$\transCC_S$ is converted to an IFDS solution as:
-$\backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)(r)\neq\top_T\}$.
+$\transCC_S$ is converted to an IFDS solution as
+\begin{equation}
+	\backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)(r)\neq\top_T\}.\label{eq:transCcDef}
+\end{equation}
 
 %a result $\rho=\resultIDE(\transCC _S(P))$ of the correlated-calls IDE analysis is
 %converted to an IFDS result as follows:
@@ -673,9 +675,18 @@ the absence of correlated calls, the analysis produces the same results as an IF
 it produces more precise results in the presence of correlated calls as expected.
 
 To evaluate the practicality of our approach, we applied two variants of the IFDS taint analysis
-to the SPEC JVM98 benchmarks: (i) an equivalent IDE taint analysis obtained using $\transEq$, and (ii)
-an IDE taint analysis obtained using   $\transCC_\rcc$ that avoids imprecision due to correlated method
+to the SPEC JVM98 benchmarks: 
+\begin{enumerate}[(i)]
+	\item an equivalent IDE taint analysis obtained using $\transEq$, and
+	\item an IDE taint analysis obtained using   $\transCC_\rcc$ that avoids imprecision due to correlated method
 calls.
+\end{enumerate}
+The equivalence analysis is there for two reasons: 
+\begin{enumerate}[(i)]
+	\item  to explain how a correlated-calls-IDE problem can be derived from an IDE problem that has the same meaning as the original IFDS problem; 
+	\item (ii) to provide a base line against which to compare the efficiency of the correlated-calls analysis.
+\end{enumerate}
+We compare the efficiency of the correlated-calls analysis against the equivalence-IDE analysis instead of the IFDS analysis because the time complexities of an IFDS and an equivalent IDE analysis are the same: an equivalent IDE analysis is just an IFDS analysis in which all edges are labeled with identity micro functions, and all operations on those functions are optimized to be constant-time.
 
 The running times $t_\Subset$ of the correlated-calls and $t_\equiv$ equivalence analyses are shown in Table~\ref{tab:runtimes}. In the table, $N^*_r$ is the number of reachable nodes in the control-flow supergraph, and $N^\#_r$ the number of reachable nodes in the exploded supergraph.
 \input{tables/runstats}

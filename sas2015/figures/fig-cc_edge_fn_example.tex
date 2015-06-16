@@ -74,7 +74,7 @@
     \node [supergraph_y] (return_secret) [below = \distt of st_a_foo.south west, anchor=west] {\texttt{return secret()}};
     \node [supergraph_y] (end_a_foo) [below = \distt of return_secret.south west,anchor = west] {\textsf{end}$_\texttt{A.foo}$};
     
-    \node [n,label=$r$] (st_a_foo_p) [left=\nd of st_a_foo.west] {};
+    \node [n,label=$\texttt{ret}$] (st_a_foo_p) [left=\nd of st_a_foo.west] {};
     \node [n] (return_secret_p) [left=\nd of return_secret.west] {};
     \node [n] (end_a_foo_p) [left=\nd of end_a_foo.west] {};
     \node [n,label=$\mathbf0$] (st_a_foo_z) [left=\nd of st_a_foo_p] {};
@@ -143,7 +143,7 @@
 }
 \end{tikzpicture}
 \vspace*{-27mm}
-\caption[An example program demonstrating correlated-call edge functions on the $\mathbf0$-node path for Listing~\ref{list:ccexample}]{An example program demonstrating correlated-call edge functions on the $\mathbf0$-node path for Listing~\ref{list:ccexample}. All non-labeled edges are implicitly labeled with identity functions $\id$. The variable $r$ denotes the return value of the \texttt{A.foo} method.}%
+\caption[An example program demonstrating correlated-call edge functions on the $\mathbf0$-node path for Listing~\ref{list:ccexample}]{An example program demonstrating correlated-call edge functions on the $\mathbf0$-node path for Listing~\ref{list:ccexample}. All non-labeled edges are implicitly labeled with identity functions $\id$. The variable $\texttt{ret}$ denotes the return value of the \texttt{A.foo} method.}%
   \label{fig:cc_edgefn_example}%  
 \end{minipage}
 \end{figure} 
