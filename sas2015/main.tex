@@ -46,8 +46,12 @@
 \input{content/related}
 \input{content/concl}
 
-\vspace{1.2cm}
-\bibliographystyle{plain}
+\vspace{.8cm}
+\makeatletter
+\patchcmd{\@makeschapterhead}{\vskip40}{\vskip10}{}{}
+\makeatother
+
+\bibliographystyle{myplain}
 \begingroup
 \let\clearpage\relax
 \bibliography{bib/ref}

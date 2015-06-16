@@ -664,9 +664,9 @@ in Java.
 We use WALA~\cite{fink2012wala} to retrieve information about an input program, such 
 as its control-flow supergraph and the set of receivers and their types.
 Since WALA does not contain an implementation of the IDE algorithm,
-we implemented it from scratch.
-We will submit our implementation to the artifact evaluation committee, and are also 
-working on contributing our infrastructure to WALA. 
+we implemented it from scratch;
+%We will submit our implementation to the artifact evaluation committee, 
+we are working on contributing our infrastructure to WALA. 
  
 We tested our correlated-calls analysis using an IFDS taint-analysis  
 as a client analysis. To this end, we converted the IFDS taint analysis into an IDE problem with an 
@@ -682,9 +682,9 @@ calls.
 
 The equivalence analysis is there for two reasons: 
 (i)  to explain how a correlated-calls-IDE problem can be derived from an IDE problem that has the same meaning as the original IFDS problem, and 
-(ii) to provide a base line against which to compare the efficiency of the correlated-calls analysis.
-
+(ii) to provide a base line against which to compare the efficiency of the correlated-calls analysis\footnote{
 We compare the efficiency of the correlated-calls analysis against the equivalence-IDE analysis instead of the IFDS analysis because the time complexities of an IFDS and an equivalent IDE analysis are the same: an equivalent IDE analysis is just an IFDS analysis in which all edges are labeled with identity micro functions, and all operations on those functions are optimized to be constant-time.
+}.
 
 The running times $t_\Subset$ of the correlated-calls and $t_\equiv$ equivalence analyses are shown in Table~\ref{tab:runtimes}. In the table, $N^*_r$ is the number of reachable nodes in the control-flow supergraph, and $N^\#_r$ the number of reachable nodes in the exploded supergraph.
 \input{tables/runstats}
@@ -699,10 +699,3 @@ optimization remain.
 %and that our technique may be worthwhile in other scenarios.  
 For the specific combination of this IFDS client analysis and these benchmark
 programs, tracking correlated calls did not impact precision. 
-
- 
-
-
-\commentout{
-The artifact of our implementation can be used to solve any IFDS problem. In the presence of correlated calls, the result of the correlated-calls analysis can be more precise than the result obtained with an IFDS solver.
-}
