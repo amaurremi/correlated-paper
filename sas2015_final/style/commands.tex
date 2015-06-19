@@ -1,17 +1,9 @@
-% brackets for denotations
 \newcommand{\denote}[1]{\left\llbracket#1\right\rrbracket}
-
-%\renewcommand{\theFancyVerbLine}{\sffamily \textcolor[rgb]{0.5,0.5,0.5}{\scriptsize \oldstylenums{\arabic{FancyVerbLine}}}}
 
 \newcommand{\inputMinted}[2]{\lstinputlisting[language=#1]{code/#2}}
 \newcommand{\inputMintedNoLNs}[2]{\lstinputlisting[language=#1,numbers=none]{code/#2}}
 
-%\newcommand{\inputMinted}[2]{\par\inputminted[fontsize=%\footnotesize,linenos=true,bgcolor=white,numberblanklines=false,mathescape,samepage=true]{#1}{code/#2}\\ \ \\}
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
-%%\usemintedstyle{manni}     % comci comca
-%%\usemintedstyle{borland}   % pretty strict style
-%%\usemintedstyle{vim}       % together with fruity and native only with dark bg!
-%\usemintedstyle{bw}         % strict, too
 
 \counterwithout{footnote}{chapter}
 
@@ -36,13 +28,6 @@
 \newlength{\ndd}
 \setlength{\ndd}{.5cm}
 
-%\newtheorem{theorem}{Theorem}[section]
-%\newtheorem{sublemma}[theorem]{Sub-Lemma}
-%\newtheorem{lemma}[theorem]{Lemma}
-%\newtheorem{proposition}[theorem]{Proposition}
-%\newtheorem{corollary}[theorem]{Corollary}
-%\newtheorem{definition}[theorem]{Definition}
-%\newtheorem{example}[theorem]{Example}
 \let\oldexample\example
 \renewcommand{\example}{\oldexample\normalfont}
 
@@ -157,7 +142,5 @@
 \belowdisplayshortskip=0pt
 \abovedisplayskip=0pt
 \belowdisplayskip=0pt
-
-%\input{squishing}
 
 \newcommand{\reportOrAppendix}{\paper{Technical Report~\cite{techrep}}\techreport{Appendix}}
