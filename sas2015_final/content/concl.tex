@@ -1,0 +1,19 @@
+\section{Conclusions}
+  \label{sec:Conclusions}
+  
+Previous algorithms for data-flow analysis are unable to avoid propagating
+data-flow facts along infeasible paths that arise in the presence of
+correlated polymorphic method calls. 
+We present an approach for transforming an IFDS problem into an IDE problem
+in which path feasibility is encoded into functions associated
+with edges in an exploded control-flow supergraph. The solution to this
+IDE problem can be mapped back to the solution space of the original IFDS
+problem, and is more precise for some client programs because data flow along
+infeasible paths is prevented. We present a formalization of the
+transformation, prove its correctness, and briefly report on
+preliminary experiments with our prototype implementation. Full proof
+details are available in the \reportOrAppendix.
+As future work, it is possible to adapt our approach to work on IDE
+problems. We would convert an initial IDE problem into a more complex IDE problem, 
+such that the solution of the latter generates a more precise
+solution to former, by preventing data flow along infeasible paths.

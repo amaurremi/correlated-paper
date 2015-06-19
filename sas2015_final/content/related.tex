@@ -1,0 +1,56 @@
+\section{Related Work}
+  \label{sec:Related}
+The IFDS algorithm is an instance of the functional approach to data-flow analysis developed by Sharir and Pnueli~\cite{pnueli1981two}.
+IFDS has been used to encode a variety of data-flow problems such as typestate analysis~\cite{naeem2008typestate,DBLP:conf/pldi/ZhangMGNY14} and shape analysis%
+~\cite{DBLP:conf/birthday/KreikerRRSWY13}. IFDS has been used~\cite{DBLP:conf/pldi/ArztRFBBKTOM14,tripp2009taj} and extended~\cite{DBLP:conf/sigsoft/LerchHBM14} to solve taint-analysis problems.
+
+Naeem and Lhot\'ak~\cite{naeem2010pei} proposed several extensions of IFDS.
+In particular, they propose several techniques for improving the algorithm's 
+efficiency, as well as a technique that improves expressiveness by extending
+applicability to a wider class of dataflow analysis problems. 
+These extensions are orthogonal to, and could be combined with the approach
+presented in this paper. Our work differs from theirs by targeting
+analysis precision, not efficiency or expressiveness.
+
+Bodden et~al.~\cite{bodden2013spl} presents a framework
+for applying IFDS analyses to software product lines. Their approach enables the analysis of
+all possible products derived from a product line in a single analysis pass. Like our approach,
+their approach transforms IFDS problems to IDE problems. The micro-functions keep track
+of the possible program variations specified by the product line.
+Rodriguez and Lhot\'ak evaluate a parallelized implementation of the IFDS algorithm using actors~\cite{rodriguez2010concurrent} that can take advantage of multiple processors.
+
+The idea of using correlated calls to remove infeasible paths in data-flow analyses of object-oriented programs 
+was introduced by Tip~\cite{DBLP:journals/scp/Tip15}. The possibility of using IDE to achieve this is mentioned, 
+but not elaborated upon. Our work is the first to present and implement a concrete solution.
+
+Recent work on correlation tracking for JavaScript~\cite{DBLP:conf/ecoop/SridharanDCST12} 
+also eliminates infeasible paths. Instead of infeasible paths
+between dynamically dispatched method calls, their approach eliminates
+infeasible paths between reads and writes of different properties
+of an object. 
+The approach differs from ours in that it targets points-to analysis rather
+than IFDS analyses, in that it targets infeasible paths due to different
+property names rather than different dynamically dispatched methods,
+and in that it employs context sensitivity to improve precision.
+
+Our approach superficially resembles, but is orthogonal to, context
+sensitivity, including the CPA algorithm~\cite{Agesen:95} and such variations as object sensitivity~\cite{DBLP:journals/tosem/MilanovaRR05}.
+Context-sensitive
+points-to analysis is orthogonal to our work because it analyzes the
+flow of data (pointers), whereas we analyze control flow paths.
+Also, object-sensitive points-to analysis is flow-insensitive, while
+IFDS and IDE are flow-sensitive analyses. Note that our transformation only makes sense
+in a flow-sensitive setting since a flow-insensitive analysis already
+introduces many infeasible control flow paths.
+
+It would be possible to simulate the effect of our correlated calls
+transformation in the following way inspired by context-sensitivity:
+we could re-analyze each method in a number
+of contexts. There would be a separate context for every possible
+assignment of concrete types to all of the pointers in the method that
+are used as receivers at a call site. The number of such contexts for
+each method would be $O(R^T)$, where $R$ is the number of receiver pointers
+in the method and $T$ is the number of possible concrete types that could
+be assigned to a receiver pointer. Our approach computes equally precise
+analysis results but avoids this exponential cost.
+

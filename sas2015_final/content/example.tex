@@ -1,0 +1,140 @@
+\section{Motivation}
+  \label{sec:MotivatingExample}
+  
+We illustrate our approach using a small example that
+applies our technique to improve the precision of taint analysis.
+A taint analysis computes how string values
+may flow from ``sources'', which are typically statements that read untrusted input, 
+to ``sinks'', which are typically security-sensitive
+operations such as calls to 
+a database. In previous research~\cite{DBLP:conf/issta/GuarnieriPTDTB11,DBLP:conf/pldi/ArztRFBBKTOM14}, 
+taint analysis algorithms have been formulated as IFDS problems.     
+
+\input{figures/fig-examplesupergraph}
+
+Figure~\ref{list:ccexample} shows a small Java program.
+The program
+declares a class \code{A} with a subclass \code{B},  where \code{A} defines methods 
+\code{foo()} and \code{bar()} that are overridden in \code{B}.  
+We assume  that secret values are created by 
+an unspecified function \code{secret()}, which is called in \code{A.foo()} on 
+line~\ref{line:Afoo}. 
+Any write to standard output 
+is assumed to be a sink (e.g., the call to \code{System.out.println()} in \code{B.bar()}).
+Depending on the number of 
+arguments passed to the program, the \code{main()} method of the example program creates 
+either an \code{A}-object or a \code{B}-object. The 
+program then calls \code{foo()} on this object
+on line~\ref{line:callfoo}, which is 
+followed by a call to \code{bar()} on the same object.  
+
+ 
+We wish to answer the following question: Is it possible for the untrusted value 
+that is read on line~\ref{line:Afoo} to flow to the print statement?
+Consider the control-flow
+supergraph for the example program that is shown in Figure~\ref{fig:examplesupergraph}.
+ The nodes in this graph correspond to statements, method entry points (start nodes) and 
+method exit points (end nodes). For each method call, the graph contains a 
+distinct call-node and a return-node. Edges in the graph reflect intraprocedural control flow, 
+flow of control from a caller to a callee (edges from call-nodes to start-nodes), or
+flow of control from a callee back to a caller (edges from end-nodes to return-nodes). 
+
+In our example, the control flow within each method is straightforward and
+all interesting issues arise from interprocedural control flow. In particular,
+since  \code{a} may point to either an \code{A}-object or a \code{B}-object, 
+the call on line~\ref{line:callfoo} may dispatch to either \code{A.foo()} or to \code{B.foo()},
+as is reflected by edges  
+  from the node labeled $\highlight{\code{call}_\code{foo}}{greyblue}$ to the nodes labeled
+  $\highlight{\code{start}_\code{A.foo()}}{bisque}$ and $\highlight{\code{start}_\code{B.foo()}}{lightsalmonpink}$
+and by edges
+  from the nodes labeled $\highlight{\code{end}_\code{A.foo}}{bisque}$ and $\highlight{\code{end}_\code{B.foo}}{lightsalmonpink}$ 
+  to the node labeled  $\highlight{\code{return}_\code{foo}}{greyblue}$.  
+Similarly, there are edges from the node labeled $\highlight{\code{call}_\code{bar}}{greyblue}$ to the nodes 
+$\highlight{\code{start}_\code{A.bar()}}{bisque}$ and $\highlight{\code{start}_\code{B.bar()}}{lightsalmonpink}$, and 
+edges
+  from the nodes labeled $\highlight{\code{end}_\code{A.bar}}{bisque}$ and $\highlight{\code{end}_\code{B.bar}}{lightsalmonpink}$ 
+  to the node labeled  $\highlight{\code{return}_\code{bar}}{greyblue}$. 
+
+ 
+ 
+An IFDS analysis propagates data-flow facts along the edges
+of a control flow supergraph such as the one in Figure~\ref{fig:examplesupergraph}. The
+IFDS algorithm already avoids flow along infeasible paths from one call site, through a target method,
+and returning to a different call site of the target method.
+However, in this example, all methods are
+called in exactly one place, so IFDS is unable to eliminate data flow along any of the
+paths shown in the figure. As a result, IFDS-based taint analysis algorithms such as
+\cite{DBLP:conf/issta/GuarnieriPTDTB11,DBLP:conf/pldi/ArztRFBBKTOM14} would report 
+that the secret value read on line~\ref{line:Afoo}
+might flow to the print statement on line~\ref{line:Bbar}. 
+
+As we discussed previously, the calls to \code{foo()} and \code{bar()} may dispatch
+to the implementations in classes \code{A} and \code{B}, 
+because the receiver variable \code{a} may be bound to
+ objects of type \code{A} or \code{B} at run time. 
+However, the methods \code{foo()} and \code{bar()} are invoked
+on \textit{the same object}. Thus the behaviours of the method calls
+are \textit{correlated}: if the call to \code{foo()} dispatches to \code{A.foo()},
+then the call to \code{bar()} must dispatch to \code{A.bar()}, and analogously
+for \code{B.foo()} and \code{B.bar()}.
+Consequently, paths such as the one shown in bold in
+Figure~\ref{fig:examplesupergraph} where the calls dispatch to
+\code{A.foo()} and \code{B.bar()}
+are infeasible.  
+
+Our main contribution is an algorithm for transforming an IFDS problem 
+into an IDE problem that expresses the feasibility of paths
+in light of correlated calls.
+The approach associates with each interprocedural CFG edge 
+a function that records the types of 
+variables that are used as the receiver of correlated method calls. Paths that 
+are composed of edges in which the same receiver expression has different types
+are infeasible, and the propagation of data-flow facts along such paths is
+prevented. Applying our technique to an IFDS-based taint analysis would enable
+the resulting IDE-based taint analysis to determine that no secret value can flow from
+line~\ref{line:Afoo} to the print statement on line~\ref{line:Bbar}. 
+
+While the discussion in this section has focused on the specific problem of taint analysis,
+our technique generally applies to \textit{any}
+data-flow-analysis problem that can be expressed in the IFDS framework. This includes
+many common analysis tasks such as reaching definitions, constant propagation, slicing,
+typestate analysis, pointer analysis, and lightweight
+shape analysis.
+
+\subsection{Occurrences of Correlated Calls}\label{sec:occur}\vspace{-.5mm}
+How often do correlated calls occur in practice? To assess the benefit of the correlated-calls analysis, we counted the number of correlated calls that occur in programs of the Dacapo benchmarks~\cite{blackburn2006dacapo}, using the WALA framework~\cite{fink2012wala}.
+Our goal was to obtain an upper bound on the number of redundant IFDS-result nodes that could be potentially removed by our analysis. The results are shown in\techreport{ Table~\ref{tab:dacapostat} in } the~\reportOrAppendix.
+
+In these programs, on average, 3\% of all call sites $C$ are polymorphic call sites $C_P$.
+Out of these polymorphic call sites, a significant fraction (39\%) are correlated 
+call sites $C^\Subset$. We also see that, on average,  each correlated-call receiver is involved in approximately
+three correlated calls. 
+
+\subsection{An Example from the Scala Collections Library}\label{sec:collex}
+The Scala collections library contains the trait \code{TraversableOnce} that is
+shared by both collections and iterators over them. 
+The \code{toArray} method of this trait
+creates an array and copies the contents of the collection or iterator into it:
+\inputMintedNoLNs{scala}{collectionsExample.scala}
+When \code{this} refers to an iterator rather than a collection, the call to \code{this.size}
+extracts all elements of the iterator to count them.
+ At the call to \code{copyToArray},
+the iterator is already empty, so nothing is copied to the newly created array.
+One could design an IFDS analysis to detect this kind of bug.
+
+However, the implementation of \code{TraversableOnce.toArray} is actually correct because the above
+code is guarded with a test: \code{if (this.isTraversableAgain) ...}
+When the \code{isTraversableAgain} method returns false, as it does for
+an iterator, the \code{toArray} method uses a different
+(less efficient) implementation. The bug report would therefore be a false positive. 
+The \code{isTraversableAgain} method is easy to analyze: it returns the constant
+true in a collection and the constant false in an iterator. However, in order
+to eliminate the false positive bug report, an analysis would need to rule out infeasible
+paths using correlated calls. Specifically, the following path triggers the bug, but
+is infeasible: first, call \code{isTraversableAgain} on a collection, returning
+true, then call \code{size} and \code{copyToArray} on an iterator. Our correlated
+calls analysis could determine that this path is infeasible because it calls the
+collection version of \code{isTraversableAgain} but the iterator versions of
+\code{size} and \code{copyToArray}.
+The relevant code from \textsf{TraversableOnce} and other related traits is shown
+\techreport{in Figure~\ref{fig:traversableonce} }in the \reportOrAppendix.

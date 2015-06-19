@@ -1,0 +1,36 @@
+\begin{figure}
+  \centering
+    \tikzset{
+  ashadow/.style={opacity=.25, shadow xshift=0.07, shadow yshift=-0.07},
+}
+  \tikzstyle{problem}=[fill=greyblue,text width=1.8cm,rounded corners,font=\scriptsize,text=charcoal,drop shadow={ashadow, color=greyblue}]
+  \tikzstyle{result}=[fill=bisque,text width=1.5cm,rounded corners,font=\scriptsize,text=charcoal,drop shadow={ashadow, color=greyblue}]
+\begin{tikzpicture}
+    \node [problem]
+      (ifds) {IFDS problem};
+    \node [problem]
+      (equiv) [above right=0.5cm and .7\dist of ifds.east] {Equivalence-IDE problem};
+    \node [problem]
+      (ccide)[below=2cm of equiv.west, anchor=west] {Correlated-calls IDE problem};
+    \node [result]
+      (equivres) [right=\dist of equiv.east] {Equivalence-IDE result};
+    \node [result]
+      (ccres) [below=2cm of equivres.west,anchor=west] {Correlated-calls IDE result};
+    \node [result,text height=1.5cm,text width=2cm]
+      (ifdsres) [below right=0cm and \dist of equivres.east] {};
+    \node [below,font=\scriptsize] at (ifdsres.north) {IFDS result};
+    \node [rounded corners,font=\scriptsize,text width=1.5cm,fill=lightsalmonpink,text=charcoal]
+      (improved) [above right=.6cm and (\dist+.3cm) of ccres.east] {Improved IFDS result};
+    
+    \path[->] (equivres) edge[out=0,in=150] node[above,font=\scriptsize]{$\backEq$} (ifdsres);
+    \path[->] (ccres) edge[out=0,in=230] node[above left,font=\scriptsize] {$\backCC$} (improved);
+    %\path[->] (ccres) edge[out=25,in=210] node[above,font=\scriptsize] {$\backEq$} (ifdsres);
+    \path[->] (ifds) edge[out=43,in=183] node[above,font=\scriptsize] {$\transEq$} (equiv);
+    \path[->] (ifds) edge[out=-45,in=173] node[below,font=\scriptsize] {$\transCC$} (ccide);
+    \path[->] (equiv) edge node[above,font=\scriptsize]{$\resultIDE$} (equivres);
+    \path[->] (ccide) edge node[above,font=\scriptsize]{$\resultIDE$} (ccres);
+    \path[->,dashed] (ifds) edge[out=-3,in=183] node[above,font=\scriptsize]{$\resultIFDS$} (ifdsres);
+\end{tikzpicture}
+  \caption{Transformations between IFDS and IDE problems and their results}%
+  \label{fig:transformations}%
+\end{figure}

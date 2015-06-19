@@ -1,0 +1,57 @@
+\section{Introduction}
+
+A control-flow graph (CFG) is an over-approximation of the possible flows 
+of control in concrete executions of a program. It may contain \textit{infeasible} 
+paths that cannot occur at runtime. The precision of a data-flow analysis algorithm
+depends on its ability to detect and disregard such infeasible paths.
+The \textit{Interprocedural Finite Distributive Subset} (IFDS) algorithm~\cite{reps1995precise}
+is a general data-flow analysis algorithm that 
+avoids infeasible interprocedural paths in which calls 
+and returns to/from functions are not properly matched. 
+The \textit{Interprocedural Distributive Environment} (IDE) algorithm~\cite{sagiv1996precise}
+has the same property, but
+supports a broader range of data-flow problems.
+
+This paper presents an approach to data-flow analysis that avoids a type
+of infeasible path that arises in object-oriented programs when two or more
+methods are dynamically dispatched on the same receiver object.
+If the
+method calls are polymorphic
+(i.e., the method invoked depends on the run-time type of the receiver),
+then their dispatch 
+behaviours are correlated, and some of the paths between them are infeasible. A recent paper~\cite{DBLP:journals/scp/Tip15} made this observation
+but did not present any concrete algorithm to take advantage of it.
+
+
+Our approach transforms an IFDS problem into an
+IDE problem that precisely accounts for infeasible paths due to correlated calls. 
+The results of this IDE problem can be mapped back to the data-flow domain of the 
+original IFDS problem, but are more precise than the results of directly applying
+the IFDS algorithm to the original problem.
+We present a formalization of the transformation and prove its correctness:
+specifically, we prove it still soundly considers all paths that are feasible,
+and that it avoids flow along all paths that are infeasible due to
+correlated calls.
+
+We implemented the correlated-calls transformation and the IDE algorithm in Scala,
+on top of the WALA framework for static analysis of JVM bytecode~\cite{fink2012wala}.
+Our prototype implementation was tested extensively by using it to transform an IFDS-based 
+taint analysis into a more precise IDE-based taint analysis, and applying the latter
+to small example programs with correlated calls. Our prototype along with all tests
+will be made available to the artifact evaluation committee.
+
+
+The remainder of this paper is organized as follows.
+Section~\ref{sec:MotivatingExample} presents a motivating example.
+Section~\ref{sec:bg} reviews the IFDS and IDE algorithms.
+Section~\ref{sec:cca} presents the correlated-calls transformation, 
+states the correctness properties%
+\footnote{
+  Detailed proofs of our lemmas and theorems can be found in
+  the \reportOrAppendix.
+}, and discusses our implementation.
+Related work is discussed in Section~\ref{sec:Related}.
+Finally, Section~\ref{sec:Conclusions} presents conclusions and directions for future work.
+
+ 
+ 

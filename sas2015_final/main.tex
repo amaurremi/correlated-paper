@@ -1,0 +1,58 @@
+\usepackage{style/packages} 
+
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\keywordname\enspace\ignorespaces#1}
+
+\begin{document}
+
+\input{style/commands}
+
+\pagenumbering{gobble}
+\listoftodos[Overview of Comments]
+
+\mainmatter
+
+\title{Precise Data Flow Analysis\\in the Presence of Correlated Method Calls\footnote{This research was supported by the Natural Sciences and Engineering Research Council of Canada and the Ontario Ministry of Research and Innovation.}}
+\titlerunning{Data Flow Analysis in the Presence of Correlated Calls}
+\techreport{\subtitle{David R. Cheriton School of Computer Science Technical Report CS-2015-07}}
+
+\author{
+ Marianna Rapoport\inst{1} \and
+ Ond\v{r}ej Lhot\'ak\inst{1} \and
+ Frank Tip\inst{2}
+}
+\institute{
+ University of Waterloo\\
+ \email{ \{mrapoport, olhotak\}@uwaterloo.ca }
+  \and
+ Samsung Research America\\
+ \email{ ftip@samsung.com  }
+}
+
+\pagenumbering{arabic}
+
+\toctitle{Data Flow Analysis in the Presence of Correlated Calls}
+
+\maketitle
+
+\input{content/abstract}
+\input{content/intro}
+\input{content/example}
+\input{content/background}
+\input{content/impl}
+\input{content/related}
+\input{content/concl}
+
+\vspace{.8cm}
+\makeatletter
+\patchcmd{\@makeschapterhead}{\vskip40}{\vskip10}{}{}
+\makeatother
+
+\bibliographystyle{myplain}
+\begingroup
+\let\clearpage\relax
+\bibliography{bib/ref}
+\endgroup
+
+\techreport{\newpage\input{content/appendix.tex}}
+\end{document}
