@@ -353,7 +353,7 @@ In the correlated-calls transformation lattice $\lcc$, a map that maps any recei
 to the empty set of possible types means that the corresponding data-flow path is
 infeasible. Therefore, an IDE solution $\rho$ computed using
 $\transCC_S$ is converted to an IFDS solution as
-\vspace{-.4cm}
+\paper{\vspace{-.4cm}}
 \begin{equation}
 	\backCC(\rho) = \lambda n.\{d\mid\forall r\in S\,.\,\rho(n)(d)(r)\neq\top_T\}.\label{eq:transCcDef}
 \end{equation}
@@ -689,7 +689,7 @@ We compare the efficiency of the correlated-calls analysis against the equivalen
 %}
 
 The running times $t_\Subset$ of the correlated-calls and $t_\equiv$ equivalence analyses are shown in Table~\ref{tab:runtimes}. In the table, $N^*_r$ is the number of reachable nodes in the control-flow supergraph, and $N^\#_r$ the number of reachable nodes in the exploded supergraph.
-\vspace{-.7cm}
+\paper{\vspace{-.7cm}}
 \input{tables/runstats}
 
 The results suggest that the overhead of tracking correlated calls is acceptable. In particular, the correlated-calls analysis takes at most twice as long as the equivalence analysis.
