@@ -1,7 +1,3 @@
-\documentclass[runningheads,a4paper]{llncs}
-
-\newcommand{\paper}[1]{#1}
-\newcommand{\techreport}[1]{}
 \usepackage{style/packages} 
 
 \newcommand{\keywords}[1]{\par\addvspace\baselineskip
@@ -12,9 +8,8 @@
 \input{style/commands}
 
 \pagenumbering{gobble}
-\listoftodos[Overview of Comments]
 
-\mainmatter  % start of an individual contribution
+\mainmatter
 
 \title{Precise Data Flow Analysis\\in the Presence of Correlated Method Calls\footnote{This research was supported by the Natural Sciences and Engineering Research Council of Canada and the Ontario Ministry of Research and Innovation.}}
 \titlerunning{Data Flow Analysis in the Presence of Correlated Calls}
@@ -33,12 +28,10 @@
  \email{ ftip@samsung.com  }
 }
 
-%\author{\institute{}}
-
 \pagenumbering{arabic}
 
 \toctitle{Data Flow Analysis in the Presence of Correlated Calls}
-%\tocauthor{Authors' Instructions} % TODO
+
 \maketitle
 
 \input{content/abstract}
@@ -46,8 +39,6 @@
 \input{content/example}
 \input{content/background}
 \input{content/impl}
-%\input{content/old/datastr}
-%\input{content/old/eval}
 \input{content/related}
 \input{content/concl}
 
